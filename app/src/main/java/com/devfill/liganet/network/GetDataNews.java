@@ -33,8 +33,13 @@ public class GetDataNews extends AsyncTask<String, Void, ArticleNews> {
     protected ArticleNews doInBackground(String... params) {
 
         ArticleNews articleNews = null;
-        //List<ArticleNews> listNews = new ArrayList<>();
-        Log.d(LOG_TAG, "params = " + params[0]);
+        String imgUrl;
+        String title;
+        String annotationStr;
+        String dateStr ;
+        String textStr;
+
+        Log.d(LOG_TAG, "params 0 = " + params[0]);
 
         Document doc = null;    //Здесь хранится будет разобранный html документ
 
@@ -47,7 +52,7 @@ public class GetDataNews extends AsyncTask<String, Void, ArticleNews> {
         }
 
         //Если всё считалось, что вытаскиваем из считанного html документа заголовок
-        if (doc!=null){
+        if (doc!=null && !params[1].equals("img")){
 
 
             Elements news_content = doc.select("div.news_content");
@@ -59,41 +64,45 @@ public class GetDataNews extends AsyncTask<String, Void, ArticleNews> {
 
             Elements img = news_content.select("div.img");
             Elements image = img.select("img");
-            String imgUrl = "http://news.liga.net" + image.attr("src");
-            String title = h1Tag.text();
-            String annotationStr = annotation.text();
-            String dateStr = date.text();
-            String textStr = text.text();
+            imgUrl = "http://news.liga.net" + image.attr("src");
+            title = h1Tag.text();
+            annotationStr = annotation.text();
+            dateStr = date.text();
+            textStr = text.text();
 
+            if(dateStr == ""){
 
-            Log.d(LOG_TAG,"h1Tag " + h1Tag.text());
-            Log.d(LOG_TAG,"date " + date.text());
-            Log.d(LOG_TAG,"annotation " + annotation.text());
-            Log.d(LOG_TAG,"text " + text.text());
+                Log.d(LOG_TAG,"Другой тип статьи ");
+
+                Elements mH1Tag = doc.select("h1");
+                Elements mText = doc.select("div.text");
+                Elements mImg = doc.select("div.img");
+                Elements mImage = mImg.select("img");
+                Elements mAnnotation = doc.select("div.annotation");
+                Elements mDate = doc.select("div.date");
+
+                imgUrl = params[2] + mImage.attr("src");
+                title = mH1Tag.text();
+                annotationStr = mAnnotation.text();
+                dateStr = mDate.text();
+                textStr = mText.text();
+            }
+
+            Log.d(LOG_TAG,"h1Tag " + title);
+            Log.d(LOG_TAG,"date " + dateStr);
+            Log.d(LOG_TAG,"annotation " + annotationStr);
+            Log.d(LOG_TAG,"text " + textStr);
             Log.d(LOG_TAG,"imgUrl " + imgUrl);
+            articleNews = new ArticleNews(imgUrl,textStr,annotationStr,textStr,dateStr,params[3]);
 
+        }
+        else if(params[1].equals("img")){
 
-            articleNews = new ArticleNews(imgUrl,textStr,annotationStr,textStr,dateStr);
-           // listNews.add(articleNews);
-
-            /*Element all_news = doc.select("div.articles-list").first();     //достаем все дивы с новыми новостями
-
-            Elements ul = doc.select("div.articles-list > ul");
-            Elements li = ul.select("li"); // select all li from ul
-
-            for(int i = 0; i < li.size(); i++){                       //проходимся по массиву новостей
-
-                Elements date = li.get(i).select("div.date"); //достаем дату из дива
-                Element title = li.get(i).select("div.title").first();
-
-                Elements link = title.select("a");
-                String linkHref = link.attr("href");
-                Element t_link = title.child(0);
-
-                News news = new News(date.text(),t_link.text());
-                listNews.add(news);
-
-            }*/
+            Elements img = doc.select("div.img");
+            Elements image = img.select("img");
+            imgUrl = params[2] + image.attr("src");
+            Log.d(LOG_TAG,"Достаем только ссылку на картинку imgUrl " + imgUrl);
+            articleNews = new ArticleNews(imgUrl,"","","","",params[3]);
         }
         else
             text = "Ошибка";

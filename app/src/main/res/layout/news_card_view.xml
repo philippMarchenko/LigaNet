@@ -20,28 +20,36 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <TextView
-                    android:text="12:00"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:id="@+id/time_news"
-                    android:layout_marginStart="20dp"
-                    android:textStyle="normal|italic"
-                    android:layout_alignParentTop="true"
-                    android:layout_alignParentStart="true" />
+            <ImageView
+                android:layout_height="100dp"
+                app:srcCompat="?attr/selectableItemBackground"
+                android:layout_centerVertical="true"
+                android:layout_alignStart="@+id/card_view_all_news"
+                android:id="@+id/image_all_news"
+                android:layout_marginStart="5dp"
+                android:layout_width="120dp" />
 
             <TextView
                 android:text="Моя новость"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/title_news"
-                android:textSize="18sp"
-                android:textStyle="normal|bold"
+                android:textSize="16sp"
+                android:layout_marginStart="10dp"
+                android:layout_toEndOf="@+id/image_all_news"
                 android:layout_marginTop="5dp"
-                android:layout_marginStart="20dp"
-                android:layout_below="@+id/time_news"
-                android:layout_alignParentStart="true" />
+                android:layout_marginEnd="5dp" />
+
+            <TextView
+                    android:text="12:00"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                android:id="@+id/time_news"
+                android:textStyle="normal|italic"
+                android:textSize="12sp"
+                android:textColor="@android:color/darker_gray"
+                android:layout_alignBottom="@+id/image_all_news"
+                android:layout_alignStart="@+id/title_news" />
         </RelativeLayout>
 
     </android.support.v7.widget.CardView>

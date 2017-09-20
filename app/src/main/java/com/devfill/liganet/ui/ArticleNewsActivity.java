@@ -6,11 +6,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.URLUtil;
 import android.widget.TextView;
 
 import com.devfill.liganet.R;
 import com.devfill.liganet.model.ArticleNews;
 import com.devfill.liganet.network.GetDataNews;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class ArticleNewsActivity extends AppCompatActivity implements GetDataNews.IGetDataNewsListener{
 
@@ -24,6 +28,8 @@ public class ArticleNewsActivity extends AppCompatActivity implements GetDataNew
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_article_news);
 
+        URL url = null;
+
         Log.d(LOG_TAG, "onCreate ArticleNewsFragment");
 
         dateAtricle = (TextView) findViewById(R.id.dateAtricle);
@@ -33,22 +39,42 @@ public class ArticleNewsActivity extends AppCompatActivity implements GetDataNew
         String linkHref = getIntent().getStringExtra("linkHref");
 
         GetDataNews getDataNews = new GetDataNews(this);
-        getDataNews.execute("http://news.liga.net" + linkHref);
 
+        if (!URLUtil.isValidUrl(linkHref)) {                           //если нет начала сайта
+            try {
+                url = new URL(linkHref);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+            getDataNews.execute("http://news.liga.net" + linkHref,"","http://news.liga.net"); //добавим его
+        }
+        else{
+            try {
+                url = new URL(linkHref);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+
+            getDataNews.execute(linkHref,"",url.getHost());
+        }
     }
 
     @Override
     public void onGetDataNewsFinished(ArticleNews articleNews) {
 
-       dateAtricle.setText(articleNews.getDate());
-       anotation.setText(articleNews.getAnnotation());
-       textArticle.setText(articleNews.getText());
+        if(articleNews != null){
+            Log.d(LOG_TAG,"getText " + articleNews.getText());
+            Log.d(LOG_TAG,"getAnnotation " + articleNews.getAnnotation());
+            Log.d(LOG_TAG,"getTitle " + articleNews.getTitle());
+            Log.d(LOG_TAG,"getDate " + articleNews.getDate());
+            Log.d(LOG_TAG,"getImgUrl " + articleNews.getImgUrl());
 
-        Log.d(LOG_TAG,"getText " + articleNews.getText());
-        Log.d(LOG_TAG,"getAnnotation " + articleNews.getAnnotation());
-        Log.d(LOG_TAG,"getTitle " + articleNews.getTitle());
-        Log.d(LOG_TAG,"getDate " + articleNews.getDate());
-        Log.d(LOG_TAG,"getImgUrl " + articleNews.getImgUrl());
+            dateAtricle.setText(articleNews.getDate());
+            anotation.setText(articleNews.getAnnotation());
+            textArticle.setText(articleNews.getText());
+        }
+
+        Log.d(LOG_TAG,"Не удалось распознать статью");
 
     }
 }

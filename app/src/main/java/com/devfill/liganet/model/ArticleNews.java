@@ -9,9 +9,10 @@ public class ArticleNews{
     private String text;
     private String title;
     private String date;
-
-
     private String annotation;
+    private String item;
+
+
 
     public String getDate() {
         return date;
@@ -21,8 +22,9 @@ public class ArticleNews{
         this.date = date;
     }
 
-    public ArticleNews(String imgUrl, String title, String annotation, String text, String date){
+    public ArticleNews(String imgUrl, String title, String annotation, String text, String date, String item){
 
+        this.item = item;
         this.annotation = annotation;
         this.imgUrl = imgUrl;
         this.title = title;
@@ -61,5 +63,13 @@ public class ArticleNews{
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getItem() {
+        return item;
+    }
+
+    public void setItem(String item) {
+        this.item = item;
     }
 }

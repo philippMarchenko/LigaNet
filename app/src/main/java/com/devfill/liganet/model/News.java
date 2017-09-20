@@ -1,6 +1,9 @@
 package com.devfill.liganet.model;
 
 
+import android.graphics.Bitmap;
+import android.widget.ImageView;
+
 public class News {
 
     private String time;
@@ -9,8 +12,12 @@ public class News {
 
 
 
-    public News(String time, String title,String linkHref){
+    private Bitmap bitmap;
 
+
+    public News(String time, String title,String linkHref,Bitmap bitmap){
+
+        this.bitmap = bitmap;
         this.time = time;
         this.title = title;
         this.linkHref = linkHref;
@@ -38,5 +45,13 @@ public class News {
 
     public String getlinkHref() {
         return linkHref;
+    }
+
+    public Bitmap getBitmap() {
+        return bitmap;
+    }
+
+    public void setBitmap(Bitmap bitmap) {
+        this.bitmap = bitmap;
     }
 }

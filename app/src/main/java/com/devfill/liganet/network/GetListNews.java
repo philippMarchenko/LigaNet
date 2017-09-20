@@ -1,5 +1,6 @@
 package com.devfill.liganet.network;
 
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -63,9 +64,12 @@ public class GetListNews extends AsyncTask<String, Void, List<News>> {
                 Element t_link = title.child(0);
 
                 Log.d(LOG_TAG, "linkHref = " + linkHref);
+                Log.d(LOG_TAG, "title = " + t_link.text());
 
+                Bitmap bitmap = Bitmap.createBitmap(135, 100,
+                        Bitmap.Config.ARGB_8888);
 
-                News news = new News(date.text(),t_link.text(),linkHref);
+                News news = new News(date.text(),t_link.text(),linkHref,bitmap);
                 listNews.add(news);
 
             }

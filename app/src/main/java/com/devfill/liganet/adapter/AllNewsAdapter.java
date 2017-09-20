@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.devfill.liganet.R;
@@ -31,12 +32,15 @@ public class AllNewsAdapter extends RecyclerView.Adapter<AllNewsAdapter.MyViewHo
 
         private TextView time,title;
         private View card_view;
+        private ImageView image;
 
         public MyViewHolder(View v) {
             super(v);
             this.time = (TextView) v.findViewById(R.id.time_news);
             this.title = (TextView) v.findViewById(R.id.title_news);
             this.card_view = v.findViewById(R.id.card_view_all_news);
+            this.image = (ImageView) v.findViewById(R.id.image_all_news);
+
         }
     }
 
@@ -62,6 +66,7 @@ public class AllNewsAdapter extends RecyclerView.Adapter<AllNewsAdapter.MyViewHo
 
         viewHolder.time.setText(news.getTime());
         viewHolder.title.setText(news.getTitle());
+        viewHolder.image.setImageBitmap(news.getBitmap());
 
         // define an on click listener to open PlaybackFragment
         viewHolder.card_view.setOnClickListener(new View.OnClickListener() {
