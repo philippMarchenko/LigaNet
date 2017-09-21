@@ -4,10 +4,18 @@ package com.devfill.liganet.model;
 import android.graphics.Bitmap;
 import android.widget.ImageView;
 
-public class News {
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
+public class News {
+    @SerializedName("date")
+    @Expose
     private String time;
+    @SerializedName("text")
+    @Expose
     private String title;
+    @SerializedName("href")
+    @Expose
     private String linkHref;
 
 

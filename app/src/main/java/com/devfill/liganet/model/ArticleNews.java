@@ -1,8 +1,5 @@
 package com.devfill.liganet.model;
 
-
-
-
 public class ArticleNews{
 
     private String imgUrl;

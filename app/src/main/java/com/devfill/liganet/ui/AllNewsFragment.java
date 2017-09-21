@@ -1,7 +1,10 @@
 package com.devfill.liganet.ui;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -13,15 +16,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.URLUtil;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.devfill.liganet.R;
 import com.devfill.liganet.adapter.AllNewsAdapter;
 import com.devfill.liganet.model.ArticleNews;
+import com.devfill.liganet.model.ListNews;
 import com.devfill.liganet.model.News;
 import com.devfill.liganet.network.GetArticleImage;
 import com.devfill.liganet.network.GetDataNews;
 import com.devfill.liganet.network.GetListNews;
+import com.devfill.liganet.network.ServerAPI;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -30,6 +36,14 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class AllNewsFragment extends android.support.v4.app.Fragment implements GetListNews.IGetListNewsListener,
         SwipeRefreshLayout.OnRefreshListener,
@@ -49,6 +63,9 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
 
     private int count_bitmap = 0;
 
+    private Retrofit retrofit;
+    private ServerAPI serverAPI;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_all_news, container, false);
@@ -66,17 +83,76 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
 
         swipeRefreshLayout.setOnRefreshListener(this);
 
-        initAllNewsList();
+
+        initRetrofit ();
+
+        getAllNewsList();
 
         return rootView;
     }
 
-    public  void initAllNewsList (){
+   private void initRetrofit (){
 
-        swipeRefreshLayout.setRefreshing(true);
-        allNewsList.clear();
-        GetListNews getLigaNet = new GetListNews(this);
-        getLigaNet.execute("http://news.liga.net/all/");
+       HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+       interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+       OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
+
+       retrofit = new Retrofit.Builder()
+               .baseUrl(ServerAPI.BASE_URL)
+               .client(client)
+               .addConverterFactory(GsonConverterFactory.create())
+               .build();
+
+
+       serverAPI = retrofit.create(ServerAPI.class);
+   }
+
+   private void getAllNewsList (){
+
+       String netType = getNetworkType(getContext());
+       if(netType == null)
+           Toast.makeText(getActivity(), "Подключение к сети отсутствует!", Toast.LENGTH_LONG).show();
+       else {
+           try {
+
+               serverAPI.getListNews("get_all_news").enqueue(new Callback<ListNews>() {
+                   @Override
+                   public void onResponse(Call<ListNews> call, Response<ListNews> response) {
+
+                       ListNews listNews = response.body();
+
+                       allNewsList.addAll(listNews.getNews());
+                       allNewsAdapter.notifyDataSetChanged();
+                       swipeRefreshLayout.setRefreshing(false);
+
+                       Log.i(LOG_TAG, "onResponse getListNews ");
+
+                   }
+
+                   @Override
+                   public void onFailure(Call<ListNews> call, Throwable t) {
+
+                       swipeRefreshLayout.setRefreshing(false);
+                       Toast.makeText(getActivity(), "Ошибка запроса к серверу!" + t.getMessage(), Toast.LENGTH_LONG).show();
+
+                       Log.i(LOG_TAG, "onFailure. Ошибка REST запроса getRoute " + t.getMessage());
+                   }
+               });
+           } catch (Exception e) {
+
+               Log.i(LOG_TAG, "Ошибка REST запроса к серверу  getListNews " + e.getMessage());
+           }
+       }
+    }
+
+   private String getNetworkType(Context context) {
+        ConnectivityManager cm =
+                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        if (activeNetwork != null) {
+            return activeNetwork.getTypeName();
+        }
+        return null;
     }
 
     @Override
@@ -120,8 +196,9 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
     @Override
     public void onRefresh() {
 
+
         swipeRefreshLayout.setRefreshing(true);
-        initAllNewsList();
+        getAllNewsList();
     }
 
     @Override
