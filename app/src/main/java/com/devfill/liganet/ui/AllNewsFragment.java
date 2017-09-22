@@ -36,6 +36,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -65,7 +66,7 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
 
     private Retrofit retrofit;
     private ServerAPI serverAPI;
-
+    Target loadtarget = null;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_all_news, container, false);
@@ -85,6 +86,7 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
 
 
         initRetrofit ();
+        initTargetPicasso();
 
         getAllNewsList();
 
@@ -95,7 +97,12 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
 
        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-       OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
+
+       OkHttpClient client = new OkHttpClient.Builder()
+               .readTimeout(60, TimeUnit.SECONDS)
+               .connectTimeout(60, TimeUnit.SECONDS)
+               .addInterceptor(interceptor)
+               .build();
 
        retrofit = new Retrofit.Builder()
                .baseUrl(ServerAPI.BASE_URL)
@@ -108,6 +115,8 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
    }
 
    private void getAllNewsList (){
+
+       swipeRefreshLayout.setRefreshing(true);
 
        String netType = getNetworkType(getContext());
        if(netType == null)
@@ -125,6 +134,9 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
                        allNewsAdapter.notifyDataSetChanged();
                        swipeRefreshLayout.setRefreshing(false);
 
+
+                       loadNextImage();
+
                        Log.i(LOG_TAG, "onResponse getListNews ");
 
                    }
@@ -135,7 +147,7 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
                        swipeRefreshLayout.setRefreshing(false);
                        Toast.makeText(getActivity(), "Ошибка запроса к серверу!" + t.getMessage(), Toast.LENGTH_LONG).show();
 
-                       Log.i(LOG_TAG, "onFailure. Ошибка REST запроса getRoute " + t.getMessage());
+                       Log.i(LOG_TAG, "onFailure. Ошибка REST запроса getListNews " + t.toString());
                    }
                });
            } catch (Exception e) {
@@ -208,7 +220,7 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
 
         int positionInList = Integer.parseInt(articleNews.getItem());
 
-        loadImage(articleNews.getImgUrl(),allNewsList.get(positionInList));
+      //  loadImage(articleNews.getImgUrl(),allNewsList.get(positionInList));
 
       //  GetArticleImage getArticleImage = new GetArticleImage(this,getContext());
        // getArticleImage.execute(articleNews.getImgUrl());
@@ -239,27 +251,47 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
         }
     }
 
-    private void loadImage(String imageUrl, final News news){
+    private void loadNextImage(){
 
-        Target loadtarget = null;
+        count_bitmap++;
+
         final float scale = getContext().getResources().getDisplayMetrics().density;
-        int height = (int) (100 * scale + 0.5f);
+        int height = (int) (90 * scale + 0.5f);
         int width = (int) (120 * scale + 0.5f);
 
 
-        if (loadtarget == null) loadtarget = new Target() {
+        if(count_bitmap == allNewsList.size()) {
+            count_bitmap = 0;
+        }
+        else{
 
+            Picasso.with(getContext()).load(allNewsList.get(count_bitmap).getImgUrl()).resize(width,height).into(loadtarget);
+
+        }
+
+        Log.d(LOG_TAG, "loadNextImage   ImgUrl " + allNewsList.get(count_bitmap).getImgUrl());
+        Log.d(LOG_TAG, "loadNextImage   count_bitmap " + count_bitmap);
+    }
+
+    void initTargetPicasso(){
+
+        loadtarget = new Target() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
 
-                news.setBitmap(bitmap);
+                Log.d(LOG_TAG, "onBitmapLoaded  ");
+
+                allNewsList.get(count_bitmap).setBitmap(bitmap);
                 allNewsAdapter.notifyDataSetChanged();
 
+                loadNextImage();
             }
 
             @Override
             public void onBitmapFailed(Drawable errorDrawable) {
-                Log.d(LOG_TAG, "onBitmapFailed " + errorDrawable.toString());
+
+                loadNextImage();
+                // Log.d(LOG_TAG, "onBitmapFailed " + errorDrawable.toString());
 
             }
 
@@ -269,9 +301,6 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
             }
 
         };
-
-        Picasso.with(getContext()).load(imageUrl).resize(width,height).into(loadtarget);
-
     }
 
 }

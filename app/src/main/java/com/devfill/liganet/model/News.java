@@ -8,6 +8,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class News {
+
     @SerializedName("date")
     @Expose
     private String time;
@@ -17,8 +18,9 @@ public class News {
     @SerializedName("href")
     @Expose
     private String linkHref;
-
-
+    @SerializedName("imgUrl")
+    @Expose
+    private String imgUrl;
 
     private Bitmap bitmap;
 
@@ -61,5 +63,16 @@ public class News {
 
     public void setBitmap(Bitmap bitmap) {
         this.bitmap = bitmap;
+    }
+
+    public String getLinkHref() {
+        return linkHref;
+    }
+
+    public String getImgUrl() {
+        return imgUrl;
+    }
+    public void setImgUrl(String imgUrl) {
+        this.imgUrl = imgUrl;
     }
 }

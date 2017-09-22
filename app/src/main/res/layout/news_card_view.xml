@@ -14,20 +14,20 @@
         android:transitionName="open_mediaplayer"
         card_view:cardCornerRadius="4dp"
         card_view:cardElevation="3dp"
-        android:layout_height="110dp">
+        android:layout_height="100dp">
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
             <ImageView
-                android:layout_height="100dp"
                 app:srcCompat="?attr/selectableItemBackground"
                 android:layout_centerVertical="true"
                 android:layout_alignStart="@+id/card_view_all_news"
                 android:id="@+id/image_all_news"
                 android:layout_marginStart="5dp"
-                android:layout_width="120dp" />
+                android:layout_width="120dp"
+                android:layout_height="90dp" />
 
             <TextView
                 android:text="Моя новость"
