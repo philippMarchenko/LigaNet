@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 
@@ -27,11 +28,15 @@ public class PoliticAdapter extends RecyclerView.Adapter<PoliticAdapter.MyViewHo
     public class MyViewHolder extends RecyclerView.ViewHolder{
 
         public TextView time,title;
+        private View card_view;
+        private ImageView image;
 
         public MyViewHolder(View v) {
             super(v);
-            this.time = (TextView) v.findViewById(R.id.time_politic);
-            this.title = (TextView) v.findViewById(R.id.title_politic);
+            this.time = (TextView) v.findViewById(R.id.time_news_politics);
+            this.title = (TextView) v.findViewById(R.id.title_news_politics);
+            this.card_view = v.findViewById(R.id.card_view_politics);
+            this.image = (ImageView) v.findViewById(R.id.image_politics);
         }
     }
 
@@ -55,7 +60,7 @@ public class PoliticAdapter extends RecyclerView.Adapter<PoliticAdapter.MyViewHo
 
         viewHolder.time.setText(news.getTime());
         viewHolder.title.setText(news.getTitle());
-
+        viewHolder.image.setImageBitmap(news.getBitmap());
     }
 
     @Override

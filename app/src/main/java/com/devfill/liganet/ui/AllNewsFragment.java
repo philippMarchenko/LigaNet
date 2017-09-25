@@ -48,8 +48,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class AllNewsFragment extends android.support.v4.app.Fragment implements GetListNews.IGetListNewsListener,
         SwipeRefreshLayout.OnRefreshListener,
-        GetDataNews.IGetDataNewsListener,
-        GetArticleImage.IGetArticleImageListener{
+        GetDataNews.IGetDataNewsListener{
 
 
     private static final String LOG_TAG = "AllNewsFragmentTag";
@@ -116,11 +115,15 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
 
    private void getAllNewsList (){
 
+       allNewsList.clear();
        swipeRefreshLayout.setRefreshing(true);
 
        String netType = getNetworkType(getContext());
-       if(netType == null)
+       if(netType == null){
            Toast.makeText(getActivity(), "Подключение к сети отсутствует!", Toast.LENGTH_LONG).show();
+           swipeRefreshLayout.setRefreshing(false);
+
+       }
        else {
            try {
 
@@ -130,10 +133,16 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
 
                        ListNews listNews = response.body();
 
-                       allNewsList.addAll(listNews.getNews());
-                       allNewsAdapter.notifyDataSetChanged();
-                       swipeRefreshLayout.setRefreshing(false);
+                       try {
+                           allNewsList.addAll(listNews.getNews());
+                           allNewsAdapter.notifyDataSetChanged();
+                           swipeRefreshLayout.setRefreshing(false);
+                       }
+                       catch(Exception e){
 
+                           Toast.makeText(getActivity(), "Нет новостей на сервере!", Toast.LENGTH_LONG).show();
+
+                       }
 
                        loadNextImage();
 
@@ -226,38 +235,12 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
        // getArticleImage.execute(articleNews.getImgUrl());
     }
 
-    @Override
-    public void onGetArticleImageFinished(Bitmap bitmap) {
-
-        Log.d(LOG_TAG, "onGetArticleImageFinished. count_bitmap " + count_bitmap);
-
-        if(count_bitmap < allNewsList.size() - 1){
-
-            allNewsList.get(count_bitmap).setBitmap(bitmap);
-            allNewsAdapter.notifyDataSetChanged();
-
-            count_bitmap++;
-        }
-        else{
-            count_bitmap = 0;
-
-           /* for(int i = 0; i < bitMapList.size(); i ++){
-
-                allNewsList.get(i).setBitmap(bitMapList.get(i));
-
-            }
-
-            Log.d(LOG_TAG, "bitMapList.size= " + bitMapList.size());*/
-        }
-    }
-
     private void loadNextImage(){
-
-        count_bitmap++;
 
         final float scale = getContext().getResources().getDisplayMetrics().density;
         int height = (int) (90 * scale + 0.5f);
         int width = (int) (120 * scale + 0.5f);
+
 
 
         if(count_bitmap == allNewsList.size()) {
@@ -266,11 +249,14 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
         else{
 
             Picasso.with(getContext()).load(allNewsList.get(count_bitmap).getImgUrl()).resize(width,height).into(loadtarget);
-
         }
 
+        Log.d(LOG_TAG, "loadNextImage   title " + allNewsList.get(count_bitmap).getTitle());
         Log.d(LOG_TAG, "loadNextImage   ImgUrl " + allNewsList.get(count_bitmap).getImgUrl());
         Log.d(LOG_TAG, "loadNextImage   count_bitmap " + count_bitmap);
+
+
+
     }
 
     void initTargetPicasso(){
@@ -284,12 +270,14 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
                 allNewsList.get(count_bitmap).setBitmap(bitmap);
                 allNewsAdapter.notifyDataSetChanged();
 
+                count_bitmap++;
                 loadNextImage();
             }
 
             @Override
             public void onBitmapFailed(Drawable errorDrawable) {
 
+                count_bitmap++;
                 loadNextImage();
                 // Log.d(LOG_TAG, "onBitmapFailed " + errorDrawable.toString());
 

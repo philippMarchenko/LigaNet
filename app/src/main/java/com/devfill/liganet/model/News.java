@@ -15,7 +15,7 @@ public class News {
     @SerializedName("text")
     @Expose
     private String title;
-    @SerializedName("href")
+    @SerializedName("articleUrl")
     @Expose
     private String linkHref;
     @SerializedName("imgUrl")

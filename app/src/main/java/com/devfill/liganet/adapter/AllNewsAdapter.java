@@ -75,18 +75,11 @@ public class AllNewsAdapter extends RecyclerView.Adapter<AllNewsAdapter.MyViewHo
                 try {
                     Intent intent = new Intent(mContext, ArticleNewsActivity.class);
                     intent.putExtra("linkHref",news.getlinkHref());
+                    intent.putExtra("imgHref",news.getImgUrl());
                     mContext.startActivity(intent);
 
                     Log.d(LOG_TAG, "viewHolder.card_view.setOnClickListener");
-
-              /*      ArticleNewsFragment articleNewsFragment = new ArticleNewsFragment().newInstance(news.getlinkHref());
-
-                    FragmentTransaction transaction = mContext
-                            .get()
-                            .beginTransaction();
-
-                    transaction.show(articleNewsFragment);
-                   */
+                    Log.d(LOG_TAG, "news.getlinkHref()" + news.getlinkHref());
 
                 } catch (Exception e) {
                     Log.d(LOG_TAG, "exception", e);
