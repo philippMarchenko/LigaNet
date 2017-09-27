@@ -111,7 +111,7 @@ public class PoliticFragment extends android.support.v4.app.Fragment implements 
         else {
             try {
 
-                serverAPI.getListNews("get_politics").enqueue(new Callback<ListNews>() {
+                serverAPI.getPoliticNews().enqueue(new Callback<ListNews>() {
                     @Override
                     public void onResponse(Call<ListNews> call, Response<ListNews> response) {
 

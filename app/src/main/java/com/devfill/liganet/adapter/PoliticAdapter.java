@@ -2,7 +2,10 @@ package com.devfill.liganet.adapter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +16,7 @@ import android.widget.TextView;
 
 import com.devfill.liganet.R;
 import com.devfill.liganet.model.News;
+import com.devfill.liganet.ui.ArticleNewsActivity;
 
 import java.util.List;
 
@@ -59,8 +63,26 @@ public class PoliticAdapter extends RecyclerView.Adapter<PoliticAdapter.MyViewHo
         final News news = mPoliticNewsList.get(position);
 
         viewHolder.time.setText(news.getTime());
-        viewHolder.title.setText(news.getTitle());
+        viewHolder.title.setText(Html.fromHtml(news.getTitle()));
         viewHolder.image.setImageBitmap(news.getBitmap());
+
+        viewHolder.card_view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    Intent intent = new Intent(mContext, ArticleNewsActivity.class);
+                    intent.putExtra("linkHref",news.getlinkHref());
+                    intent.putExtra("imgHref",news.getImgUrl());
+                    mContext.startActivity(intent);
+
+                    Log.d(LOG_TAG, "viewHolder.card_view.setOnClickListener");
+                    Log.d(LOG_TAG, "news.getlinkHref()" + news.getlinkHref());
+
+                } catch (Exception e) {
+                    Log.d(LOG_TAG, "exception", e);
+                }
+            }
+        });
     }
 
     @Override

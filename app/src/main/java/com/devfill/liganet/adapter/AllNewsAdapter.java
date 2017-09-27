@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -65,7 +66,7 @@ public class AllNewsAdapter extends RecyclerView.Adapter<AllNewsAdapter.MyViewHo
         final News news = mListNewsShort.get(position);
 
         viewHolder.time.setText(news.getTime());
-        viewHolder.title.setText(news.getTitle());
+        viewHolder.title.setText(Html.fromHtml(news.getTitle()));
         viewHolder.image.setImageBitmap(news.getBitmap());
 
         // define an on click listener to open PlaybackFragment

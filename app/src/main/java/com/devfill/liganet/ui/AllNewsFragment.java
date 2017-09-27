@@ -46,9 +46,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class AllNewsFragment extends android.support.v4.app.Fragment implements GetListNews.IGetListNewsListener,
-        SwipeRefreshLayout.OnRefreshListener,
-        GetDataNews.IGetDataNewsListener{
+public class AllNewsFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
 
     private static final String LOG_TAG = "AllNewsFragmentTag";
@@ -89,6 +87,8 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
 
         getAllNewsList();
 
+
+
         return rootView;
     }
 
@@ -127,7 +127,7 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
        else {
            try {
 
-               serverAPI.getListNews("get_all_news").enqueue(new Callback<ListNews>() {
+               serverAPI.getAllNews().enqueue(new Callback<ListNews>() {
                    @Override
                    public void onResponse(Call<ListNews> call, Response<ListNews> response) {
 
@@ -177,62 +177,11 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
     }
 
     @Override
-    public void onGetListNewsFinished(List<News> news) {
-
-        URL url = null;
-        String link = null;
-
-        for(int i = 0; i < news.size(); i++){
-
-            GetDataNews getDataNews = new GetDataNews(this);
-
-            if (!URLUtil.isValidUrl(news.get(i).getlinkHref())) {
-
-                link = "http://news.liga.net" + news.get(i).getlinkHref();
-                Log.d(LOG_TAG, "link " + link);
-                try {
-                    url = new URL(link);
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                }
-                getDataNews.execute(link,"img","http://news.liga.net",Integer.toString(i)); //добавим его
-            }
-            else{
-                try {
-                    url = new URL(news.get(i).getlinkHref());
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                }
-                getDataNews.execute(news.get(i).getlinkHref(),"img","http://" + url.getHost(),Integer.toString(i));
-            }
-        }
-
-
-        allNewsList.addAll(news);
-        allNewsAdapter.notifyDataSetChanged();
-        swipeRefreshLayout.setRefreshing(false);
-
-    }
-
-    @Override
     public void onRefresh() {
 
 
         swipeRefreshLayout.setRefreshing(true);
         getAllNewsList();
-    }
-
-    @Override
-    public void onGetDataNewsFinished(ArticleNews articleNews) {
-
-        Log.d(LOG_TAG, "onGetDataNewsFinished. getImgUrl() " + articleNews.getImgUrl());
-
-        int positionInList = Integer.parseInt(articleNews.getItem());
-
-      //  loadImage(articleNews.getImgUrl(),allNewsList.get(positionInList));
-
-      //  GetArticleImage getArticleImage = new GetArticleImage(this,getContext());
-       // getArticleImage.execute(articleNews.getImgUrl());
     }
 
     private void loadNextImage(){
@@ -267,11 +216,14 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
 
                 Log.d(LOG_TAG, "onBitmapLoaded  ");
 
-                allNewsList.get(count_bitmap).setBitmap(bitmap);
-                allNewsAdapter.notifyDataSetChanged();
+                if (allNewsList.size() > 0) {
+                    allNewsList.get(count_bitmap).setBitmap(bitmap);
+                    allNewsAdapter.notifyDataSetChanged();
 
-                count_bitmap++;
-                loadNextImage();
+                    count_bitmap++;
+                    loadNextImage();
+                }
+
             }
 
             @Override

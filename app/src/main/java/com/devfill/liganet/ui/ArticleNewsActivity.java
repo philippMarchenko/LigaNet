@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.util.Log;
@@ -14,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.URLUtil;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,11 +47,14 @@ public class ArticleNewsActivity extends AppCompatActivity implements GetDataNew
 
     private TextView dateAtricle,anotation,textArticle;
     private ImageView backdrop;
-
+    private ProgressBar progressArticle;
 
     private Retrofit retrofit;
     private ServerAPI serverAPI;
     Target loadtarget = null;
+
+    CollapsingToolbarLayout collapsingToolbarLayout;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +67,13 @@ public class ArticleNewsActivity extends AppCompatActivity implements GetDataNew
         anotation = (TextView) findViewById(R.id.anotation);
         textArticle = (TextView) findViewById(R.id.textArticle);
         backdrop = (ImageView) findViewById(R.id.backdrop);
+        progressArticle = (ProgressBar) findViewById(R.id.progressArticle);
+
+
+        dateAtricle.setVisibility(View.INVISIBLE);
+        anotation.setVisibility(View.INVISIBLE);
+        textArticle.setVisibility(View.INVISIBLE);
+        progressArticle.setVisibility(View.VISIBLE);
 
 
         String linkHref = getIntent().getStringExtra("linkHref");
@@ -136,11 +148,18 @@ public class ArticleNewsActivity extends AppCompatActivity implements GetDataNew
         else {
             try {
 
-                serverAPI.getNewsContent("get_news_content",linkHref).enqueue(new Callback<NewsContent>() {
+                serverAPI.getNewsContent(linkHref).enqueue(new Callback<NewsContent>() {
                     @Override
                     public void onResponse(Call<NewsContent> call, Response<NewsContent> response) {
 
                         NewsContent newsContent = response.body();
+                        progressArticle.setVisibility(View.INVISIBLE);
+                        dateAtricle.setVisibility(View.VISIBLE);
+                        anotation.setVisibility(View.VISIBLE);
+                        textArticle.setVisibility(View.VISIBLE);
+
+                        Log.i(LOG_TAG, "anotation  " + newsContent.getAnnotation());
+                        Log.i(LOG_TAG, "dateAtricle " + newsContent.getDate());
 
                         try {
 
@@ -163,7 +182,10 @@ public class ArticleNewsActivity extends AppCompatActivity implements GetDataNew
                     @Override
                     public void onFailure(Call<NewsContent> call, Throwable t) {
 
-
+                        progressArticle.setVisibility(View.INVISIBLE);
+                        dateAtricle.setVisibility(View.VISIBLE);
+                        anotation.setVisibility(View.VISIBLE);
+                        textArticle.setVisibility(View.VISIBLE);
                         Toast.makeText(getBaseContext(), "Ошибка запроса к серверу!" + t.getMessage(), Toast.LENGTH_LONG).show();
 
                         Log.i(LOG_TAG, "onFailure. Ошибка REST запроса getNewsContent " + t.toString());
