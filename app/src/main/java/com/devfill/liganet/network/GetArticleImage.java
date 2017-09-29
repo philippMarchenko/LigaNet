@@ -2,26 +2,10 @@ package com.devfill.liganet.network;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
+
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.bumptech.glide.Glide;
-import com.devfill.liganet.model.News;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
-
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-import org.jsoup.select.Evaluator;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 public class GetArticleImage extends AsyncTask<String, Void, Bitmap> {
 

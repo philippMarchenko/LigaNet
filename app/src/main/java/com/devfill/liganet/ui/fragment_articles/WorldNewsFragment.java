@@ -1,4 +1,4 @@
-package com.devfill.liganet.ui;
+package com.devfill.liganet.ui.fragment_articles;
 
 
 import android.content.Context;
@@ -56,6 +56,8 @@ public class WorldNewsFragment extends android.support.v4.app.Fragment implement
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_world, container, false);
+
+            Log.i(LOG_TAG, "onCreateView ");
 
             recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view_world);
             worldAdapter = new PoliticAdapter(getContext(),getActivity(),worldList);
@@ -169,12 +171,18 @@ public class WorldNewsFragment extends android.support.v4.app.Fragment implement
         }
         else{
 
-            Picasso.with(getContext()).load(worldList.get(count_bitmap).getImgUrl()).resize(width,height).into(loadtarget);
+            try {
+                Picasso.with(getContext()).load(worldList.get(count_bitmap).getImgUrl()).resize(width, height).into(loadtarget);
+            }
+            catch (Exception e){
+
+                Log.d(LOG_TAG, "Error load image " + e.getMessage());
+                count_bitmap++;
+                Picasso.with(getContext()).load(worldList.get(count_bitmap).getImgUrl()).resize(width, height).into(loadtarget);
+            }
 
         }
 
-        Log.d(LOG_TAG, "loadNextImage   ImgUrl " + worldList.get(count_bitmap).getImgUrl());
-        Log.d(LOG_TAG, "loadNextImage   count_bitmap " + count_bitmap);
     }
 
     private void initTargetPicasso(){

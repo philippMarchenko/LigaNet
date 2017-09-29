@@ -1,4 +1,4 @@
-package com.devfill.liganet.ui;
+package com.devfill.liganet.ui.fragment_articles;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -18,7 +18,7 @@ import android.webkit.URLUtil;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
+
 import com.devfill.liganet.R;
 import com.devfill.liganet.adapter.AllNewsAdapter;
 import com.devfill.liganet.model.ArticleNews;
@@ -68,6 +68,8 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_all_news, container, false);
 
+        Log.i(LOG_TAG, "onCreateView ");
+
 
         recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view_all_news);
         allNewsAdapter = new AllNewsAdapter(getContext(),getActivity(),allNewsList);
@@ -86,8 +88,6 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
         initTargetPicasso();
 
         getAllNewsList();
-
-
 
         return rootView;
     }
@@ -117,6 +117,7 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
 
        allNewsList.clear();
        swipeRefreshLayout.setRefreshing(true);
+       Log.i(LOG_TAG, "getAllNewsList ");
 
        String netType = getNetworkType(getContext());
        if(netType == null){
@@ -197,14 +198,16 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
         }
         else{
 
-            Picasso.with(getContext()).load(allNewsList.get(count_bitmap).getImgUrl()).resize(width,height).into(loadtarget);
+            try {
+                Picasso.with(getContext()).load(allNewsList.get(count_bitmap).getImgUrl()).resize(width, height).into(loadtarget);
+            }
+            catch (Exception e){
+                Log.d(LOG_TAG, "Error load image " + e.getMessage());
+
+                count_bitmap++;
+                Picasso.with(getContext()).load(allNewsList.get(count_bitmap).getImgUrl()).resize(width, height).into(loadtarget);
+            }
         }
-
-        Log.d(LOG_TAG, "loadNextImage   title " + allNewsList.get(count_bitmap).getTitle());
-        Log.d(LOG_TAG, "loadNextImage   ImgUrl " + allNewsList.get(count_bitmap).getImgUrl());
-        Log.d(LOG_TAG, "loadNextImage   count_bitmap " + count_bitmap);
-
-
 
     }
 

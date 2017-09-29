@@ -1,4 +1,4 @@
-package com.devfill.liganet.ui;
+package com.devfill.liganet.ui.fragment_articles;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -57,6 +57,8 @@ public class EconomicFragment extends android.support.v4.app.Fragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_economic, container, false);
+
+        Log.i(LOG_TAG, "onCreateView ");
 
         recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view_economic);
         economicAdapter = new EconomicAdapter(getContext(),getActivity(),economicList);
@@ -167,12 +169,18 @@ public class EconomicFragment extends android.support.v4.app.Fragment implements
         }
         else{
 
-            Picasso.with(getContext()).load(economicList.get(count_bitmap).getImgUrl()).resize(width,height).into(loadtarget);
+            try {
+                Picasso.with(getContext()).load(economicList.get(count_bitmap).getImgUrl()).resize(width, height).into(loadtarget);
+            }
+            catch (Exception e){
 
+                Log.d(LOG_TAG, "Error load image " + e.getMessage());
+
+                count_bitmap++;
+                Picasso.with(getContext()).load(economicList.get(count_bitmap).getImgUrl()).resize(width, height).into(loadtarget);
+            }
         }
 
-        Log.d(LOG_TAG, "loadNextImage   ImgUrl " + economicList.get(count_bitmap).getImgUrl());
-        Log.d(LOG_TAG, "loadNextImage   count_bitmap " + count_bitmap);
     }
 
     private void initTargetPicasso(){

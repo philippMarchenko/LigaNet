@@ -17,7 +17,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.devfill.liganet.R;
 import com.devfill.liganet.model.News;
-import com.devfill.liganet.ui.ArticleNewsActivity;
+import com.devfill.liganet.ui.activity.ArticleNewsActivity;
 
 
 import java.util.List;

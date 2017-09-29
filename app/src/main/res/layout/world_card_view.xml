@@ -14,11 +14,11 @@
         android:transitionName="open_mediaplayer"
         app:cardCornerRadius="4dp"
         app:cardElevation="3dp"
-        android:layout_height="100dp">
+        android:layout_height="wrap_content">
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
 
             <ImageView
                 app:srcCompat="?attr/selectableItemBackground"
@@ -48,8 +48,11 @@
                 android:textStyle="normal|italic"
                 android:textSize="12sp"
                 android:textColor="@android:color/darker_gray"
-                android:layout_alignBottom="@+id/image_world"
-                android:layout_alignStart="@+id/title_news_world" />
+                android:layout_alignStart="@+id/title_news_world"
+                android:layout_marginBottom="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_below="@+id/title_news_world"
+                android:fontFamily="sans-serif-condensed" />
         </RelativeLayout>
 
     </android.support.v7.widget.CardView>

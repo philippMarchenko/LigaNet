@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/articles"
+        android:icon="@drawable/ic_assignment_black_48dp"
+        android:title="Статьи"/>
+    <item
+        android:id="@+id/photo"
+        android:icon="@drawable/ic_photo_camera_black_48dp"
+        android:title="Фото"/>
+    <item
+        android:id="@+id/video"
+        android:icon="@drawable/ic_videocam_black_48dp"
+        android:title="Видео"/>
+</menu>

@@ -1,7 +1,8 @@
-package com.devfill.liganet.ui;
+package com.devfill.liganet.ui.activity;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -53,8 +54,6 @@ public class ArticleNewsActivity extends AppCompatActivity implements GetDataNew
     private ServerAPI serverAPI;
     Target loadtarget = null;
 
-    CollapsingToolbarLayout collapsingToolbarLayout;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +68,11 @@ public class ArticleNewsActivity extends AppCompatActivity implements GetDataNew
         backdrop = (ImageView) findViewById(R.id.backdrop);
         progressArticle = (ProgressBar) findViewById(R.id.progressArticle);
 
+
+        Typeface face = Typeface.createFromAsset(getAssets(),
+                "fonts/10710.ttf");
+       // anotation.setTypeface(face);
+      //  textArticle.setTypeface(face);
 
         dateAtricle.setVisibility(View.INVISIBLE);
         anotation.setVisibility(View.INVISIBLE);
@@ -86,8 +90,13 @@ public class ArticleNewsActivity extends AppCompatActivity implements GetDataNew
       //  initTargetPicasso();
 
         getNewsContent(linkHref);
+        try {
+            Picasso.with(getBaseContext()).load(imgHref).into(backdrop);
+        }
+        catch (Exception e){
+            Log.d(LOG_TAG, "Error load image " + e.getMessage());
+        }
 
-        Picasso.with(getBaseContext()).load(imgHref).into(backdrop);
 
     }
     private String getNetworkType(Context context) {
