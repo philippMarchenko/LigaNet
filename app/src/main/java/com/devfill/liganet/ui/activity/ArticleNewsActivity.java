@@ -41,7 +41,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class ArticleNewsActivity extends AppCompatActivity implements GetDataNews.IGetDataNewsListener{
+public class ArticleNewsActivity extends AppCompatActivity{
 
 
     private static final String LOG_TAG = "ArticleNewsActivityTag";
@@ -108,26 +108,6 @@ public class ArticleNewsActivity extends AppCompatActivity implements GetDataNew
         }
         return null;
     }
-
-    @Override
-    public void onGetDataNewsFinished(ArticleNews articleNews) {
-
-        if(articleNews != null){
-            Log.d(LOG_TAG,"getText " + articleNews.getText());
-            Log.d(LOG_TAG,"getAnnotation " + articleNews.getAnnotation());
-            Log.d(LOG_TAG,"getTitle " + articleNews.getTitle());
-            Log.d(LOG_TAG,"getDate " + articleNews.getDate());
-            Log.d(LOG_TAG,"getImgUrl " + articleNews.getImgUrl());
-
-            dateAtricle.setText(articleNews.getDate());
-            anotation.setText(articleNews.getAnnotation());
-            textArticle.setText(articleNews.getText());
-        }
-
-        Log.d(LOG_TAG,"Не удалось распознать статью");
-
-    }
-
     private void initRetrofit (){
 
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();

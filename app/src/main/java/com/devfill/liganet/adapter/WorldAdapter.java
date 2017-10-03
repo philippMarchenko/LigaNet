@@ -15,13 +15,14 @@ import android.widget.TextView;
 import com.devfill.liganet.R;
 import com.devfill.liganet.model.News;
 import com.devfill.liganet.ui.activity.ArticleNewsActivity;
+import com.devfill.liganet.ui.activity.ArticleVideoActivity;
 
 import java.util.List;
 
 
 public class WorldAdapter extends RecyclerView.Adapter<WorldAdapter.MyViewHolder>  {
 
-    private static final String LOG_TAG = "WorldAdapter";
+    private static final String LOG_TAG = "WorldAdapterTag";
 
     public static Context mContext;
     private Activity myActivity;
@@ -64,23 +65,40 @@ public class WorldAdapter extends RecyclerView.Adapter<WorldAdapter.MyViewHolder
         viewHolder.title.setText(Html.fromHtml(news.getTitle()));
         viewHolder.image.setImageBitmap(news.getBitmap());
 
-
-
         viewHolder.card_view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                try {
-                    Intent intent = new Intent(mContext, ArticleNewsActivity.class);
-                    intent.putExtra("linkHref", news.getlinkHref());
-                    intent.putExtra("imgHref", news.getImgUrl());
-                    mContext.startActivity(intent);
 
-                    Log.d(LOG_TAG, "viewHolder.card_view.setOnClickListener");
-                    Log.d(LOG_TAG, "news.getlinkHref()" + news.getlinkHref());
+               if(news.getVideoUrl().equals("")){
 
-                } catch (Exception e) {
-                    Log.d(LOG_TAG, "exception", e);
-                }
+                   Log.d(LOG_TAG, "Это не видео");
+                   try {
+                       Intent intent = new Intent(mContext, ArticleNewsActivity.class);
+                       intent.putExtra("linkHref", news.getlinkHref());
+                       intent.putExtra("imgHref", news.getImgUrl());
+                       mContext.startActivity(intent);
+
+
+                   } catch (Exception e) {
+                       Log.d(LOG_TAG, "exception", e);
+                   }
+               }
+                else{
+                   try {
+
+                       Intent intent = new Intent(mContext, ArticleVideoActivity.class);
+                       intent.putExtra("videoUrl", news.getVideoUrl());
+                       mContext.startActivity(intent);
+
+
+                   } catch (Exception e) {
+                       Log.d(LOG_TAG, "exception", e);
+                   }
+                   Log.d(LOG_TAG, " А это видео");
+               }
+
+
+
             }
         });
 

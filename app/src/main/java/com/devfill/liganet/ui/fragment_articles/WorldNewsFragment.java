@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import com.devfill.liganet.R;
 import com.devfill.liganet.adapter.PoliticAdapter;
+import com.devfill.liganet.adapter.WorldAdapter;
 import com.devfill.liganet.model.ListNews;
 import com.devfill.liganet.model.News;
 import com.devfill.liganet.network.GetListNews;
@@ -44,7 +45,7 @@ public class WorldNewsFragment extends android.support.v4.app.Fragment implement
 
         private List<News> worldList = new ArrayList<>();
         private RecyclerView recyclerView;
-        private PoliticAdapter worldAdapter;
+        private WorldAdapter worldAdapter;
         private SwipeRefreshLayout swipeRefreshLayout;
 
         private Retrofit retrofit;
@@ -60,7 +61,7 @@ public class WorldNewsFragment extends android.support.v4.app.Fragment implement
             Log.i(LOG_TAG, "onCreateView ");
 
             recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view_world);
-            worldAdapter = new PoliticAdapter(getContext(),getActivity(),worldList);
+            worldAdapter = new WorldAdapter(getContext(),getActivity(),worldList);
             RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(getContext(), 1);
             recyclerView.setLayoutManager(mLayoutManager);
             recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -160,10 +161,21 @@ public class WorldNewsFragment extends android.support.v4.app.Fragment implement
 
     private void loadNextImage(){
 
+        int height = 90;
+        int width = 120;
 
-        final float scale = getContext().getResources().getDisplayMetrics().density;
-        int height = (int) (90 * scale + 0.5f);
-        int width = (int) (120 * scale + 0.5f);
+        try{
+
+            final float scale = getContext().getResources().getDisplayMetrics().density;
+             height = (int) (90 * scale + 0.5f);
+             width = (int) (120 * scale + 0.5f);
+        }
+        catch(Exception e){
+
+            Log.d(LOG_TAG, "Не удалось загрузить ресурсы " + e.getMessage());
+
+        }
+
 
 
         if(count_bitmap == worldList.size()) {

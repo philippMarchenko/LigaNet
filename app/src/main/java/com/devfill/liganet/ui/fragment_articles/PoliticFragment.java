@@ -158,9 +158,20 @@ public class PoliticFragment extends android.support.v4.app.Fragment implements 
     private void loadNextImage(){
 
 
-        final float scale = getContext().getResources().getDisplayMetrics().density;
-        int height = (int) (90 * scale + 0.5f);
-        int width = (int) (120 * scale + 0.5f);
+        int height = 90;
+        int width = 120;
+
+        try{
+
+            final float scale = getContext().getResources().getDisplayMetrics().density;
+            height = (int) (90 * scale + 0.5f);
+            width = (int) (120 * scale + 0.5f);
+        }
+        catch(Exception e){
+
+            Log.d(LOG_TAG, "Не удалось загрузить ресурсы " + e.getMessage());
+
+        }
 
 
         if(count_bitmap == politicList.size()) {

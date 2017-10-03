@@ -18,6 +18,8 @@ public class NewsContent {
     @Expose
     private String text;
 
+
+
     public String getTitle() {
         return title;
     }
@@ -25,6 +27,8 @@ public class NewsContent {
     public void setTitle(String title) {
         this.title = title;
     }
+
+
 
     public String getDate() {
         return date;

@@ -3,6 +3,7 @@ package com.devfill.liganet.network;
 
 import com.devfill.liganet.model.ListNews;
 import com.devfill.liganet.model.NewsContent;
+import com.devfill.liganet.model.PhotoContent;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -14,6 +15,9 @@ public interface ServerAPI {
 
     @GET("/liga_net/get_news_content.php")
     Call<NewsContent> getNewsContent(@Query(value = "link_href") String link_href);
+
+    @GET("/liga_net/parse_liga_photo.php")
+    Call<PhotoContent> getPhotoContent(@Query(value = "link_href") String link_href);
 
     @GET("/liga_net/get_all_news.php")
     Call<ListNews> getAllNews();

@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.devfill.liganet.R;
 import com.devfill.liganet.model.News;
 import com.devfill.liganet.ui.activity.ArticleNewsActivity;
+import com.devfill.liganet.ui.activity.ArticleVideoActivity;
 
 import java.util.List;
 
@@ -69,17 +70,32 @@ public class PoliticAdapter extends RecyclerView.Adapter<PoliticAdapter.MyViewHo
         viewHolder.card_view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                try {
-                    Intent intent = new Intent(mContext, ArticleNewsActivity.class);
-                    intent.putExtra("linkHref",news.getlinkHref());
-                    intent.putExtra("imgHref",news.getImgUrl());
-                    mContext.startActivity(intent);
+                if(news.getVideoUrl().equals("")){
 
-                    Log.d(LOG_TAG, "viewHolder.card_view.setOnClickListener");
-                    Log.d(LOG_TAG, "news.getlinkHref()" + news.getlinkHref());
+                    Log.d(LOG_TAG, "Это не видео");
+                    try {
+                        Intent intent = new Intent(mContext, ArticleNewsActivity.class);
+                        intent.putExtra("linkHref", news.getlinkHref());
+                        intent.putExtra("imgHref", news.getImgUrl());
+                        mContext.startActivity(intent);
 
-                } catch (Exception e) {
-                    Log.d(LOG_TAG, "exception", e);
+
+                    } catch (Exception e) {
+                        Log.d(LOG_TAG, "exception", e);
+                    }
+                }
+                else{
+                    try {
+
+                        Intent intent = new Intent(mContext, ArticleVideoActivity.class);
+                        intent.putExtra("videoUrl", news.getVideoUrl());
+                        mContext.startActivity(intent);
+
+
+                    } catch (Exception e) {
+                        Log.d(LOG_TAG, "exception", e);
+                    }
+                    Log.d(LOG_TAG, " А это видео");
                 }
             }
         });

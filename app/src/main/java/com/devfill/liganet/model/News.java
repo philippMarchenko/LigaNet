@@ -21,7 +21,9 @@ public class News {
     @SerializedName("imgUrl")
     @Expose
     private String imgUrl;
-
+    @SerializedName("videoUrl")
+    @Expose
+    private String videoUrl;
     private Bitmap bitmap;
 
 
@@ -72,7 +74,17 @@ public class News {
     public String getImgUrl() {
         return imgUrl;
     }
+
     public void setImgUrl(String imgUrl) {
         this.imgUrl = imgUrl;
     }
+
+    public String getVideoUrl() {
+        return videoUrl;
+    }
+
+    public void setVideoUrl(String videoUrl) {
+        this.videoUrl = videoUrl;
+    }
+
 }
