@@ -3,42 +3,62 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-        <TextView
-            android:text="TextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/title_photo_news"
-            android:layout_marginTop="5dp"
-            android:layout_marginStart="5dp"
-            android:textSize="20sp"
-            android:fontFamily="casual"
-            android:textStyle="normal|bold" />
 
-        <me.relex.circleindicator.CircleIndicator
-            android:id="@+id/indicator"
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/pager">
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_alignParentBottom="false"
-            android:layout_alignStart="@+id/title_photo_news"
-            android:layout_alignBottom="@+id/pager" />
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
 
-        <android.support.v4.view.ViewPager
-            android:id="@+id/pager"
-            android:layout_marginRight="5dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginTop="10dp"
-            android:layout_below="@+id/title_photo_news"
-            android:layout_alignParentEnd="false"
-            android:layout_height="250dp"
-            android:layout_width="match_parent" />
 
-    <TextView
-        android:text="TextView"
+            <TextView
+                    android:text="TextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/title_photo_news"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginStart="5dp"
+                android:fontFamily="serif"
+                android:textStyle="normal|bold"
+                android:textSize="18sp" />
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/pager"
+                android:layout_marginRight="5dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="10dp"
+                android:layout_below="@+id/title_photo_news"
+                android:layout_height="250dp"
+                android:layout_width="match_parent"
+                android:fitsSystemWindows="true"
+                />
+
+            <TextView
+                android:text="TextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/indicator"
+                android:layout_alignStart="@+id/indicator"
+                android:layout_marginTop="5dp"
+                android:id="@+id/text_article_photo"
+                android:layout_marginStart="5dp"
+                android:fontFamily="serif" />
+
+
+        </LinearLayout>
+
+    </android.support.v4.widget.NestedScrollView>
+    <ProgressBar
+        style="@style/Widget.AppCompat.ProgressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/indicator"
-        android:layout_alignStart="@+id/indicator"
-        android:layout_marginTop="5dp"
-        android:id="@+id/text_article_photo" />
+        android:id="@+id/progressPhoto"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="false"
+        android:layout_centerInParent="true" />
 </RelativeLayout>
 

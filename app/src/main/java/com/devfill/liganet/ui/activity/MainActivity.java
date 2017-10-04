@@ -1,25 +1,21 @@
 package com.devfill.liganet.ui.activity;
 
-import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 
 import com.devfill.liganet.R;
 
 import com.devfill.liganet.ui.ArticlesFragment;
+import com.devfill.liganet.ui.fragment_photo.PhotoFragmentBase;
 import com.devfill.liganet.ui.helper.CustomViewPager;
-
-import com.devfill.liganet.ui.PhotoFragment;
 
 import com.devfill.liganet.ui.VideoFragment;
 
@@ -77,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
     {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(new ArticlesFragment());
-        adapter.addFragment(new PhotoFragment());
+        adapter.addFragment(new PhotoFragmentBase());
         adapter.addFragment(new VideoFragment());
         viewPager.setAdapter(adapter);
     }

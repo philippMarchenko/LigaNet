@@ -16,8 +16,9 @@ public interface ServerAPI {
     @GET("/liga_net/get_news_content.php")
     Call<NewsContent> getNewsContent(@Query(value = "link_href") String link_href);
 
-    @GET("/liga_net/parse_liga_photo.php")
+    @GET("/liga_net/get_photo_content.php")
     Call<PhotoContent> getPhotoContent(@Query(value = "link_href") String link_href);
+
 
     @GET("/liga_net/get_all_news.php")
     Call<ListNews> getAllNews();
@@ -27,6 +28,9 @@ public interface ServerAPI {
     Call<ListNews> getEconomicNews();
     @GET("/liga_net/get_world_news.php")
     Call<ListNews> getWorldNews();
+
+    @GET("/liga_net/get_photo_list.php")
+    Call<ListNews> getPhotoNews();
 
 }
 

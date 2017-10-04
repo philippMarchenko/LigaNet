@@ -1,4 +1,4 @@
-package com.devfill.liganet.ui;
+package com.devfill.liganet.ui.fragment_photo;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -14,6 +14,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,7 +45,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 
-public class PhotoFragment extends android.support.v4.app.Fragment{
+public class PhotoFragment extends android.support.v4.app.Fragment {
 
 
     private static final String LOG_TAG = "PhotoFragmentTag";
@@ -54,13 +57,18 @@ public class PhotoFragment extends android.support.v4.app.Fragment{
 
     private Retrofit retrofit;
     private ServerAPI serverAPI;
-    Target loadtarget = null;
+    private Target loadtarget = null;
 
-    TextView title_photo_news,text_article_photo;
+    private TextView title_photo_news,text_article_photo;
     private int count_bitmap = 0;
-    ImageSliderAdapter imageSliderAdapter;
-    List<String> imgUrls;
-    List<Bitmap> bitmapList = new ArrayList<>();
+    private ImageSliderAdapter imageSliderAdapter;
+    private List<String> imgUrls;
+    private List<Bitmap> bitmapList = new ArrayList<>();
+    private ProgressBar progressBar;
+
+    private LinearLayout pager_indicator;
+    private ImageView[] dots;
+    private int dotsCount;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -68,19 +76,25 @@ public class PhotoFragment extends android.support.v4.app.Fragment{
 
         title_photo_news  = (TextView) rootView.findViewById(R.id.title_photo_news);
         text_article_photo  = (TextView) rootView.findViewById(R.id.text_article_photo);
-
+        progressBar = (ProgressBar) rootView.findViewById(R.id.progressPhoto);
 
         imageSliderAdapter = new ImageSliderAdapter(getContext(),bitmapList);
         mPager = (ViewPager) rootView.findViewById(R.id.pager);
         mPager.setAdapter(imageSliderAdapter);
-        CircleIndicator indicator = (CircleIndicator) rootView.findViewById(R.id.indicator);
-        indicator.setViewPager(mPager);
+
+
+        title_photo_news.setVisibility(View.INVISIBLE);
+        text_article_photo.setVisibility(View.INVISIBLE);
+        mPager.setVisibility(View.INVISIBLE);
+        progressBar.setVisibility(View.VISIBLE);
 
         initRetrofit();
 
         initTargetPicasso();
 
-        getPhotoContent("http://news.liga.net/photo/incident/14831006-na_skladakh_v_kalinovke_prekratilis_pozhary_i_vzryvy_spasateli.htm");
+        String linkHref = getArguments().getString("linkHref");
+
+        getPhotoContent(linkHref);
 
         return rootView;
     }
@@ -139,6 +153,11 @@ public class PhotoFragment extends android.support.v4.app.Fragment{
 
                                 Log.i(LOG_TAG, "url  " + photoContent.getUrls().get(i));
                             }
+
+                            title_photo_news.setVisibility(View.VISIBLE);
+                            text_article_photo.setVisibility(View.VISIBLE);
+                            mPager.setVisibility(View.VISIBLE);
+                            progressBar.setVisibility(View.INVISIBLE);
 
                             title_photo_news.setText(Html.fromHtml(photoContent.getData().getAnnotation()));
                             text_article_photo.setText(Html.fromHtml(photoContent.getData().getText()));
@@ -221,4 +240,6 @@ public class PhotoFragment extends android.support.v4.app.Fragment{
 
         }
     }
+
+
 }

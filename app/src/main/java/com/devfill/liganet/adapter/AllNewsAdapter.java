@@ -42,12 +42,6 @@ public class AllNewsAdapter extends RecyclerView.Adapter<AllNewsAdapter.MyViewHo
             this.card_view = v.findViewById(R.id.card_view_all_news);
             this.image = (ImageView) v.findViewById(R.id.image_all_news);
 
-
-            Typeface face = Typeface.createFromAsset(mContext.getAssets(),
-                    "fonts/10626.ttf");
-           // title.setTypeface(face);
-
-
         }
     }
 
