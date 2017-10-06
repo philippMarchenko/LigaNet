@@ -4,6 +4,7 @@ package com.devfill.liganet.network;
 import com.devfill.liganet.model.ListNews;
 import com.devfill.liganet.model.NewsContent;
 import com.devfill.liganet.model.PhotoContent;
+import com.devfill.liganet.model.VideoContent;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -18,7 +19,8 @@ public interface ServerAPI {
 
     @GET("/liga_net/get_photo_content.php")
     Call<PhotoContent> getPhotoContent(@Query(value = "link_href") String link_href);
-
+    @GET("/liga_net/get_video_content.php")
+    Call<VideoContent> getVideoContent(@Query(value = "link_href") String link_href);
 
     @GET("/liga_net/get_all_news.php")
     Call<ListNews> getAllNews();
@@ -31,6 +33,8 @@ public interface ServerAPI {
 
     @GET("/liga_net/get_photo_list.php")
     Call<ListNews> getPhotoNews();
+    @GET("/liga_net/get_video_list.php")
+    Call<ListNews> getVideoNews();
 
 }
 

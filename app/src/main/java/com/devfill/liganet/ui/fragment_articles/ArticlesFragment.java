@@ -1,4 +1,4 @@
-package com.devfill.liganet.ui;
+package com.devfill.liganet.ui.fragment_articles;
 
 import android.os.Bundle;
 
@@ -66,6 +66,7 @@ public class ArticlesFragment extends android.support.v4.app.Fragment  {
         adapter.addFragment(new WorldNewsFragment(), "Мир");
 
         viewPager.setAdapter(adapter);
+
     }
     class ViewPagerAdapter extends FragmentPagerAdapter {
         private final List<Fragment> mFragmentList = new ArrayList<>();

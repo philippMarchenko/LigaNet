@@ -2,7 +2,9 @@ package com.devfill.liganet.ui.fragment_photo;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,8 +24,19 @@ public class PhotoFragmentBase extends Fragment {
 
         ft = getFragmentManager().beginTransaction();
         ft.replace(R.id.container_photo, photoListFragment);
+
+        ft.addToBackStack(null);
         ft.commit();
 
+        getFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
+            @Override
+            public void onBackStackChanged() {
+
+                Log.d(LOG_TAG, "onBackStackChanged ");
+
+
+            }
+        });
         return  rootview;
     }
 

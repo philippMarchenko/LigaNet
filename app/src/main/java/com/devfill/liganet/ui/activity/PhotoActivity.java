@@ -1,43 +1,50 @@
-package com.devfill.liganet.ui.fragment_photo;
+package com.devfill.liganet.ui.activity;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-
-import android.os.Handler;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+import android.provider.ContactsContract;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.URLUtil;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 import com.devfill.liganet.R;
 import com.devfill.liganet.adapter.ImageSliderAdapter;
+import com.devfill.liganet.model.ArticleNews;
+import com.devfill.liganet.model.ListNews;
 import com.devfill.liganet.model.NewsContent;
 import com.devfill.liganet.model.PhotoContent;
+import com.devfill.liganet.model.VideoContent;
+import com.devfill.liganet.network.GetDataNews;
 import com.devfill.liganet.network.ServerAPI;
+import com.google.android.youtube.player.YouTubeBaseActivity;
+import com.google.android.youtube.player.YouTubeInitializationResult;
+import com.google.android.youtube.player.YouTubePlayer;
+import com.google.android.youtube.player.YouTubePlayerSupportFragment;
+import com.google.android.youtube.player.YouTubePlayerView;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
-import me.relex.circleindicator.CircleIndicator;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
@@ -46,11 +53,10 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+public class PhotoActivity extends AppCompatActivity{
 
-public class PhotoFragment extends android.support.v4.app.Fragment {
 
-
-    private static final String LOG_TAG = "PhotoFragmentTag";
+    private static final String LOG_TAG = "PhotoActivityTag";
 
     private static ViewPager mPager;
 
@@ -64,19 +70,23 @@ public class PhotoFragment extends android.support.v4.app.Fragment {
     private List<String> imgUrls;
     private List<Bitmap> bitmapList = new ArrayList<>();
     private ProgressBar progressBar;
-    private FragmentTransaction ft;
+
+
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_photo, container, false);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.photo_activity);
 
-        title_photo_news  = (TextView) rootView.findViewById(R.id.title_photo_news);
-        text_article_photo  = (TextView) rootView.findViewById(R.id.text_article_photo);
-        progressBar = (ProgressBar) rootView.findViewById(R.id.progressPhoto);
+        Log.d(LOG_TAG, "onCreate ArticleNewsFragment");
 
-        imageSliderAdapter = new ImageSliderAdapter(getContext(),bitmapList);
-        mPager = (ViewPager) rootView.findViewById(R.id.pager);
+        title_photo_news  = (TextView) findViewById(R.id.title_photo_news);
+        text_article_photo  = (TextView) findViewById(R.id.text_article_photo);
+        progressBar = (ProgressBar) findViewById(R.id.progressPhoto);
+
+        imageSliderAdapter = new ImageSliderAdapter(getBaseContext(),bitmapList);
+        mPager = (ViewPager) findViewById(R.id.pager);
         mPager.setAdapter(imageSliderAdapter);
-
 
         title_photo_news.setVisibility(View.INVISIBLE);
         text_article_photo.setVisibility(View.INVISIBLE);
@@ -87,26 +97,9 @@ public class PhotoFragment extends android.support.v4.app.Fragment {
 
         initTargetPicasso();
 
-        String linkHref = getArguments().getString("linkHref");
+        String linkHref = getIntent().getStringExtra("linkHref");
 
         getPhotoContent(linkHref);
-
-        getFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
-            @Override
-            public void onBackStackChanged() {
-
-                Log.d(LOG_TAG, "onBackStackChanged ");
-                ft = getFragmentManager().beginTransaction();
-                ft.replace(R.id.container_photo, new PhotoListFragment());
-                ft.addToBackStack(null);
-                ft.commit();
-
-            }
-        });
-
-
-
-        return rootView;
     }
 
     private String getNetworkType(Context context) {
@@ -141,9 +134,9 @@ public class PhotoFragment extends android.support.v4.app.Fragment {
     }
 
     private void getPhotoContent (String linkHref){
-        String netType = getNetworkType(getContext());
+        String netType = getNetworkType(getBaseContext());
         if(netType == null){
-            Toast.makeText(getContext(), "Подключение к сети отсутствует!", Toast.LENGTH_LONG).show();
+            Toast.makeText(getBaseContext(), "Подключение к сети отсутствует!", Toast.LENGTH_LONG).show();
         }
         else {
             try {
@@ -176,7 +169,7 @@ public class PhotoFragment extends android.support.v4.app.Fragment {
                         }
                         catch(Exception e){
 
-                            Toast.makeText(getContext(), "Не удалось распознать фото!" + e.getMessage(), Toast.LENGTH_LONG).show();
+                            Toast.makeText(getBaseContext(), "Не удалось распознать фото!" + e.getMessage(), Toast.LENGTH_LONG).show();
 
                         }
 
@@ -190,7 +183,7 @@ public class PhotoFragment extends android.support.v4.app.Fragment {
                     public void onFailure(Call<PhotoContent> call, Throwable t) {
 
 
-                        Toast.makeText(getContext(), "Ошибка запроса к серверу!" + t.getMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(getBaseContext(), "Ошибка запроса к серверу!" + t.getMessage(), Toast.LENGTH_LONG).show();
 
                         Log.i(LOG_TAG, "onFailure. Ошибка REST запроса getNewsContent " + t.toString());
                     }
@@ -240,18 +233,16 @@ public class PhotoFragment extends android.support.v4.app.Fragment {
         } else {
 
             try {
-                Picasso.with(getContext()).load(imgUrls.get(count_bitmap)).into(loadtarget);
+                Picasso.with(getBaseContext()).load(imgUrls.get(count_bitmap)).into(loadtarget);
             } catch (Exception e) {
                 Log.d(LOG_TAG, "Error load image " + e.getMessage());
 
                 count_bitmap++;
-                Picasso.with(getContext()).load(imgUrls.get(count_bitmap)).into(loadtarget);
+                Picasso.with(getBaseContext()).load(imgUrls.get(count_bitmap)).into(loadtarget);
 
             }
 
         }
     }
-
-
 
 }

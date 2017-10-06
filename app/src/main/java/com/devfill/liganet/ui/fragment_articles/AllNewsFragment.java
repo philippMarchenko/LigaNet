@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
@@ -69,7 +70,6 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
         View rootView = inflater.inflate(R.layout.fragment_all_news, container, false);
 
         Log.i(LOG_TAG, "onCreateView ");
-
 
         recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view_all_news);
         allNewsAdapter = new AllNewsAdapter(getContext(),getActivity(),allNewsList);
@@ -140,7 +140,7 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
                            swipeRefreshLayout.setRefreshing(false);
                        }
                        catch(Exception e){
-
+                           swipeRefreshLayout.setRefreshing(false);
                            Toast.makeText(getActivity(), "Нет новостей на сервере!", Toast.LENGTH_LONG).show();
 
                        }

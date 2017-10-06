@@ -16,8 +16,9 @@ import android.widget.TextView;
 
 import com.devfill.liganet.R;
 import com.devfill.liganet.model.News;
+import com.devfill.liganet.model.PhotoContent;
 import com.devfill.liganet.ui.activity.ArticleNewsActivity;
-import com.devfill.liganet.ui.activity.ArticleVideoActivity;
+import com.devfill.liganet.ui.activity.VideoActivity;
 
 import java.util.List;
 
@@ -34,7 +35,7 @@ public class PoliticAdapter extends RecyclerView.Adapter<PoliticAdapter.MyViewHo
 
         public TextView time,title;
         private View card_view;
-        private ImageView image;
+        private ImageView image,video;
 
         public MyViewHolder(View v) {
             super(v);
@@ -42,6 +43,9 @@ public class PoliticAdapter extends RecyclerView.Adapter<PoliticAdapter.MyViewHo
             this.title = (TextView) v.findViewById(R.id.title_news_politics);
             this.card_view = v.findViewById(R.id.card_view_politics);
             this.image = (ImageView) v.findViewById(R.id.image_politics);
+            this.video = (ImageView) v.findViewById(R.id.video);
+
+            video.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -67,6 +71,12 @@ public class PoliticAdapter extends RecyclerView.Adapter<PoliticAdapter.MyViewHo
         viewHolder.title.setText(Html.fromHtml(news.getTitle()));
         viewHolder.image.setImageBitmap(news.getBitmap());
 
+        if(!news.getVideoUrl().equals("") && news.getIs_photo().equals("")){
+
+            viewHolder.video.setVisibility(View.VISIBLE);
+
+        }
+
         viewHolder.card_view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -84,11 +94,26 @@ public class PoliticAdapter extends RecyclerView.Adapter<PoliticAdapter.MyViewHo
                         Log.d(LOG_TAG, "exception", e);
                     }
                 }
+                else if (news.getIs_photo().equals("1")) {
+
+                    try {
+
+                        Intent intent = new Intent(mContext, PhotoContent.class);
+                        intent.putExtra("linkHref", news.getlinkHref());
+                        mContext.startActivity(intent);
+
+
+                    } catch (Exception e) {
+                        Log.d(LOG_TAG, "exception", e);
+                    }
+                    Log.d(LOG_TAG, " А это фото");
+                }
+
                 else{
                     try {
 
-                        Intent intent = new Intent(mContext, ArticleVideoActivity.class);
-                        intent.putExtra("videoUrl", news.getVideoUrl());
+                        Intent intent = new Intent(mContext, VideoActivity.class);
+                        intent.putExtra("linkHref", news.getlinkHref());
                         mContext.startActivity(intent);
 
 

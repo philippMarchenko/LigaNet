@@ -1,4 +1,4 @@
-package com.devfill.liganet.ui.fragment_photo;
+package com.devfill.liganet.ui.fragment_video;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -6,7 +6,6 @@ import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -24,6 +23,7 @@ import android.widget.Toast;
 import com.devfill.liganet.R;
 import com.devfill.liganet.adapter.AllNewsAdapter;
 import com.devfill.liganet.adapter.PhotoListAdapter;
+import com.devfill.liganet.adapter.VideoListAdapter;
 import com.devfill.liganet.model.ArticleNews;
 import com.devfill.liganet.model.ListNews;
 import com.devfill.liganet.model.News;
@@ -49,14 +49,14 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class PhotoListFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener {
+public class VideoListFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
 
-    private static final String LOG_TAG = "PhotoListFragmentTag";
+    private static final String LOG_TAG = "VideoListFragmentTag";
 
-    private List<News> photoList = new ArrayList<>();
+    private List<News> videoList = new ArrayList<>();
     private RecyclerView recyclerView;
-    private PhotoListAdapter photoListAdapter;
+    private VideoListAdapter videoListAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
 
     private int count_bitmap = 0;
@@ -68,7 +68,7 @@ public class PhotoListFragment extends android.support.v4.app.Fragment implement
     FragmentTransaction ft;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_photo_list, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_video_list, container, false);
 
         Log.i(LOG_TAG, "onCreateView ");
 
@@ -76,14 +76,14 @@ public class PhotoListFragment extends android.support.v4.app.Fragment implement
         ft = getFragmentManager().beginTransaction();
 
 
-        recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view_photo);
-        photoListAdapter = new PhotoListAdapter(getContext(),getActivity(),ft,photoList);
+        recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view_video);
+        videoListAdapter = new VideoListAdapter(getContext(),getActivity(),ft,videoList);
         RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(getContext(), 1);
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(photoListAdapter);
+        recyclerView.setAdapter(videoListAdapter);
 
-        swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh_layout_photo);
+        swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh_layout_video);
         swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
 
         swipeRefreshLayout.setOnRefreshListener(this);
@@ -92,7 +92,7 @@ public class PhotoListFragment extends android.support.v4.app.Fragment implement
         initRetrofit ();
         initTargetPicasso();
 
-        getPhotoList();
+        getVideoList();
 
         return rootView;
     }
@@ -118,9 +118,9 @@ public class PhotoListFragment extends android.support.v4.app.Fragment implement
         serverAPI = retrofit.create(ServerAPI.class);
     }
 
-    private void getPhotoList (){
+    private void getVideoList (){
 
-        photoList.clear();
+        videoList.clear();
         swipeRefreshLayout.setRefreshing(true);
 
 
@@ -133,15 +133,15 @@ public class PhotoListFragment extends android.support.v4.app.Fragment implement
         else {
             try {
 
-                serverAPI.getPhotoNews().enqueue(new Callback<ListNews>() {
+                serverAPI.getVideoNews().enqueue(new Callback<ListNews>() {
                     @Override
                     public void onResponse(Call<ListNews> call, Response<ListNews> response) {
 
                         ListNews listNews = response.body();
 
                         try {
-                            photoList.addAll(listNews.getNews());
-                            photoListAdapter.notifyDataSetChanged();
+                            videoList.addAll(listNews.getNews());
+                            videoListAdapter.notifyDataSetChanged();
                             swipeRefreshLayout.setRefreshing(false);
                         }
                         catch(Exception e){
@@ -187,7 +187,7 @@ public class PhotoListFragment extends android.support.v4.app.Fragment implement
 
 
         swipeRefreshLayout.setRefreshing(true);
-        getPhotoList();
+        getVideoList();
     }
 
     private void loadNextImage(){
@@ -209,19 +209,19 @@ public class PhotoListFragment extends android.support.v4.app.Fragment implement
 
 
 
-        if(count_bitmap == photoList.size()) {
+        if(count_bitmap == videoList.size()) {
             count_bitmap = 0;
         }
         else{
 
             try {
-                Picasso.with(getContext()).load(photoList.get(count_bitmap).getImgUrl()).resize(width, height).into(loadtarget);
+                Picasso.with(getContext()).load(videoList.get(count_bitmap).getImgUrl()).resize(width, height).into(loadtarget);
             }
             catch (Exception e){
                 Log.d(LOG_TAG, "Error load image " + e.getMessage());
 
                 count_bitmap++;
-                Picasso.with(getContext()).load(photoList.get(count_bitmap).getImgUrl()).resize(width, height).into(loadtarget);
+                Picasso.with(getContext()).load(videoList.get(count_bitmap).getImgUrl()).resize(width, height).into(loadtarget);
             }
         }
 
@@ -235,9 +235,9 @@ public class PhotoListFragment extends android.support.v4.app.Fragment implement
 
                 Log.d(LOG_TAG, "onBitmapLoaded  ");
 
-                if (photoList.size() > 0) {
-                    photoList.get(count_bitmap).setBitmap(bitmap);
-                    photoListAdapter.notifyDataSetChanged();
+                if (videoList.size() > 0) {
+                    videoList.get(count_bitmap).setBitmap(bitmap);
+                    videoListAdapter.notifyDataSetChanged();
 
                     count_bitmap++;
                     loadNextImage();

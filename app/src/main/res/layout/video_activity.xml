@@ -24,19 +24,18 @@
                 android:textStyle="normal|bold" />
 
             <RelativeLayout
-        android:layout_width="match_parent"
+                android:layout_width="match_parent"
                 android:layout_below="@+id/annotation_video"
-        android:id="@+id/layout"
+                android:id="@+id/layout"
                 android:layout_height="235dp">
 
-        <fragment
-            android:name="com.google.android.youtube.player.YouTubePlayerSupportFragment"
-            android:id="@+id/youtubesupportfragment"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp" />
+                <com.google.android.youtube.player.YouTubePlayerView
+                    android:id="@+id/youtube"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp" />
 
-    </RelativeLayout>
+            </RelativeLayout>
 
             <TextView
                 android:text="text_video"

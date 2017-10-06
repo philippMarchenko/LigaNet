@@ -13,11 +13,11 @@ import android.view.MenuItem;
 
 import com.devfill.liganet.R;
 
-import com.devfill.liganet.ui.ArticlesFragment;
+import com.devfill.liganet.ui.fragment_articles.ArticlesFragment;
 import com.devfill.liganet.ui.fragment_photo.PhotoFragmentBase;
+import com.devfill.liganet.ui.fragment_video.VideoFragmentBase;
 import com.devfill.liganet.ui.helper.CustomViewPager;
 
-import com.devfill.liganet.ui.VideoFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(new ArticlesFragment());
         adapter.addFragment(new PhotoFragmentBase());
-        adapter.addFragment(new VideoFragment());
+        adapter.addFragment(new VideoFragmentBase());
         viewPager.setAdapter(adapter);
     }
     class ViewPagerAdapter extends FragmentPagerAdapter {

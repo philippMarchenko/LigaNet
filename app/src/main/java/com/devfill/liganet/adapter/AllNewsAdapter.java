@@ -15,8 +15,10 @@ import android.widget.TextView;
 
 import com.devfill.liganet.R;
 import com.devfill.liganet.model.News;
+import com.devfill.liganet.model.PhotoContent;
 import com.devfill.liganet.ui.activity.ArticleNewsActivity;
-import com.devfill.liganet.ui.activity.ArticleVideoActivity;
+import com.devfill.liganet.ui.activity.VideoActivity;
+
 
 import java.util.List;
 
@@ -33,7 +35,7 @@ public class AllNewsAdapter extends RecyclerView.Adapter<AllNewsAdapter.MyViewHo
 
         private TextView time,title;
         private View card_view;
-        private ImageView image;
+        private ImageView image,video;
 
         public MyViewHolder(View v) {
             super(v);
@@ -41,6 +43,9 @@ public class AllNewsAdapter extends RecyclerView.Adapter<AllNewsAdapter.MyViewHo
             this.title = (TextView) v.findViewById(R.id.title_news);
             this.card_view = v.findViewById(R.id.card_view_all_news);
             this.image = (ImageView) v.findViewById(R.id.image_all_news);
+            this.video = (ImageView) v.findViewById(R.id.video);
+
+            video.setVisibility(View.INVISIBLE);
 
         }
     }
@@ -69,11 +74,24 @@ public class AllNewsAdapter extends RecyclerView.Adapter<AllNewsAdapter.MyViewHo
         viewHolder.title.setText(Html.fromHtml(news.getTitle()));
         viewHolder.image.setImageBitmap(news.getBitmap());
 
+        if(!news.getVideoUrl().equals("") && news.getIs_photo().equals("")){
+
+            viewHolder.video.setVisibility(View.VISIBLE);
+
+        }
+        if(news.getVideoUrl().equals("") && !news.getIs_photo().equals("")){
+
+            //viewHolder.video.setVisibility(View.VISIBLE);
+
+        }
+
+
+
         // define an on click listener to open PlaybackFragment
         viewHolder.card_view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(news.getVideoUrl().equals("")){
+               if(news.getVideoUrl().equals("")){
 
                     Log.d(LOG_TAG, "Это не видео");
                     try {
@@ -87,11 +105,26 @@ public class AllNewsAdapter extends RecyclerView.Adapter<AllNewsAdapter.MyViewHo
                         Log.d(LOG_TAG, "exception", e);
                     }
                 }
-                else{
-                    try {
+                else if (news.getIs_photo().equals("1")) {
 
-                        Intent intent = new Intent(mContext, ArticleVideoActivity.class);
-                        intent.putExtra("videoUrl", news.getVideoUrl());
+                   try {
+
+                       Intent intent = new Intent(mContext, PhotoContent.class);
+                       intent.putExtra("linkHref", news.getlinkHref());
+                       mContext.startActivity(intent);
+
+
+                   } catch (Exception e) {
+                       Log.d(LOG_TAG, "exception", e);
+                   }
+                   Log.d(LOG_TAG, " А это фото");
+                }
+
+                else{
+                   try {
+
+                        Intent intent = new Intent(mContext, VideoActivity.class);
+                        intent.putExtra("linkHref", news.getlinkHref());
                         mContext.startActivity(intent);
 
 

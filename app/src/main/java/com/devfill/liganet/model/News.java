@@ -24,6 +24,12 @@ public class News {
     @SerializedName("videoUrl")
     @Expose
     private String videoUrl;
+
+
+    @SerializedName("isPhoto")
+    @Expose
+    private String isPhoto;
+
     private Bitmap bitmap;
 
 
@@ -33,6 +39,13 @@ public class News {
         this.time = time;
         this.title = title;
         this.linkHref = linkHref;
+    }
+    public String getIs_photo() {
+        return isPhoto;
+    }
+
+    public void setIs_photo(String is_photo) {
+        this.isPhoto = is_photo;
     }
 
     public String getTime() {

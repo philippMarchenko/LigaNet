@@ -18,7 +18,6 @@ import android.widget.TextView;
 import com.devfill.liganet.R;
 import com.devfill.liganet.model.News;
 import com.devfill.liganet.ui.activity.ArticleNewsActivity;
-import com.devfill.liganet.ui.activity.ArticleVideoActivity;
 
 
 import java.util.List;
@@ -97,9 +96,9 @@ public class EconomicAdapter extends RecyclerView.Adapter<EconomicAdapter.MyView
                 else{
                     try {
 
-                        Intent intent = new Intent(mContext, ArticleVideoActivity.class);
-                        intent.putExtra("videoUrl", news.getVideoUrl());
-                        mContext.startActivity(intent);
+                       // Intent intent = new Intent(mContext, ArticleVideoActivity.class);
+                      //  intent.putExtra("videoUrl", news.getVideoUrl());
+                       // mContext.startActivity(intent);
 
 
                     } catch (Exception e) {

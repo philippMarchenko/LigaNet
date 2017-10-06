@@ -6,12 +6,11 @@
     >
 
     <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/card_view_world"
+        android:id="@+id/card_view_video"
         android:layout_width="match_parent"
         android:layout_gravity="center"
         android:layout_margin="2dp"
         android:foreground="?android:attr/selectableItemBackground"
-        android:transitionName="open_mediaplayer"
         card_view:cardCornerRadius="4dp"
         card_view:cardElevation="3dp"
         android:layout_height="wrap_content">
@@ -31,43 +30,21 @@
                 <ImageView
                     app:srcCompat="?attr/selectableItemBackground"
                     android:layout_centerVertical="true"
-                    android:layout_alignStart="@+id/card_view_world"
-                    android:id="@+id/image_world"
+                    android:layout_alignStart="@+id/card_view_video"
+                    android:id="@+id/image_video"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <ImageView
-                        app:srcCompat="@drawable/video"
-                        android:id="@+id/video"
-                        android:layout_height="50dp"
-                        android:layout_width="50dp"
-                        android:layout_centerInParent="true"
-                        android:alpha="0.8"/>
-
-                    <TextView
-                        android:text="Фото"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentBottom="true"
-                        android:layout_alignParentEnd="true"
-                        android:id="@+id/photo"
-                        android:layout_marginRight="3dp"
-                        android:layout_marginBottom="3dp" />
-                </RelativeLayout>
             </android.support.v7.widget.CardView>
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
-                android:layout_toEndOf="@+id/cardView"
+                android:layout_toEndOf="@+id/card_view_video"
                 android:layout_marginStart="125dp">
 
                 <TextView
-                    android:id="@+id/title_news_world"
+                    android:id="@+id/title_news_video"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-condensed"
@@ -80,14 +57,14 @@
                     android:text="12:00"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/time_news_world"
+                    android:id="@+id/time_new_video"
                     android:textStyle="normal|italic"
                     android:textSize="12sp"
                     android:textColor="@android:color/darker_gray"
                     android:layout_marginTop="5dp"
                     android:layout_marginBottom="5dp"
-                    android:layout_below="@+id/title_news_world"
-                    android:layout_alignStart="@+id/title_news_world"
+                    android:layout_below="@+id/title_news_video"
+                    android:layout_alignStart="@+id/title_news_video"
                     android:layout_alignParentBottom="false"
                     android:layout_centerHorizontal="false" />
             </RelativeLayout>

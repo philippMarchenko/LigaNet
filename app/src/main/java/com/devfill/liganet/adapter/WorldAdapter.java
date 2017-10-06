@@ -14,8 +14,10 @@ import android.widget.TextView;
 
 import com.devfill.liganet.R;
 import com.devfill.liganet.model.News;
+import com.devfill.liganet.model.PhotoContent;
 import com.devfill.liganet.ui.activity.ArticleNewsActivity;
-import com.devfill.liganet.ui.activity.ArticleVideoActivity;
+import com.devfill.liganet.ui.activity.VideoActivity;
+
 
 import java.util.List;
 
@@ -30,16 +32,21 @@ public class WorldAdapter extends RecyclerView.Adapter<WorldAdapter.MyViewHolder
 
     public class MyViewHolder extends RecyclerView.ViewHolder{
 
-        public TextView time,title;
+        public TextView time,title,photo;
         private View card_view;
-        private ImageView image;
+        private ImageView image,video;
 
         public MyViewHolder(View v) {
             super(v);
             this.time = (TextView) v.findViewById(R.id.time_news_world);
             this.title = (TextView) v.findViewById(R.id.title_news_world);
+            this.photo = (TextView) v.findViewById(R.id.photo);
             this.card_view = v.findViewById(R.id.card_view_world);
             this.image = (ImageView) v.findViewById(R.id.image_world);
+            this.video = (ImageView) v.findViewById(R.id.video);
+
+            photo.setVisibility(View.INVISIBLE);
+            video.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -65,6 +72,18 @@ public class WorldAdapter extends RecyclerView.Adapter<WorldAdapter.MyViewHolder
         viewHolder.title.setText(Html.fromHtml(news.getTitle()));
         viewHolder.image.setImageBitmap(news.getBitmap());
 
+        Log.d(LOG_TAG, "onBindViewHolder getVideoUrl " + news.getVideoUrl());
+
+        if(!news.getVideoUrl().equals("")){
+
+            viewHolder.video.setVisibility(View.VISIBLE);
+
+        }
+        if(news.getIs_photo().equals("1")){
+
+            viewHolder.photo.setVisibility(View.VISIBLE);
+
+        }
         viewHolder.card_view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -83,11 +102,26 @@ public class WorldAdapter extends RecyclerView.Adapter<WorldAdapter.MyViewHolder
                        Log.d(LOG_TAG, "exception", e);
                    }
                }
-                else{
+               else if (news.getIs_photo().equals("1")) {
+
                    try {
 
-                       Intent intent = new Intent(mContext, ArticleVideoActivity.class);
-                       intent.putExtra("videoUrl", news.getVideoUrl());
+                       Intent intent = new Intent(mContext, PhotoContent.class);
+                       intent.putExtra("linkHref", news.getlinkHref());
+                       mContext.startActivity(intent);
+
+
+                   } catch (Exception e) {
+                       Log.d(LOG_TAG, "exception", e);
+                   }
+                   Log.d(LOG_TAG, " А это фото");
+               }
+
+               else{
+                   try {
+
+                       Intent intent = new Intent(mContext, VideoActivity.class);
+                       intent.putExtra("linkHref", news.getlinkHref());
                        mContext.startActivity(intent);
 
 
@@ -96,8 +130,6 @@ public class WorldAdapter extends RecyclerView.Adapter<WorldAdapter.MyViewHolder
                    }
                    Log.d(LOG_TAG, " А это видео");
                }
-
-
 
             }
         });
