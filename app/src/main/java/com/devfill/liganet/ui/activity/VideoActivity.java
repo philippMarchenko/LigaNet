@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LevelListDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.provider.ContactsContract;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,6 +40,8 @@ import com.squareup.picasso.Target;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
@@ -48,7 +52,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class VideoActivity extends YouTubeBaseActivity{
+public class VideoActivity extends YouTubeBaseActivity implements Html.ImageGetter {
 
 
     private static final String LOG_TAG = "VideoActivityTag";
@@ -56,13 +60,15 @@ public class VideoActivity extends YouTubeBaseActivity{
     private TextView text_video,annotation_video;
     private ProgressBar progressBar;
     private YouTubePlayer.OnInitializedListener onInitializedListener;
-    private  YouTubePlayer mPlayer;
+    private YouTubePlayer mPlayer;
     private YouTubePlayerView youTubePlayerView;
 
     private Retrofit retrofit;
     private ServerAPI serverAPI;
 
     String videoUrl,linkHref;
+
+    Map<String, Drawable> drawableHashMap = new HashMap<String, Drawable>();
 
 
     @Override
@@ -130,6 +136,7 @@ public class VideoActivity extends YouTubeBaseActivity{
         }
         return null;
     }
+
     private void initRetrofit (){
 
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
@@ -152,6 +159,7 @@ public class VideoActivity extends YouTubeBaseActivity{
     }
 
     private void getVideoContent (String linkHref){
+
         String netType = getNetworkType(this);
         if(netType == null){
             Toast.makeText(this, "Подключение к сети отсутствует!", Toast.LENGTH_LONG).show();
@@ -165,7 +173,6 @@ public class VideoActivity extends YouTubeBaseActivity{
 
                         VideoContent videoContent = response.body();
 
-
                         try {
 
                             text_video.setVisibility(View.VISIBLE);
@@ -173,11 +180,30 @@ public class VideoActivity extends YouTubeBaseActivity{
                             progressBar.setVisibility(View.INVISIBLE);
                             youTubePlayerView.setVisibility(View.VISIBLE);
 
-                            text_video.setText(Html.fromHtml(videoContent.getText()));
-                            annotation_video.setText(Html.fromHtml(videoContent.getAnnotation()));
-                            videoUrl = videoContent.getVideo_url();
+                            text_video.setText(Html.fromHtml(videoContent.getData().getText()));
+                            annotation_video.setText(Html.fromHtml(videoContent.getData().getAnnotation()));
+                            videoUrl = videoContent.getData().getVideo_url();
+
+                            for(int i = 0; i < videoContent.getUrls().size(); i ++){
+
+                                Log.i(LOG_TAG, "urlPhoto " + videoContent.getUrls().get(i));
+
+                            }
 
                             youTubePlayerView.setVisibility(View.VISIBLE);
+
+                           /* String code = "<p><b>First, </b><br/>" +
+                                    "Please press the <img src ='addbutton.png'> button beside the to insert a new event.</p>" +
+                                    "<p><b>Second,</b><br/>" +
+                                    "Please insert the details of the event.</p>"
+                            "<p>The icon of the is show the level of the event.<br/>" +
+                                    "eg: <img src = 'tu1.png' > is easier to do.</p></td>";
+
+                            message = (TextView) findViewById (R.id.message);
+                            Spanned spanned = Html.fromHtml(code);
+                            message.setText(spanned);
+                            message.setTextSize(16);*/
+
 
                             Log.i(LOG_TAG, "getVideoContent videoUrl " + videoUrl);
 
@@ -214,6 +240,25 @@ public class VideoActivity extends YouTubeBaseActivity{
         }
     }
 
+    @Override
+    public Drawable getDrawable(String source) {
+        int id = 0;
+
+       /* if(source.equals("addbutton.png")){
+            id = R.drawable.addbutton;
+        }
+
+        if(source.equals("tu1.png")){
+            id = R.drawable.tu1;
+        }
+        LevelListDrawable d = new LevelListDrawable();
+        Drawable empty = getResources().getDrawable(id);
+        d.addLevel(0, 0, empty);
+        d.setBounds(0, 0, empty.getIntrinsicWidth(), empty.getIntrinsicHeight());
 
 
+        Drawable drawable = new BitmapDrawable(getResources(), bitmap);*/
+
+        return null;
+    }
 }

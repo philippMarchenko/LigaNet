@@ -164,9 +164,9 @@ if(youTubePlayerSupportFragment != null){
                             progressBar.setVisibility(View.INVISIBLE);
                             youTubePlayerSupportFragment.getView().setVisibility(View.VISIBLE);
 
-                            text_video.setText(Html.fromHtml(videoContent.getText()));
-                            annotation_video.setText(Html.fromHtml(videoContent.getAnnotation()));
-                            videoUrl = videoContent.getVideo_url();
+                            text_video.setText(Html.fromHtml(videoContent.getData().getText()));
+                            annotation_video.setText(Html.fromHtml(videoContent.getData().getAnnotation()));
+                            videoUrl = videoContent.getData().getVideo_url();
 
                             youTubePlayerSupportFragment.getView().setVisibility(View.VISIBLE);
 
