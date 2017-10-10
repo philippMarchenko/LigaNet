@@ -14,18 +14,20 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
+
 import com.devfill.liganet.R;
+import com.devfill.liganet.adapter.AllNewsAdapter;
 import com.devfill.liganet.adapter.EconomicAdapter;
-import com.devfill.liganet.adapter.PoliticAdapter;
+import com.devfill.liganet.helper.OnLoadMoreListener;
 import com.devfill.liganet.model.ListNews;
 import com.devfill.liganet.model.News;
-import com.devfill.liganet.network.GetListNews;
 import com.devfill.liganet.network.ServerAPI;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -38,21 +40,24 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class EconomicFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener{
+public class EconomicFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
-    private static final String LOG_TAG = "EconomicFragmentTag";
+
+    private static final String LOG_TAG = "AllNewsFragmentTag";
 
     private List<News> economicList = new ArrayList<>();
     private RecyclerView recyclerView;
     private EconomicAdapter economicAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
 
+    private int count_bitmap = 0;
+
     private Retrofit retrofit;
     private ServerAPI serverAPI;
     Target loadtarget = null;
 
-    private int count_bitmap = 0;
-
+    int start = 0,end = 21;
+    ProgressBar progressBarEconomic;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -60,22 +65,50 @@ public class EconomicFragment extends android.support.v4.app.Fragment implements
 
         Log.i(LOG_TAG, "onCreateView ");
 
-        recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view_economic);
-        economicAdapter = new EconomicAdapter(getContext(),getActivity(),economicList);
+        progressBarEconomic = (ProgressBar) rootView.findViewById(R.id.progressBarEconomic);
+        progressBarEconomic.setVisibility(View.INVISIBLE);
+
+        recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view_economics);
+
         RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(getContext(), 1);
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
+
+        economicAdapter = new EconomicAdapter(getContext(),getActivity(),economicList,recyclerView);
         recyclerView.setAdapter(economicAdapter);
+
+        economicAdapter.setOnLoadMoreListener(new OnLoadMoreListener() {
+            @Override
+            public void onLoadMore() {
+                //add null , so the adapter will check view_type and show progress bar at bottom
+                economicList.add(null);
+                economicAdapter.notifyItemInserted(economicList.size() - 1);
+
+
+                economicList.remove(economicList.size() - 1);
+                economicAdapter.notifyItemRemoved(economicList.size());
+                //add items one by one
+                start = economicList.size();
+                end = start + 21;
+
+                progressBarEconomic.setVisibility(View.VISIBLE);
+                getEconomicList();
+
+
+            }
+        });
+
 
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh_layout_economic);
         swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
 
         swipeRefreshLayout.setOnRefreshListener(this);
 
-        initRetrofit();
+        initRetrofit ();
         initTargetPicasso();
 
-        getEconomicsNewsList();
+        getEconomicList();
+
         return rootView;
     }
 
@@ -100,33 +133,50 @@ public class EconomicFragment extends android.support.v4.app.Fragment implements
         serverAPI = retrofit.create(ServerAPI.class);
     }
 
-    private void getEconomicsNewsList (){
+    private void getEconomicList (){
 
+        //  allNewsList.clear();
         swipeRefreshLayout.setRefreshing(true);
+        Log.i(LOG_TAG, "getAllNewsList ");
 
         String netType = getNetworkType(getContext());
         if(netType == null){
             Toast.makeText(getActivity(), "Подключение к сети отсутствует!", Toast.LENGTH_LONG).show();
             swipeRefreshLayout.setRefreshing(false);
+
         }
         else {
             try {
 
-                serverAPI.getEconomicNews().enqueue(new Callback<ListNews>() {
+                serverAPI.getEconomicNews(Integer.toString(start),Integer.toString(end)).enqueue(new Callback<ListNews>() {
                     @Override
                     public void onResponse(Call<ListNews> call, Response<ListNews> response) {
 
                         ListNews listNews = response.body();
 
-                        economicList.addAll(listNews.getNews());
-                        economicAdapter.notifyDataSetChanged();
-                        swipeRefreshLayout.setRefreshing(false);
 
+                        Log.i(LOG_TAG, "onResponse getListNews ");
+
+
+                        try {
+
+                            economicList.addAll(listNews.getNews());
+                            economicAdapter.notifyDataSetChanged();
+                            economicAdapter.setLoaded();
+                            swipeRefreshLayout.setRefreshing(false);
+                            progressBarEconomic.setVisibility(View.INVISIBLE);
+
+                        }
+                        catch(Exception e){
+                            swipeRefreshLayout.setRefreshing(false);
+                            progressBarEconomic.setVisibility(View.INVISIBLE);
+                            Toast.makeText(getActivity(), "Нет новостей на сервере!", Toast.LENGTH_LONG).show();
+
+                        }
 
                         loadNextImage();
 
-                        Log.i(LOG_TAG, "onResponse getListNews size" + listNews.getNews().size());
-                        Log.i(LOG_TAG, "onResponse getListNews getTitle()" + listNews.getNews().get(0).getTitle());
+                        Log.i(LOG_TAG, "onResponse getListNews ");
 
                     }
 
@@ -140,7 +190,7 @@ public class EconomicFragment extends android.support.v4.app.Fragment implements
                     }
                 });
             } catch (Exception e) {
-                Toast.makeText(getActivity(), "Ошибка запроса к серверу!" + e.getMessage(), Toast.LENGTH_LONG).show();
+
                 Log.i(LOG_TAG, "Ошибка REST запроса к серверу  getListNews " + e.getMessage());
             }
         }
@@ -156,8 +206,18 @@ public class EconomicFragment extends android.support.v4.app.Fragment implements
         return null;
     }
 
-    private void loadNextImage(){
+    @Override
+    public void onRefresh() {
 
+        swipeRefreshLayout.setRefreshing(true);
+        economicList.clear();
+
+        start = 0;
+        end = 21;
+        getEconomicList();
+    }
+
+    private void loadNextImage(){
 
         int height = 90;
         int width = 120;
@@ -175,6 +235,7 @@ public class EconomicFragment extends android.support.v4.app.Fragment implements
         }
 
 
+
         if(count_bitmap == economicList.size()) {
             count_bitmap = 0;
         }
@@ -184,7 +245,6 @@ public class EconomicFragment extends android.support.v4.app.Fragment implements
                 Picasso.with(getContext()).load(economicList.get(count_bitmap).getImgUrl()).resize(width, height).into(loadtarget);
             }
             catch (Exception e){
-
                 Log.d(LOG_TAG, "Error load image " + e.getMessage());
 
                 count_bitmap++;
@@ -194,7 +254,7 @@ public class EconomicFragment extends android.support.v4.app.Fragment implements
 
     }
 
-    private void initTargetPicasso(){
+    void initTargetPicasso(){
 
         loadtarget = new Target() {
             @Override
@@ -202,11 +262,14 @@ public class EconomicFragment extends android.support.v4.app.Fragment implements
 
                 Log.d(LOG_TAG, "onBitmapLoaded  ");
 
-                economicList.get(count_bitmap).setBitmap(bitmap);
-                economicAdapter.notifyDataSetChanged();
+                if (economicList.size() > 0) {
+                    economicList.get(count_bitmap).setBitmap(bitmap);
+                    economicAdapter.notifyDataSetChanged();
 
-                count_bitmap++;
-                loadNextImage();
+                    count_bitmap++;
+                    loadNextImage();
+                }
+
             }
 
             @Override
@@ -225,10 +288,5 @@ public class EconomicFragment extends android.support.v4.app.Fragment implements
 
         };
     }
-    @Override
-    public void onRefresh() {
 
-        swipeRefreshLayout.setRefreshing(true);
-        getEconomicsNewsList();
-    }
 }

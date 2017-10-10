@@ -77,7 +77,6 @@ public class PhotoFragment extends android.support.v4.app.Fragment {
         mPager = (ViewPager) rootView.findViewById(R.id.pager);
         mPager.setAdapter(imageSliderAdapter);
 
-
         title_photo_news.setVisibility(View.INVISIBLE);
         text_article_photo.setVisibility(View.INVISIBLE);
         mPager.setVisibility(View.INVISIBLE);
@@ -90,21 +89,6 @@ public class PhotoFragment extends android.support.v4.app.Fragment {
         String linkHref = getArguments().getString("linkHref");
 
         getPhotoContent(linkHref);
-
-        getFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
-            @Override
-            public void onBackStackChanged() {
-
-                Log.d(LOG_TAG, "onBackStackChanged ");
-                ft = getFragmentManager().beginTransaction();
-                ft.replace(R.id.container_photo, new PhotoListFragment());
-                ft.addToBackStack(null);
-                ft.commit();
-
-            }
-        });
-
-
 
         return rootView;
     }

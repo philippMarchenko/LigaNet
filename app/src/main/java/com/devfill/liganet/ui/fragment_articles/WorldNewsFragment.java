@@ -15,11 +15,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.devfill.liganet.R;
 import com.devfill.liganet.adapter.PoliticAdapter;
 import com.devfill.liganet.adapter.WorldAdapter;
+import com.devfill.liganet.helper.OnLoadMoreListener;
 import com.devfill.liganet.model.ListNews;
 import com.devfill.liganet.model.News;
 import com.devfill.liganet.network.GetListNews;
@@ -52,19 +54,26 @@ public class WorldNewsFragment extends android.support.v4.app.Fragment implement
         private ServerAPI serverAPI;
         Target loadtarget = null;
 
-         private int count_bitmap = 0;
+        private int count_bitmap = 0;
 
+        int start = 0,end = 21;
+        ProgressBar progressBarWorld;
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_world, container, false);
 
             Log.i(LOG_TAG, "onCreateView ");
 
+            progressBarWorld = (ProgressBar) rootView.findViewById(R.id.progressBarWorld);
+            progressBarWorld.setVisibility(View.INVISIBLE);
+
             recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view_world);
-            worldAdapter = new WorldAdapter(getContext(),getActivity(),worldList);
+
             RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(getContext(), 1);
             recyclerView.setLayoutManager(mLayoutManager);
             recyclerView.setItemAnimator(new DefaultItemAnimator());
+
+            worldAdapter = new WorldAdapter(getContext(),getActivity(),worldList,recyclerView);
             recyclerView.setAdapter(worldAdapter);
 
             swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh_layout_world);
@@ -72,6 +81,26 @@ public class WorldNewsFragment extends android.support.v4.app.Fragment implement
 
             swipeRefreshLayout.setOnRefreshListener(this);
 
+            worldAdapter.setOnLoadMoreListener(new OnLoadMoreListener() {
+                @Override
+                public void onLoadMore() {
+                    //add null , so the adapter will check view_type and show progress bar at bottom
+                    worldList.add(null);
+                    worldAdapter.notifyItemInserted(worldList.size() - 1);
+
+
+                    worldList.remove(worldList.size() - 1);
+                    worldAdapter.notifyItemRemoved(worldList.size());
+                    //add items one by one
+                    start = worldList.size();
+                    end = start + 21;
+
+                    progressBarWorld.setVisibility(View.VISIBLE);
+                    getWorldNewsList();
+
+
+                }
+            });
 
             initRetrofit();
             initTargetPicasso();
@@ -115,7 +144,7 @@ public class WorldNewsFragment extends android.support.v4.app.Fragment implement
         else {
             try {
 
-                serverAPI.getWorldNews().enqueue(new Callback<ListNews>() {
+                serverAPI.getWorldNews(Integer.toString(start),Integer.toString(end)).enqueue(new Callback<ListNews>() {
                     @Override
                     public void onResponse(Call<ListNews> call, Response<ListNews> response) {
 
@@ -123,7 +152,9 @@ public class WorldNewsFragment extends android.support.v4.app.Fragment implement
 
                         worldList.addAll(listNews.getNews());
                         worldAdapter.notifyDataSetChanged();
+                        worldAdapter.setLoaded();
                         swipeRefreshLayout.setRefreshing(false);
+                        progressBarWorld.setVisibility(View.INVISIBLE);
 
 
                         loadNextImage();
@@ -232,6 +263,10 @@ public class WorldNewsFragment extends android.support.v4.app.Fragment implement
     public void onRefresh() {
 
         swipeRefreshLayout.setRefreshing(true);
+        worldList.clear();
+
+        start = 0;
+        end = 21;
         getWorldNewsList();
     }
 }

@@ -60,10 +60,12 @@ public class ArticlesFragment extends android.support.v4.app.Fragment  {
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getChildFragmentManager());
+
         adapter.addFragment(new AllNewsFragment(), "Все новости");
-        adapter.addFragment(new PoliticFragment(), "Политика");
         adapter.addFragment(new EconomicFragment(), "Экономика");
         adapter.addFragment(new WorldNewsFragment(), "Мир");
+        adapter.addFragment(new PoliticFragment(), "Политика");
+
 
         viewPager.setAdapter(adapter);
 

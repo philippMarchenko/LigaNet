@@ -23,13 +23,17 @@ public interface ServerAPI {
     Call<VideoContent> getVideoContent(@Query(value = "link_href") String link_href);
 
     @GET("/liga_net/get_all_news.php")
-    Call<ListNews> getAllNews();
+    Call<ListNews> getAllNews(@Query(value = "start") String start,
+                              @Query(value = "end") String end);
     @GET("/liga_net/get_politic_news.php")
-    Call<ListNews> getPoliticNews();
+    Call<ListNews> getPoliticNews(@Query(value = "start") String start,
+                                  @Query(value = "end") String end);
     @GET("/liga_net/get_economic_news .php")
-    Call<ListNews> getEconomicNews();
+    Call<ListNews> getEconomicNews(@Query(value = "start") String start,
+                                   @Query(value = "end") String end);
     @GET("/liga_net/get_world_news.php")
-    Call<ListNews> getWorldNews();
+    Call<ListNews> getWorldNews(@Query(value = "start") String start,
+                                @Query(value = "end") String end);
 
     @GET("/liga_net/get_photo_list.php")
     Call<ListNews> getPhotoNews();

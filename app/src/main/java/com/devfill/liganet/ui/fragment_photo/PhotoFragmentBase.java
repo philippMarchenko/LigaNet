@@ -22,10 +22,11 @@ public class PhotoFragmentBase extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootview = inflater.inflate(R.layout.fragment_photo_base, container, false);
 
-        ft = getFragmentManager().beginTransaction();
+        ft = getChildFragmentManager().beginTransaction();
         ft.replace(R.id.container_photo, photoListFragment);
+        ft.commit();
 
-        ft.addToBackStack(null);
+       /* ft.addToBackStack(null);
         ft.commit();
 
         getFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
@@ -36,7 +37,7 @@ public class PhotoFragmentBase extends Fragment {
 
 
             }
-        });
+        });*/
         return  rootview;
     }
 

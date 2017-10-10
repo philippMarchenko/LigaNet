@@ -170,6 +170,7 @@ if(youTubePlayerSupportFragment != null){
 
                             youTubePlayerSupportFragment.getView().setVisibility(View.VISIBLE);
 
+                            Log.i(LOG_TAG, "getVideoContent videoUrl " + videoUrl);
                             mPlayer.cueVideo(videoUrl);
 
                           //  youTubePlayerSupportFragment.initialize("AIzaSyAW4zFM9keH8D0uDd3YGbysra3Ci8Sn-tM",onInitializedListener);

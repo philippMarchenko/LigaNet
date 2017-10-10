@@ -6,7 +6,6 @@ import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
@@ -15,28 +14,21 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.URLUtil;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 
 import com.devfill.liganet.R;
 import com.devfill.liganet.adapter.AllNewsAdapter;
-import com.devfill.liganet.model.ArticleNews;
+import com.devfill.liganet.helper.OnLoadMoreListener;
 import com.devfill.liganet.model.ListNews;
 import com.devfill.liganet.model.News;
-import com.devfill.liganet.network.GetArticleImage;
-import com.devfill.liganet.network.GetDataNews;
-import com.devfill.liganet.network.GetListNews;
 import com.devfill.liganet.network.ServerAPI;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
-
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
@@ -52,9 +44,6 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
 
     private static final String LOG_TAG = "AllNewsFragmentTag";
 
-    private ImageView image_all_news;
-
-    private List<Bitmap> bitMapList = new ArrayList<>();
     private List<News> allNewsList = new ArrayList<>();
     private RecyclerView recyclerView;
     private AllNewsAdapter allNewsAdapter;
@@ -65,24 +54,54 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
     private Retrofit retrofit;
     private ServerAPI serverAPI;
     Target loadtarget = null;
+
+    int start = 0,end = 21;
+    ProgressBar progressBarAllNews;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_all_news, container, false);
 
         Log.i(LOG_TAG, "onCreateView ");
 
+        progressBarAllNews = (ProgressBar) rootView.findViewById(R.id.progressBarAllNews);
+        progressBarAllNews.setVisibility(View.INVISIBLE);
+
         recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view_all_news);
-        allNewsAdapter = new AllNewsAdapter(getContext(),getActivity(),allNewsList);
+
         RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(getContext(), 1);
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
+
+        allNewsAdapter = new AllNewsAdapter(getContext(),getActivity(),allNewsList,recyclerView);
         recyclerView.setAdapter(allNewsAdapter);
+
+        allNewsAdapter.setOnLoadMoreListener(new OnLoadMoreListener() {
+            @Override
+            public void onLoadMore() {
+                //add null , so the adapter will check view_type and show progress bar at bottom
+                allNewsList.add(null);
+                allNewsAdapter.notifyItemInserted(allNewsList.size() - 1);
+
+
+                allNewsList.remove(allNewsList.size() - 1);
+                allNewsAdapter.notifyItemRemoved(allNewsList.size());
+                //add items one by one
+                start = allNewsList.size();
+                end = start + 21;
+
+                progressBarAllNews.setVisibility(View.VISIBLE);
+                getAllNewsList();
+
+
+            }
+        });
+
 
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh_layout_all_news);
         swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
 
         swipeRefreshLayout.setOnRefreshListener(this);
-
 
         initRetrofit ();
         initTargetPicasso();
@@ -115,7 +134,7 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
 
    private void getAllNewsList (){
 
-       allNewsList.clear();
+     //  allNewsList.clear();
        swipeRefreshLayout.setRefreshing(true);
        Log.i(LOG_TAG, "getAllNewsList ");
 
@@ -128,19 +147,28 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
        else {
            try {
 
-               serverAPI.getAllNews().enqueue(new Callback<ListNews>() {
+               serverAPI.getAllNews(Integer.toString(start),Integer.toString(end)).enqueue(new Callback<ListNews>() {
                    @Override
                    public void onResponse(Call<ListNews> call, Response<ListNews> response) {
 
                        ListNews listNews = response.body();
 
+
+                       Log.i(LOG_TAG, "onResponse getListNews ");
+
+
                        try {
+
                            allNewsList.addAll(listNews.getNews());
                            allNewsAdapter.notifyDataSetChanged();
+                           allNewsAdapter.setLoaded();
                            swipeRefreshLayout.setRefreshing(false);
+                           progressBarAllNews.setVisibility(View.INVISIBLE);
+
                        }
                        catch(Exception e){
                            swipeRefreshLayout.setRefreshing(false);
+                           progressBarAllNews.setVisibility(View.INVISIBLE);
                            Toast.makeText(getActivity(), "Нет новостей на сервере!", Toast.LENGTH_LONG).show();
 
                        }
@@ -182,6 +210,10 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
 
 
         swipeRefreshLayout.setRefreshing(true);
+        allNewsList.clear();
+
+        start = 0;
+        end = 21;
         getAllNewsList();
     }
 

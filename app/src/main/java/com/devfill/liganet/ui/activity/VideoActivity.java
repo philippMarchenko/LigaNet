@@ -85,6 +85,7 @@ public class VideoActivity extends YouTubeBaseActivity{
 
 
         linkHref = getIntent().getStringExtra("linkHref");
+        Log.d(LOG_TAG, "linkHref " + linkHref);
 
         initRetrofit();
 
@@ -96,10 +97,9 @@ public class VideoActivity extends YouTubeBaseActivity{
                 public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer player, boolean wasRestored) {
                     if (!wasRestored) {
                         player.setPlayerStyle(YouTubePlayer.PlayerStyle.DEFAULT);
-                        // player.loadVideo(videoUrl);
                         player.play();
                         mPlayer = player;
-                        getVideoContent(linkHref);
+                        getVideoContent(linkHref);  // когда инициализировался плеерб отправляем запрос к серверу на парсинг страниці с виде
                     }
                 }
 
@@ -178,6 +178,9 @@ public class VideoActivity extends YouTubeBaseActivity{
                             videoUrl = videoContent.getVideo_url();
 
                             youTubePlayerView.setVisibility(View.VISIBLE);
+
+                            Log.i(LOG_TAG, "getVideoContent videoUrl " + videoUrl);
+
 
                             mPlayer.cueVideo(videoUrl);
 

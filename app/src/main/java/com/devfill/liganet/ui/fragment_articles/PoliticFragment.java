@@ -15,10 +15,13 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.devfill.liganet.R;
+import com.devfill.liganet.adapter.AllNewsAdapter;
 import com.devfill.liganet.adapter.PoliticAdapter;
+import com.devfill.liganet.helper.OnLoadMoreListener;
 import com.devfill.liganet.model.ListNews;
 import com.devfill.liganet.model.News;
 import com.devfill.liganet.network.GetListNews;
@@ -52,6 +55,9 @@ public class PoliticFragment extends android.support.v4.app.Fragment implements 
     private ServerAPI serverAPI;
     Target loadtarget = null;
 
+    int start = 0,end = 21;
+
+    ProgressBar progressBarPolitic;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -59,12 +65,39 @@ public class PoliticFragment extends android.support.v4.app.Fragment implements 
 
         Log.i(LOG_TAG, "onCreateView ");
 
+        progressBarPolitic = (ProgressBar) rootView.findViewById(R.id.progressBarPolitic);
+        progressBarPolitic.setVisibility(View.INVISIBLE);
+
         recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view_politic);
-        politicAdapter = new PoliticAdapter(getContext(),getActivity(),politicList);
+
         RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(getContext(), 1);
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
+
+        politicAdapter = new PoliticAdapter(getContext(),getActivity(),politicList,recyclerView);
         recyclerView.setAdapter(politicAdapter);
+
+
+        politicAdapter.setOnLoadMoreListener(new OnLoadMoreListener() {
+            @Override
+            public void onLoadMore() {
+                //add null , so the adapter will check view_type and show progress bar at bottom
+                politicList.add(null);
+                politicAdapter.notifyItemInserted(politicList.size() - 1);
+
+
+                politicList.remove(politicList.size() - 1);
+                politicAdapter.notifyItemRemoved(politicList.size());
+                //add items one by one
+                start = politicList.size();
+                end = start + 21;
+
+                progressBarPolitic.setVisibility(View.VISIBLE);
+                getPoliticsNewsList();
+
+
+            }
+        });
 
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh_layout_politic);
         swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
@@ -112,7 +145,7 @@ public class PoliticFragment extends android.support.v4.app.Fragment implements 
         else {
             try {
 
-                serverAPI.getPoliticNews().enqueue(new Callback<ListNews>() {
+                serverAPI.getPoliticNews(Integer.toString(start),Integer.toString(end)).enqueue(new Callback<ListNews>() {
                     @Override
                     public void onResponse(Call<ListNews> call, Response<ListNews> response) {
 
@@ -120,8 +153,9 @@ public class PoliticFragment extends android.support.v4.app.Fragment implements 
 
                         politicList.addAll(listNews.getNews());
                         politicAdapter.notifyDataSetChanged();
+                        politicAdapter.setLoaded();
                         swipeRefreshLayout.setRefreshing(false);
-
+                        progressBarPolitic.setVisibility(View.INVISIBLE);
 
                         loadNextImage();
 
