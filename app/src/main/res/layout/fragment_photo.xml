@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginBottom="80dp">
@@ -10,11 +11,20 @@
         android:layout_height="match_parent"
         android:layout_below="@+id/pager">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical" >
 
+
+            <android.support.design.widget.TabLayout
+                        android:id="@+id/tab_layout_photo_slider"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:tabBackground="@drawable/tab_selector"
+                        app:tabIndicatorHeight="0dp"
+                        app:tabGravity="center"
+                android:layout_alignParentBottom="true" />
 
             <TextView
                     android:text="TextView"
@@ -35,21 +45,23 @@
                 android:layout_below="@+id/title_photo_news"
                 android:layout_height="250dp"
                 android:fitsSystemWindows="true"
-                android:layout_width="match_parent" />
+                android:layout_width="match_parent">
+
+
+            </android.support.v4.view.ViewPager>
 
             <TextView
                 android:text="TextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/indicator"
-                android:layout_alignStart="@+id/indicator"
+                android:layout_below="@+id/pager"
                 android:layout_marginTop="5dp"
                 android:id="@+id/text_article_photo"
                 android:layout_marginStart="5dp"
                 android:fontFamily="serif" />
 
 
-        </LinearLayout>
+        </RelativeLayout>
 
     </android.support.v4.widget.NestedScrollView>
     <ProgressBar

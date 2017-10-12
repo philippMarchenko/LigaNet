@@ -8,6 +8,7 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 
 import android.os.Handler;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
@@ -76,6 +77,9 @@ public class PhotoFragment extends android.support.v4.app.Fragment {
         imageSliderAdapter = new ImageSliderAdapter(getContext(),bitmapList);
         mPager = (ViewPager) rootView.findViewById(R.id.pager);
         mPager.setAdapter(imageSliderAdapter);
+
+        TabLayout tabLayout = (TabLayout) rootView.findViewById(R.id.tab_layout_photo_slider);
+        tabLayout.setupWithViewPager(mPager, true);
 
         title_photo_news.setVisibility(View.INVISIBLE);
         text_article_photo.setVisibility(View.INVISIBLE);
