@@ -3,55 +3,68 @@ package com.devfill.liganet.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 public class NewsContent {
 
-    @SerializedName("title")
+    @SerializedName("Urls")
     @Expose
-    private String title;
-    @SerializedName("date")
+    private List<String> urls;
+
+    @SerializedName("Data")
     @Expose
-    private String date;
-    @SerializedName("annotation")
-    @Expose
-    private String annotation;
-    @SerializedName("text")
-    @Expose
-    private String text;
+    private Data data;
 
 
 
-    public String getTitle() {
-        return title;
+    public class Data {
+
+        String annotation;
+        String text;
+        String date;
+        String videoUrl;
+        String title;
+
+        public String getDate() {
+            return date;
+        }
+
+        public String getVideoUrl() {
+            return videoUrl;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+        public String getAnnotation() {
+            return annotation;
+        }
+
+        public void setAnnotation(String annotation) {
+            this.annotation = annotation;
+        }
+
+        public String getText() {
+            return text;
+        }
+
+        public void setText(String text) {
+            this.text = text;
+        }
+    }
+    public Data getData() {
+        return data;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setData(Data data) {
+        this.data = data;
     }
 
-
-
-    public String getDate() {
-        return date;
+    public List<String> getUrls() {
+        return urls;
     }
 
-    public void setDate(String date) {
-        this.date = date;
+    public void setUrls(List<String> urls) {
+        this.urls = urls;
     }
-
-    public String getAnnotation() {
-        return annotation;
-    }
-
-    public void setAnnotation(String annotation) {
-        this.annotation = annotation;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
-    }
-
 }

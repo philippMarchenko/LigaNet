@@ -34,9 +34,8 @@
                 android:layout_marginTop="10dp"
                 android:layout_below="@+id/title_photo_news"
                 android:layout_height="250dp"
-                android:layout_width="match_parent"
                 android:fitsSystemWindows="true"
-                />
+                android:layout_width="match_parent" />
 
             <TextView
                 android:text="TextView"

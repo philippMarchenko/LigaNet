@@ -242,13 +242,14 @@ public class EconomicFragment extends android.support.v4.app.Fragment implements
         else{
 
             try {
-                Picasso.with(getContext()).load(economicList.get(count_bitmap).getImgUrl()).resize(width, height).into(loadtarget);
+                if(!economicList.get(count_bitmap).getImgUrl().equals(""))
+                    Picasso.with(getContext()).load(economicList.get(count_bitmap).getImgUrl()).resize(width, height).into(loadtarget);
             }
             catch (Exception e){
                 Log.d(LOG_TAG, "Error load image " + e.getMessage());
 
                 count_bitmap++;
-                Picasso.with(getContext()).load(economicList.get(count_bitmap).getImgUrl()).resize(width, height).into(loadtarget);
+               // Picasso.with(getContext()).load(economicList.get(count_bitmap).getImgUrl()).resize(width, height).into(loadtarget);
             }
         }
 

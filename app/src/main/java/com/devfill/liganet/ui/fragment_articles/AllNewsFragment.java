@@ -153,8 +153,13 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
 
                        ListNews listNews = response.body();
 
+                       for(int i = 0; i < listNews.getNews().size(); i++){
 
-                       Log.i(LOG_TAG, "onResponse getListNews ");
+                           Log.i(LOG_TAG, "getImgUrl " + listNews.getNews().get(i).getImgUrl());
+
+
+                       }
+
 
 
                        try {

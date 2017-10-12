@@ -3,7 +3,9 @@ package com.devfill.liganet.ui.activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.Icon;
 import android.graphics.drawable.LevelListDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -40,7 +42,9 @@ import com.squareup.picasso.Target;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -65,10 +69,17 @@ public class VideoActivity extends YouTubeBaseActivity implements Html.ImageGett
 
     private Retrofit retrofit;
     private ServerAPI serverAPI;
+    Target loadtarget = null;
+
+    Map<String, Drawable> drawableHashMap = new HashMap<String, Drawable>();
+    List<String> imageUrls = new ArrayList<>();
+
+    private int count_bitmap = 0;
+
 
     String videoUrl,linkHref;
 
-    Map<String, Drawable> drawableHashMap = new HashMap<String, Drawable>();
+
 
 
     @Override
@@ -94,6 +105,12 @@ public class VideoActivity extends YouTubeBaseActivity implements Html.ImageGett
         Log.d(LOG_TAG, "linkHref " + linkHref);
 
         initRetrofit();
+        initTargetPicasso();
+
+        //Html.ImageGetter = new Html.ImageGetter(add);
+
+
+
 
         if(youTubePlayerView != null){
             youTubePlayerView.initialize("AIzaSyAW4zFM9keH8D0uDd3YGbysra3Ci8Sn-tM",new YouTubePlayer.OnInitializedListener(){
@@ -180,30 +197,41 @@ public class VideoActivity extends YouTubeBaseActivity implements Html.ImageGett
                             progressBar.setVisibility(View.INVISIBLE);
                             youTubePlayerView.setVisibility(View.VISIBLE);
 
-                            text_video.setText(Html.fromHtml(videoContent.getData().getText()));
+                           // text_video.setText(Html.fromHtml(videoContent.getData().getText()));
                             annotation_video.setText(Html.fromHtml(videoContent.getData().getAnnotation()));
                             videoUrl = videoContent.getData().getVideo_url();
+
+                            imageUrls = videoContent.getUrls();
+
 
                             for(int i = 0; i < videoContent.getUrls().size(); i ++){
 
                                 Log.i(LOG_TAG, "urlPhoto " + videoContent.getUrls().get(i));
 
+                                try {
+
+                                    Picasso.with(getBaseContext()).load(videoContent.getUrls().get(i)).into(loadtarget);
+                                }
+                                catch (Exception e){
+
+                                    Log.d(LOG_TAG, "Error load image " + e.getMessage());
+                                }
                             }
 
                             youTubePlayerView.setVisibility(View.VISIBLE);
-
-                           /* String code = "<p><b>First, </b><br/>" +
+/*
+                            String code = "<p><b>First, </b><br/>" +
                                     "Please press the <img src ='addbutton.png'> button beside the to insert a new event.</p>" +
                                     "<p><b>Second,</b><br/>" +
                                     "Please insert the details of the event.</p>"
                             "<p>The icon of the is show the level of the event.<br/>" +
-                                    "eg: <img src = 'tu1.png' > is easier to do.</p></td>";
+                                    "eg: <img src = 'tu1.png' > is easier to do.</p></td>";*/
 
-                            message = (TextView) findViewById (R.id.message);
-                            Spanned spanned = Html.fromHtml(code);
-                            message.setText(spanned);
-                            message.setTextSize(16);*/
-
+                           // message = (TextView) findViewById (R.id.message);
+                            Spanned spanned = Html.fromHtml(videoContent.getData().getText(),(VideoActivity)getBaseContext(),null);
+                         //   message.setText(spanned);
+                         //   message.setTextSize(16);*/
+                            text_video.setText(spanned);
 
                             Log.i(LOG_TAG, "getVideoContent videoUrl " + videoUrl);
 
@@ -242,23 +270,60 @@ public class VideoActivity extends YouTubeBaseActivity implements Html.ImageGett
 
     @Override
     public Drawable getDrawable(String source) {
-        int id = 0;
 
-       /* if(source.equals("addbutton.png")){
-            id = R.drawable.addbutton;
+        Drawable drawable = null;
+
+        for(int i = 0 ; i < imageUrls.size(); i++){
+
+            if(source.equals(imageUrls.get(i))){
+                drawable = drawableHashMap.get(imageUrls.get(i));
+            }
         }
 
-        if(source.equals("tu1.png")){
+ /*       if(source.equals("tu1.png")){
             id = R.drawable.tu1;
         }
         LevelListDrawable d = new LevelListDrawable();
         Drawable empty = getResources().getDrawable(id);
         d.addLevel(0, 0, empty);
-        d.setBounds(0, 0, empty.getIntrinsicWidth(), empty.getIntrinsicHeight());
+        d.setBounds(0, 0, empty.getIntrinsicWidth(), empty.getIntrinsicHeight());*/
 
+        Log.i(LOG_TAG, "getDrawable " );
 
-        Drawable drawable = new BitmapDrawable(getResources(), bitmap);*/
+        return drawable;
+    }
+    void initTargetPicasso(){
 
-        return null;
+        loadtarget = new Target() {
+
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+
+                Log.d(LOG_TAG, "onBitmapLoaded  ");
+
+                if (imageUrls.size() > 0) {
+
+                    Drawable drawable = new BitmapDrawable(getResources(), bitmap);
+
+                    drawableHashMap.put(imageUrls.get(count_bitmap),drawable);
+
+                    count_bitmap++;
+
+                }
+            }
+
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+
+                count_bitmap++;
+
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+            }
+
+        };
     }
 }

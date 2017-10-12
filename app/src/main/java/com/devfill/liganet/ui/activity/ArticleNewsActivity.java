@@ -3,6 +3,7 @@ package com.devfill.liganet.ui.activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -10,6 +11,7 @@ import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,8 +31,15 @@ import com.devfill.liganet.network.ServerAPI;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
+import java.lang.ref.WeakReference;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
@@ -41,7 +50,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class ArticleNewsActivity extends AppCompatActivity{
+public class ArticleNewsActivity extends AppCompatActivity {
 
 
     private static final String LOG_TAG = "ArticleNewsActivityTag";
@@ -54,6 +63,15 @@ public class ArticleNewsActivity extends AppCompatActivity{
     private ServerAPI serverAPI;
     Target loadtarget = null;
 
+    Map<String, Drawable> drawableHashMap = new HashMap<String, Drawable>();
+    List<String> imageUrls = new ArrayList<>();
+    NewsContent newsContent;
+
+    static final Map<String, WeakReference<Drawable>> mDrawableCache = Collections.synchronizedMap(new WeakHashMap<String, WeakReference<Drawable>>());
+
+    private int count_bitmap = 0;
+
+    Html.ImageGetter igLoader;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,7 +105,7 @@ public class ArticleNewsActivity extends AppCompatActivity{
         Log.d(LOG_TAG, "linkHref " + linkHref);
 
         initRetrofit();
-      //  initTargetPicasso();
+        initTargetPicasso();
 
         getNewsContent(linkHref);
         try {
@@ -98,7 +116,40 @@ public class ArticleNewsActivity extends AppCompatActivity{
         }
 
 
+        igLoader = new Html.ImageGetter() {
+            public Drawable getDrawable(String source) {
+
+                Drawable drawable = null;
+
+                for(int i = 0 ; i < imageUrls.size(); i++){
+
+                    if(source.equals(imageUrls.get(i))){
+                        drawable = drawableHashMap.get(imageUrls.get(i));
+
+                    }
+                }
+
+                Log.d(LOG_TAG, "getDrawable  " + drawable);
+
+                return drawable;
+            }
+        };
+
+
+
+            //Создаем второй ImageGetter.
+        //В нем возникнет потребность, когда файл загрузится
+            Html.ImageGetter igCached = new Html.ImageGetter() {
+                public Drawable getDrawable(String source) {
+                    //Просто возвращаем наш рисунок из кеша
+                    if (mDrawableCache.containsKey(source))
+                        return mDrawableCache.get(source).get();
+                    return null;
+                }
+            };
+
     }
+
     private String getNetworkType(Context context) {
         ConnectivityManager cm =
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -108,6 +159,7 @@ public class ArticleNewsActivity extends AppCompatActivity{
         }
         return null;
     }
+
     private void initRetrofit (){
 
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
@@ -141,27 +193,53 @@ public class ArticleNewsActivity extends AppCompatActivity{
                     @Override
                     public void onResponse(Call<NewsContent> call, Response<NewsContent> response) {
 
-                        NewsContent newsContent = response.body();
+                        newsContent = response.body();
                         progressArticle.setVisibility(View.INVISIBLE);
                         dateAtricle.setVisibility(View.VISIBLE);
                         anotation.setVisibility(View.VISIBLE);
                         textArticle.setVisibility(View.VISIBLE);
 
-                        Log.i(LOG_TAG, "anotation  " + newsContent.getAnnotation());
-                        Log.i(LOG_TAG, "dateAtricle " + newsContent.getDate());
-
                         try {
 
-                            dateAtricle.setText(newsContent.getDate());
-                            anotation.setText(Html.fromHtml(newsContent.getAnnotation()));
-                            textArticle.setText(Html.fromHtml(newsContent.getText()));
+                            dateAtricle.setText(newsContent.getData().getDate());
+                            anotation.setText(Html.fromHtml(newsContent.getData().getAnnotation()));
+                            // textArticle.setText(Html.fromHtml(newsContent.getData().getText()));
 
-                        }
-                        catch(Exception e){
+                            imageUrls = newsContent.getUrls();
 
-                            Toast.makeText(getBaseContext(), "Не удалось распознать статью!", Toast.LENGTH_LONG).show();
+                            if (newsContent.getUrls().size() > 0) {
+                                for (int i = 0; i < newsContent.getUrls().size(); i++) {
 
-                        }
+                                    Log.i(LOG_TAG, "urlPhoto " + newsContent.getUrls().get(i));
+
+                                    try {
+                                        int height = 90;
+                                        int width = 120;
+                                        final float scale = getBaseContext().getResources().getDisplayMetrics().density;
+                                        height = (int) (200 * scale + 0.5f);
+                                        width = (int) (380 * scale + 0.5f);
+
+
+                                        Picasso.with(getBaseContext()).load(newsContent.getUrls().get(i)).resize(width,height).into(loadtarget);
+                                    } catch (Exception e) {
+
+                                        Log.d(LOG_TAG, "Error load image " + e.getMessage());
+                                    }
+                                }
+                              }
+                            else{
+
+                                textArticle.setText(Html.fromHtml(newsContent.getData().getText()));
+
+                                }
+                            }
+                            catch(Exception e){
+
+                                Toast.makeText(getBaseContext(), "Не удалось распознать статью!", Toast.LENGTH_LONG).show();
+
+                            }
+
+
 
 
                         Log.i(LOG_TAG, "onResponse getNewsContent ");
@@ -194,6 +272,24 @@ public class ArticleNewsActivity extends AppCompatActivity{
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
 
                 Log.d(LOG_TAG, "onBitmapLoaded  ");
+
+               // Spanned spanned = Html.fromHtml(newsContent.getData().getText(),(ArticleNewsActivity)getBaseContext(),null);
+                //Log.d(LOG_TAG, "text " + newsContent.getData().getText());
+                //textArticle.setText(spanned);
+
+                if (imageUrls.size() > 0) {
+
+                    Drawable drawable = new BitmapDrawable(getResources(), bitmap);
+                    drawable.setBounds(0, 0, drawable.getIntrinsicWidth(),
+                            drawable.getIntrinsicHeight());
+                    drawableHashMap.put(imageUrls.get(count_bitmap),drawable);
+
+                    count_bitmap++;
+
+                    Log.d(LOG_TAG, "set drawable  ");
+                }
+                //И сразу же используем его
+                textArticle.setText(Html.fromHtml(newsContent.getData().getText(), igLoader, null));
             }
 
             @Override
