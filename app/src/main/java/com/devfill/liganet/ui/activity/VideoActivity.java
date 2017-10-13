@@ -56,7 +56,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class VideoActivity extends YouTubeBaseActivity implements Html.ImageGetter {
+public class VideoActivity extends YouTubeBaseActivity  {
 
 
     private static final String LOG_TAG = "VideoActivityTag";
@@ -76,6 +76,8 @@ public class VideoActivity extends YouTubeBaseActivity implements Html.ImageGett
 
     private int count_bitmap = 0;
 
+    VideoContent videoContent;
+    Html.ImageGetter igLoader;
 
     String videoUrl,linkHref;
 
@@ -107,7 +109,24 @@ public class VideoActivity extends YouTubeBaseActivity implements Html.ImageGett
         initRetrofit();
         initTargetPicasso();
 
-        //Html.ImageGetter = new Html.ImageGetter(add);
+        igLoader = new Html.ImageGetter() {
+            public Drawable getDrawable(String source) {
+
+                Drawable drawable = null;
+
+                for(int i = 0 ; i < imageUrls.size(); i++){
+
+                    if(source.equals(imageUrls.get(i))){
+                        drawable = drawableHashMap.get(imageUrls.get(i));
+
+                    }
+                }
+
+                Log.d(LOG_TAG, "getDrawable  " + drawable);
+
+                return drawable;
+            }
+        };
 
 
 
@@ -188,7 +207,7 @@ public class VideoActivity extends YouTubeBaseActivity implements Html.ImageGett
                     @Override
                     public void onResponse(Call<VideoContent> call, Response<VideoContent> response) {
 
-                        VideoContent videoContent = response.body();
+                         videoContent = response.body();
 
                         try {
 
@@ -203,43 +222,35 @@ public class VideoActivity extends YouTubeBaseActivity implements Html.ImageGett
 
                             imageUrls = videoContent.getUrls();
 
+                            if (videoContent.getUrls().size() > 0) {
 
-                            for(int i = 0; i < videoContent.getUrls().size(); i ++){
+                                for (int i = 0; i < videoContent.getUrls().size(); i++) {
 
-                                Log.i(LOG_TAG, "urlPhoto " + videoContent.getUrls().get(i));
+                                    Log.i(LOG_TAG, "urlPhoto " + videoContent.getUrls().get(i));
 
-                                try {
+                                    try {
+                                        int height = 90;
+                                        int width = 120;
+                                        final float scale = getBaseContext().getResources().getDisplayMetrics().density;
+                                        height = (int) (200 * scale + 0.5f);
+                                        width = (int) (380 * scale + 0.5f);
 
-                                    Picasso.with(getBaseContext()).load(videoContent.getUrls().get(i)).into(loadtarget);
+                                        Picasso.with(getBaseContext()).load(videoContent.getUrls().get(i)).into(loadtarget);
+                                    } catch (Exception e) {
+
+                                        Log.d(LOG_TAG, "Error load image " + e.getMessage());
+                                    }
                                 }
-                                catch (Exception e){
+                            }
+                            else{
 
-                                    Log.d(LOG_TAG, "Error load image " + e.getMessage());
-                                }
+                                text_video.setText(Html.fromHtml(videoContent.getData().getText()));
                             }
 
                             youTubePlayerView.setVisibility(View.VISIBLE);
-/*
-                            String code = "<p><b>First, </b><br/>" +
-                                    "Please press the <img src ='addbutton.png'> button beside the to insert a new event.</p>" +
-                                    "<p><b>Second,</b><br/>" +
-                                    "Please insert the details of the event.</p>"
-                            "<p>The icon of the is show the level of the event.<br/>" +
-                                    "eg: <img src = 'tu1.png' > is easier to do.</p></td>";*/
-
-                           // message = (TextView) findViewById (R.id.message);
-                            Spanned spanned = Html.fromHtml(videoContent.getData().getText(),(VideoActivity)getBaseContext(),null);
-                         //   message.setText(spanned);
-                         //   message.setTextSize(16);*/
-                            text_video.setText(spanned);
-
-                            Log.i(LOG_TAG, "getVideoContent videoUrl " + videoUrl);
 
 
                             mPlayer.cueVideo(videoUrl);
-
-                            //  youTubePlayerSupportFragment.initialize("AIzaSyAW4zFM9keH8D0uDd3YGbysra3Ci8Sn-tM",onInitializedListener);
-
 
                         }
                         catch(Exception e){
@@ -268,30 +279,6 @@ public class VideoActivity extends YouTubeBaseActivity implements Html.ImageGett
         }
     }
 
-    @Override
-    public Drawable getDrawable(String source) {
-
-        Drawable drawable = null;
-
-        for(int i = 0 ; i < imageUrls.size(); i++){
-
-            if(source.equals(imageUrls.get(i))){
-                drawable = drawableHashMap.get(imageUrls.get(i));
-            }
-        }
-
- /*       if(source.equals("tu1.png")){
-            id = R.drawable.tu1;
-        }
-        LevelListDrawable d = new LevelListDrawable();
-        Drawable empty = getResources().getDrawable(id);
-        d.addLevel(0, 0, empty);
-        d.setBounds(0, 0, empty.getIntrinsicWidth(), empty.getIntrinsicHeight());*/
-
-        Log.i(LOG_TAG, "getDrawable " );
-
-        return drawable;
-    }
     void initTargetPicasso(){
 
         loadtarget = new Target() {
@@ -304,12 +291,16 @@ public class VideoActivity extends YouTubeBaseActivity implements Html.ImageGett
                 if (imageUrls.size() > 0) {
 
                     Drawable drawable = new BitmapDrawable(getResources(), bitmap);
-
+                    drawable.setBounds(0, 0, drawable.getIntrinsicWidth(),
+                            drawable.getIntrinsicHeight());
                     drawableHashMap.put(imageUrls.get(count_bitmap),drawable);
 
                     count_bitmap++;
 
+                    Log.d(LOG_TAG, "set drawable  ");
                 }
+                //И сразу же используем его
+                text_video.setText(Html.fromHtml(videoContent.getData().getText(), igLoader, null));
             }
 
             @Override

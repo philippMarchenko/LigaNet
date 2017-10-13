@@ -17,26 +17,6 @@
             android:orientation="vertical" >
 
 
-            <android.support.design.widget.TabLayout
-                        android:id="@+id/tab_layout_photo_slider"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        app:tabBackground="@drawable/tab_selector"
-                        app:tabIndicatorHeight="0dp"
-                        app:tabGravity="center"
-                android:layout_alignParentBottom="true" />
-
-            <TextView
-                    android:text="TextView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/title_photo_news"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginStart="5dp"
-                android:fontFamily="serif"
-                android:textStyle="normal|bold"
-                android:textSize="18sp" />
-
             <android.support.v4.view.ViewPager
                 android:id="@+id/pager"
                 android:layout_marginRight="5dp"
@@ -49,6 +29,28 @@
 
 
             </android.support.v4.view.ViewPager>
+
+            <android.support.design.widget.TabLayout
+                        android:id="@+id/tab_layout_photo_slider"
+                android:layout_height="match_parent"
+                        app:tabBackground="@drawable/tab_selector"
+                        app:tabIndicatorHeight="0dp"
+                android:layout_alignParentBottom="false"
+                android:layout_alignBottom="@+id/pager"
+                app:tabGravity="center"
+                android:layout_centerHorizontal="true"
+                android:layout_width="100dp" />
+
+            <TextView
+                    android:text="TextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/title_photo_news"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginStart="5dp"
+                android:fontFamily="serif"
+                android:textStyle="normal|bold"
+                android:textSize="18sp" />
 
             <TextView
                 android:text="TextView"
@@ -64,14 +66,15 @@
         </RelativeLayout>
 
     </android.support.v4.widget.NestedScrollView>
+
     <ProgressBar
         style="@style/Widget.AppCompat.ProgressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/progressPhoto"
+        android:layout_marginTop="60dp"
         android:layout_alignParentTop="true"
-        android:layout_alignParentStart="false"
-        android:layout_centerInParent="true"
-        android:layout_marginTop="65dp" />
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="154dp" />
 </RelativeLayout>
 

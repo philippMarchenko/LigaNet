@@ -9,6 +9,7 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
@@ -88,10 +89,15 @@ public class PhotoActivity extends AppCompatActivity{
         mPager = (ViewPager) findViewById(R.id.pager);
         mPager.setAdapter(imageSliderAdapter);
 
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout_photo_slider);
+        tabLayout.setupWithViewPager(mPager, true);
+
         title_photo_news.setVisibility(View.INVISIBLE);
         text_article_photo.setVisibility(View.INVISIBLE);
         mPager.setVisibility(View.INVISIBLE);
         progressBar.setVisibility(View.VISIBLE);
+
+
 
         initRetrofit();
 

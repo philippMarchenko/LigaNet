@@ -86,11 +86,16 @@ public class ArticleNewsActivity extends AppCompatActivity {
         backdrop = (ImageView) findViewById(R.id.backdrop);
         progressArticle = (ProgressBar) findViewById(R.id.progressArticle);
 
+        Typeface typefaceRI = Typeface.createFromAsset(getAssets(),
+                "fonts/UbuntuMono-RI.ttf");
+        Typeface typefaceR = Typeface.createFromAsset(getAssets(),
+                "fonts/UbuntuMono-R.ttf");
+        Typeface typefaceB = Typeface.createFromAsset(getAssets(),
+                "fonts/UbuntuMono-B.ttf");
+        anotation.setTypeface(typefaceB);
+        textArticle.setTypeface(typefaceR);
+        dateAtricle.setTypeface(typefaceRI);
 
-        Typeface face = Typeface.createFromAsset(getAssets(),
-                "fonts/10710.ttf");
-       // anotation.setTypeface(face);
-      //  textArticle.setTypeface(face);
 
         dateAtricle.setVisibility(View.INVISIBLE);
         anotation.setVisibility(View.INVISIBLE);
@@ -98,55 +103,29 @@ public class ArticleNewsActivity extends AppCompatActivity {
         progressArticle.setVisibility(View.VISIBLE);
 
 
-        String linkHref = getIntent().getStringExtra("linkHref");
-        String imgHref = getIntent().getStringExtra("imgHref");
+        String linkHref = getIntent().getStringExtra("linkHref");           //получим ссылку на саму статью
+        String imgHref = getIntent().getStringExtra("imgHref");             //получим ссылку на картинку для тулбара
 
         Log.d(LOG_TAG, "imgHref " + imgHref);
         Log.d(LOG_TAG, "linkHref " + linkHref);
 
-        initRetrofit();
-        initTargetPicasso();
+        initRetrofit();                                                     //настроем ретрофит
+        initTargetPicasso();                                                //настроим пикассо
+        initImageLoader ();                                                 //настроим загружчик картинки для HTML
+        getNewsContent(linkHref);                                           //запрос к серверу по контент статьи
 
-        getNewsContent(linkHref);
         try {
-            Picasso.with(getBaseContext()).load(imgHref).into(backdrop);
+            Picasso.with(getBaseContext()).load(imgHref).into(backdrop);    //загружаем картинку в тулбар
         }
         catch (Exception e){
             Log.d(LOG_TAG, "Error load image " + e.getMessage());
         }
 
 
-        igLoader = new Html.ImageGetter() {
-            public Drawable getDrawable(String source) {
-
-                Drawable drawable = null;
-
-                for(int i = 0 ; i < imageUrls.size(); i++){
-
-                    if(source.equals(imageUrls.get(i))){
-                        drawable = drawableHashMap.get(imageUrls.get(i));
-
-                    }
-                }
-
-                Log.d(LOG_TAG, "getDrawable  " + drawable);
-
-                return drawable;
-            }
-        };
 
 
 
-            //Создаем второй ImageGetter.
-        //В нем возникнет потребность, когда файл загрузится
-            Html.ImageGetter igCached = new Html.ImageGetter() {
-                public Drawable getDrawable(String source) {
-                    //Просто возвращаем наш рисунок из кеша
-                    if (mDrawableCache.containsKey(source))
-                        return mDrawableCache.get(source).get();
-                    return null;
-                }
-            };
+
 
     }
 
@@ -179,6 +158,28 @@ public class ArticleNewsActivity extends AppCompatActivity {
 
 
         serverAPI = retrofit.create(ServerAPI.class);
+    }
+
+    private void initImageLoader (){
+
+        igLoader = new Html.ImageGetter() {
+            public Drawable getDrawable(String source) {
+
+                Drawable drawable = null;
+
+                for(int i = 0 ; i < imageUrls.size(); i++){
+
+                    if(source.equals(imageUrls.get(i))){
+                        drawable = drawableHashMap.get(imageUrls.get(i));
+
+                    }
+                }
+
+                Log.d(LOG_TAG, "getDrawable  " + drawable);
+
+                return drawable;
+            }
+        };
     }
 
     private void getNewsContent (String linkHref){
@@ -272,10 +273,6 @@ public class ArticleNewsActivity extends AppCompatActivity {
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
 
                 Log.d(LOG_TAG, "onBitmapLoaded  ");
-
-               // Spanned spanned = Html.fromHtml(newsContent.getData().getText(),(ArticleNewsActivity)getBaseContext(),null);
-                //Log.d(LOG_TAG, "text " + newsContent.getData().getText());
-                //textArticle.setText(spanned);
 
                 if (imageUrls.size() > 0) {
 
