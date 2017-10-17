@@ -52,13 +52,16 @@ public class WorldNewsFragment extends android.support.v4.app.Fragment implement
 
         private Retrofit retrofit;
         private ServerAPI serverAPI;
-        Target loadtarget = null;
+        private Target loadtarget = null;
 
         private int count_bitmap = 0;
 
-        int start = 0,end = 21;
-        ProgressBar progressBarWorld;
-        @Override
+        private int start = 0,end = 21;
+        private ProgressBar progressBarWorld;
+        private boolean listIsShowed = false;
+
+
+    @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_world, container, false);
 
@@ -81,192 +84,201 @@ public class WorldNewsFragment extends android.support.v4.app.Fragment implement
 
             swipeRefreshLayout.setOnRefreshListener(this);
 
-            worldAdapter.setOnLoadMoreListener(new OnLoadMoreListener() {
-                @Override
-                public void onLoadMore() {
-                    //add null , so the adapter will check view_type and show progress bar at bottom
-                    worldList.add(null);
-                    worldAdapter.notifyItemInserted(worldList.size() - 1);
 
-
-                    worldList.remove(worldList.size() - 1);
-                    worldAdapter.notifyItemRemoved(worldList.size());
-                    //add items one by one
-                    start = worldList.size();
-                    end = start + 21;
-
-                    progressBarWorld.setVisibility(View.VISIBLE);
-                    getWorldNewsList();
-
-
-                }
-            });
-
+            initLoadMoreListener();
             initRetrofit();
             initTargetPicasso();
 
-            getWorldNewsList();
+            if(!listIsShowed){
+                getWorldNewsList();
+                listIsShowed = true;
+            }
 
             return rootView;
         }
 
+        private void initRetrofit (){
 
-    private void initRetrofit (){
+            HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+            interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 
-        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+            OkHttpClient client = new OkHttpClient.Builder()
+                    .readTimeout(60, TimeUnit.SECONDS)
+                    .connectTimeout(60, TimeUnit.SECONDS)
+                    .addInterceptor(interceptor)
+                    .build();
 
-        OkHttpClient client = new OkHttpClient.Builder()
-                .readTimeout(60, TimeUnit.SECONDS)
-                .connectTimeout(60, TimeUnit.SECONDS)
-                .addInterceptor(interceptor)
-                .build();
-
-        retrofit = new Retrofit.Builder()
-                .baseUrl(ServerAPI.BASE_URL)
-                .client(client)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
+            retrofit = new Retrofit.Builder()
+                    .baseUrl(ServerAPI.BASE_URL)
+                    .client(client)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
 
 
-        serverAPI = retrofit.create(ServerAPI.class);
-    }
-
-    private void getWorldNewsList (){
-
-        swipeRefreshLayout.setRefreshing(true);
-
-        String netType = getNetworkType(getContext());
-        if(netType == null){
-            Toast.makeText(getActivity(), "Подключение к сети отсутствует!", Toast.LENGTH_LONG).show();
-            swipeRefreshLayout.setRefreshing(false);
+            serverAPI = retrofit.create(ServerAPI.class);
         }
-        else {
-            try {
 
-                serverAPI.getWorldNews(Integer.toString(start),Integer.toString(end)).enqueue(new Callback<ListNews>() {
-                    @Override
-                    public void onResponse(Call<ListNews> call, Response<ListNews> response) {
+        private void initLoadMoreListener(){
 
-                        ListNews listNews = response.body();
-
-                        worldList.addAll(listNews.getNews());
-                        worldAdapter.notifyDataSetChanged();
-                        worldAdapter.setLoaded();
-                        swipeRefreshLayout.setRefreshing(false);
-                        progressBarWorld.setVisibility(View.INVISIBLE);
+           worldAdapter.setOnLoadMoreListener(new OnLoadMoreListener() {
+               @Override
+               public void onLoadMore() {
+                   //add null , so the adapter will check view_type and show progress bar at bottom
+                   worldList.add(null);
+                   worldAdapter.notifyItemInserted(worldList.size() - 1);
 
 
-                        loadNextImage();
+                   worldList.remove(worldList.size() - 1);
+                   worldAdapter.notifyItemRemoved(worldList.size());
+                   //add items one by one
+                   start = worldList.size();
+                   end = start + 21;
 
-                        Log.i(LOG_TAG, "onResponse getListNews size" + listNews.getNews().size());
-                        Log.i(LOG_TAG, "onResponse getListNews getTitle()" + listNews.getNews().get(0).getTitle());
+                   progressBarWorld.setVisibility(View.VISIBLE);
+                   getWorldNewsList();
 
-                    }
 
-                    @Override
-                    public void onFailure(Call<ListNews> call, Throwable t) {
+               }
+           });
+       }
 
-                        swipeRefreshLayout.setRefreshing(false);
-                        Toast.makeText(getActivity(), "Ошибка запроса к серверу!" + t.getMessage(), Toast.LENGTH_LONG).show();
+        private void getWorldNewsList (){
 
-                        Log.i(LOG_TAG, "onFailure. Ошибка REST запроса getListNews " + t.toString());
-                    }
-                });
-            } catch (Exception e) {
-                Toast.makeText(getActivity(), "Ошибка запроса к серверу!" + e.getMessage(), Toast.LENGTH_LONG).show();
-                Log.i(LOG_TAG, "Ошибка REST запроса к серверу  getListNews " + e.getMessage());
+            swipeRefreshLayout.setRefreshing(true);
+
+            String netType = getNetworkType(getContext());
+            if(netType == null){
+                Toast.makeText(getActivity(), "Подключение к сети отсутствует!", Toast.LENGTH_LONG).show();
+                swipeRefreshLayout.setRefreshing(false);
+            }
+            else {
+                try {
+
+                    serverAPI.getWorldNews(Integer.toString(start),Integer.toString(end)).enqueue(new Callback<ListNews>() {
+                        @Override
+                        public void onResponse(Call<ListNews> call, Response<ListNews> response) {
+
+                            ListNews listNews = response.body();
+
+                            worldList.addAll(listNews.getNews());
+                            worldAdapter.notifyDataSetChanged();
+                            worldAdapter.setLoaded();
+                            swipeRefreshLayout.setRefreshing(false);
+                            progressBarWorld.setVisibility(View.INVISIBLE);
+
+
+                            loadNextImage();
+
+                            Log.i(LOG_TAG, "onResponse getListNews size" + listNews.getNews().size());
+                            Log.i(LOG_TAG, "onResponse getListNews getTitle()" + listNews.getNews().get(0).getTitle());
+
+                        }
+
+                        @Override
+                        public void onFailure(Call<ListNews> call, Throwable t) {
+
+                            swipeRefreshLayout.setRefreshing(false);
+                            Toast.makeText(getActivity(), "Ошибка запроса к серверу!" + t.getMessage(), Toast.LENGTH_LONG).show();
+
+                            Log.i(LOG_TAG, "onFailure. Ошибка REST запроса getListNews " + t.toString());
+                        }
+                    });
+                } catch (Exception e) {
+                    Toast.makeText(getActivity(), "Ошибка запроса к серверу!" + e.getMessage(), Toast.LENGTH_LONG).show();
+                    Log.i(LOG_TAG, "Ошибка REST запроса к серверу  getListNews " + e.getMessage());
+                }
             }
         }
-    }
 
-    private String getNetworkType(Context context) {
-        ConnectivityManager cm =
-                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        if (activeNetwork != null) {
-            return activeNetwork.getTypeName();
-        }
-        return null;
-    }
-
-    private void loadNextImage(){
-
-        int height = 90;
-        int width = 120;
-
-        try{
-
-            final float scale = getContext().getResources().getDisplayMetrics().density;
-             height = (int) (90 * scale + 0.5f);
-             width = (int) (120 * scale + 0.5f);
-        }
-        catch(Exception e){
-
-            Log.d(LOG_TAG, "Не удалось загрузить ресурсы " + e.getMessage());
-
-        }
-
-
-
-        if(count_bitmap == worldList.size()) {
-            count_bitmap = 0;
-        }
-        else{
-
-            try {
-                Picasso.with(getContext()).load(worldList.get(count_bitmap).getImgUrl()).resize(width, height).into(loadtarget);
+        private String getNetworkType(Context context) {
+            ConnectivityManager cm =
+                    (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+            if (activeNetwork != null) {
+                return activeNetwork.getTypeName();
             }
-            catch (Exception e){
-
-                Log.d(LOG_TAG, "Error load image " + e.getMessage());
-                count_bitmap++;
-                Picasso.with(getContext()).load(worldList.get(count_bitmap).getImgUrl()).resize(width, height).into(loadtarget);
-            }
-
+            return null;
         }
 
-    }
+        private void loadNextImage(){
 
-    private void initTargetPicasso(){
+            int height = 90;
+            int width = 120;
 
-        loadtarget = new Target() {
-            @Override
-            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+            try{
 
-                Log.d(LOG_TAG, "onBitmapLoaded  ");
-
-                worldList.get(count_bitmap).setBitmap(bitmap);
-                worldAdapter.notifyDataSetChanged();
-
-                count_bitmap++;
-                loadNextImage();
+                final float scale = getContext().getResources().getDisplayMetrics().density;
+                 height = (int) (90 * scale + 0.5f);
+                 width = (int) (120 * scale + 0.5f);
             }
+            catch(Exception e){
 
-            @Override
-            public void onBitmapFailed(Drawable errorDrawable) {
-
-                count_bitmap++;
-                loadNextImage();
-                // Log.d(LOG_TAG, "onBitmapFailed " + errorDrawable.toString());
+                Log.d(LOG_TAG, "Не удалось загрузить ресурсы " + e.getMessage());
 
             }
 
-            @Override
-            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+
+            if(count_bitmap == worldList.size()) {
+                count_bitmap = 0;
+            }
+            else{
+
+                try {
+                    Picasso.with(getContext()).load(worldList.get(count_bitmap).getImgUrl()).resize(width, height).into(loadtarget);
+                }
+                catch (Exception e){
+
+                    Log.d(LOG_TAG, "Error load image " + e.getMessage());
+                    count_bitmap++;
+                    Picasso.with(getContext()).load(worldList.get(count_bitmap).getImgUrl()).resize(width, height).into(loadtarget);
+                }
 
             }
 
-        };
-    }
-    @Override
-    public void onRefresh() {
+        }
 
-        swipeRefreshLayout.setRefreshing(true);
-        worldList.clear();
+        private void initTargetPicasso(){
 
-        start = 0;
-        end = 21;
-        getWorldNewsList();
-    }
+            loadtarget = new Target() {
+                @Override
+                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+
+                    Log.d(LOG_TAG, "onBitmapLoaded  ");
+
+                    worldList.get(count_bitmap).setBitmap(bitmap);
+                    worldAdapter.notifyDataSetChanged();
+
+                    count_bitmap++;
+                    loadNextImage();
+                }
+
+                @Override
+                public void onBitmapFailed(Drawable errorDrawable) {
+
+                    count_bitmap++;
+                    loadNextImage();
+                    // Log.d(LOG_TAG, "onBitmapFailed " + errorDrawable.toString());
+
+                }
+
+                @Override
+                public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                }
+
+            };
+        }
+
+        @Override
+        public void onRefresh() {
+
+            swipeRefreshLayout.setRefreshing(true);
+            worldList.clear();
+
+            start = 0;
+            end = 21;
+            getWorldNewsList();
+            listIsShowed = true;
+        }
 }

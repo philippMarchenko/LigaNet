@@ -52,7 +52,7 @@ public class VideoFragment extends android.support.v4.app.Fragment{
     private Retrofit retrofit;
     private ServerAPI serverAPI;
 
-    String videoUrl,linkHref;
+    private String videoUrl,linkHref;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -73,37 +73,8 @@ public class VideoFragment extends android.support.v4.app.Fragment{
 
         initRetrofit();
 
-if(youTubePlayerSupportFragment != null){
-    youTubePlayerSupportFragment.initialize("AIzaSyAW4zFM9keH8D0uDd3YGbysra3Ci8Sn-tM",new YouTubePlayer.OnInitializedListener(){
+        initYouTube();
 
-
-        @Override
-        public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer player, boolean wasRestored) {
-            if (!wasRestored) {
-                player.setPlayerStyle(YouTubePlayer.PlayerStyle.DEFAULT);
-                // player.loadVideo(videoUrl);
-                player.play();
-                mPlayer = player;
-                getVideoContent(linkHref);
-            }
-        }
-
-
-        @Override
-        public void onInitializationFailure(YouTubePlayer.Provider provider, YouTubeInitializationResult error) {
-            // YouTube error
-            String errorMessage = error.toString();
-            Toast.makeText(getActivity(), errorMessage, Toast.LENGTH_LONG).show();
-            Log.d("errorMessage:", errorMessage);
-        }
-    });
-
-}
-        else{
-    Toast.makeText(getActivity(), "NULL", Toast.LENGTH_LONG).show();
-        }
-
-      //  youTubePlayerSupportFragment.getView().setVisibility(View.INVISIBLE);
 
 
 
@@ -111,6 +82,40 @@ if(youTubePlayerSupportFragment != null){
 
         return rootView;
     }
+
+    private void initYouTube(){
+
+        if(youTubePlayerSupportFragment != null){
+            youTubePlayerSupportFragment.initialize("AIzaSyAW4zFM9keH8D0uDd3YGbysra3Ci8Sn-tM",new YouTubePlayer.OnInitializedListener(){
+
+
+                @Override
+                public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer player, boolean wasRestored) {
+                    if (!wasRestored) {
+                        player.setPlayerStyle(YouTubePlayer.PlayerStyle.DEFAULT);
+                        // player.loadVideo(videoUrl);
+                        player.play();
+                        mPlayer = player;
+                        getVideoContent(linkHref);
+                    }
+                }
+
+
+                @Override
+                public void onInitializationFailure(YouTubePlayer.Provider provider, YouTubeInitializationResult error) {
+                    // YouTube error
+                    String errorMessage = error.toString();
+                    Toast.makeText(getActivity(), errorMessage, Toast.LENGTH_LONG).show();
+                    Log.d("errorMessage:", errorMessage);
+                }
+            });
+
+        }
+        else{
+            Toast.makeText(getActivity(), "NULL", Toast.LENGTH_LONG).show();
+        }
+    }
+
     private String getNetworkType(Context context) {
         ConnectivityManager cm =
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -120,6 +125,7 @@ if(youTubePlayerSupportFragment != null){
         }
         return null;
     }
+
     private void initRetrofit (){
 
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
@@ -155,9 +161,7 @@ if(youTubePlayerSupportFragment != null){
 
                         VideoContent videoContent = response.body();
 
-
                         try {
-
 
                             text_video.setVisibility(View.VISIBLE);
                             annotation_video.setVisibility(View.VISIBLE);
@@ -173,13 +177,10 @@ if(youTubePlayerSupportFragment != null){
                             Log.i(LOG_TAG, "getVideoContent videoUrl " + videoUrl);
                             mPlayer.cueVideo(videoUrl);
 
-                          //  youTubePlayerSupportFragment.initialize("AIzaSyAW4zFM9keH8D0uDd3YGbysra3Ci8Sn-tM",onInitializedListener);
-
 
                         }
                         catch(Exception e){
-
-                            Toast.makeText(getContext(), "Не удалось распознать видео статью!" + e.getMessage(), Toast.LENGTH_LONG).show();
+                            Log.i(LOG_TAG, "Не удалось распознать видео статью! " + e.getMessage());
 
                         }
 
@@ -202,7 +203,5 @@ if(youTubePlayerSupportFragment != null){
             }
         }
     }
-
-
 
 }

@@ -53,11 +53,11 @@ public class PoliticFragment extends android.support.v4.app.Fragment implements 
     private SwipeRefreshLayout swipeRefreshLayout;
     private Retrofit retrofit;
     private ServerAPI serverAPI;
-    Target loadtarget = null;
+    private Target loadtarget = null;
 
-    int start = 0,end = 21;
-
-    ProgressBar progressBarPolitic;
+    private int start = 0,end = 21;
+    private ProgressBar progressBarPolitic;
+    private boolean listIsShowed = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -77,37 +77,19 @@ public class PoliticFragment extends android.support.v4.app.Fragment implements 
         politicAdapter = new PoliticAdapter(getContext(),getActivity(),politicList,recyclerView);
         recyclerView.setAdapter(politicAdapter);
 
-
-        politicAdapter.setOnLoadMoreListener(new OnLoadMoreListener() {
-            @Override
-            public void onLoadMore() {
-                //add null , so the adapter will check view_type and show progress bar at bottom
-                politicList.add(null);
-                politicAdapter.notifyItemInserted(politicList.size() - 1);
-
-
-                politicList.remove(politicList.size() - 1);
-                politicAdapter.notifyItemRemoved(politicList.size());
-                //add items one by one
-                start = politicList.size();
-                end = start + 21;
-
-                progressBarPolitic.setVisibility(View.VISIBLE);
-                getPoliticsNewsList();
-
-
-            }
-        });
-
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh_layout_politic);
         swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
 
         swipeRefreshLayout.setOnRefreshListener(this);
 
+        initLoadMoreListener();
         initRetrofit();
         initTargetPicasso();
 
-        getPoliticsNewsList();
+        if(!listIsShowed){
+            getPoliticsNewsList();
+            listIsShowed = true;
+        }
 
         return rootView;
     }
@@ -131,6 +113,30 @@ public class PoliticFragment extends android.support.v4.app.Fragment implements 
 
 
         serverAPI = retrofit.create(ServerAPI.class);
+    }
+
+    private void initLoadMoreListener(){
+
+        politicAdapter.setOnLoadMoreListener(new OnLoadMoreListener() {
+            @Override
+            public void onLoadMore() {
+                //add null , so the adapter will check view_type and show progress bar at bottom
+                politicList.add(null);
+                politicAdapter.notifyItemInserted(politicList.size() - 1);
+
+
+                politicList.remove(politicList.size() - 1);
+                politicAdapter.notifyItemRemoved(politicList.size());
+                //add items one by one
+                start = politicList.size();
+                end = start + 21;
+
+                progressBarPolitic.setVisibility(View.VISIBLE);
+                getPoliticsNewsList();
+
+
+            }
+        });
     }
 
     private void getPoliticsNewsList (){
@@ -259,11 +265,17 @@ public class PoliticFragment extends android.support.v4.app.Fragment implements 
 
         };
     }
+
     @Override
     public void onRefresh() {
 
         swipeRefreshLayout.setRefreshing(true);
+        politicList.clear();
+
+        start = 0;
+        end = 21;
         getPoliticsNewsList();
+        listIsShowed = true;
 
     }
 }

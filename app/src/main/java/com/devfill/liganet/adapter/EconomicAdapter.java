@@ -20,6 +20,7 @@ import com.devfill.liganet.helper.OnLoadMoreListener;
 import com.devfill.liganet.model.News;
 import com.devfill.liganet.model.PhotoContent;
 import com.devfill.liganet.ui.activity.ArticleNewsActivity;
+import com.devfill.liganet.ui.activity.PhotoActivity;
 import com.devfill.liganet.ui.activity.VideoActivity;
 
 
@@ -115,8 +116,12 @@ public class EconomicAdapter extends RecyclerView.Adapter<EconomicAdapter.MyView
 
         if(!news.getVideoUrl().equals("")){
 
-            myViewHolder.image.setImageDrawable(mContext.getDrawable(R.drawable.video));
+            myViewHolder.image.setImageDrawable(mContext.getDrawable(R.drawable.video2));
 
+        }
+        else if (news.getIs_photo().equals("1")) {
+
+            myViewHolder.image.setImageDrawable(mContext.getDrawable(R.drawable.foto));
         }
         else{
 
@@ -125,23 +130,15 @@ public class EconomicAdapter extends RecyclerView.Adapter<EconomicAdapter.MyView
 
 
 
-        if(news.getVideoUrl().equals("") && !news.getIs_photo().equals("")){
-
-            //viewHolder.video.setVisibility(View.VISIBLE);
-
-        }
-
-
-
         // define an on click listener to open PlaybackFragment
         myViewHolder.card_view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(news.getVideoUrl().equals("")){
+                if(news.getVideoUrl().equals("") && !news.getIs_photo().equals("1")){   //если это не видео и не фото
 
                     Log.d(LOG_TAG, "Это не видео");
                     try {
-                        Intent intent = new Intent(mContext, ArticleNewsActivity.class);
+                        Intent intent = new Intent(mContext, ArticleNewsActivity.class);    //ЭТО СТАТЬЯ
                         intent.putExtra("linkHref", news.getlinkHref());
                         intent.putExtra("imgHref", news.getImgUrl());
                         mContext.startActivity(intent);
@@ -151,11 +148,11 @@ public class EconomicAdapter extends RecyclerView.Adapter<EconomicAdapter.MyView
                         Log.d(LOG_TAG, "exception", e);
                     }
                 }
-                else if (news.getIs_photo().equals("1")) {
+                else if (news.getIs_photo().equals("1")) {          //это фото
 
                     try {
 
-                        Intent intent = new Intent(mContext, PhotoContent.class);
+                        Intent intent = new Intent(mContext, PhotoActivity.class);
                         intent.putExtra("linkHref", news.getlinkHref());
                         mContext.startActivity(intent);
 
@@ -169,7 +166,7 @@ public class EconomicAdapter extends RecyclerView.Adapter<EconomicAdapter.MyView
                 else{
                     try {
 
-                        Intent intent = new Intent(mContext, VideoActivity.class);
+                        Intent intent = new Intent(mContext, VideoActivity.class);      // а это видео
                         intent.putExtra("linkHref", news.getlinkHref());
                         mContext.startActivity(intent);
 

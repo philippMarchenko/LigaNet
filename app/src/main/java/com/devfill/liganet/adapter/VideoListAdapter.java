@@ -21,7 +21,7 @@ import java.util.List;
 
 public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.MyViewHolder>  {
 
-    private static final String LOG_TAG = "PhotoListAdapterTag";
+    private static final String LOG_TAG = "VideoListAdapterTag";
 
     private static Context mContext;
     private Activity myActivity;
@@ -81,6 +81,7 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.MyVi
                 videoFragment.setArguments(bundle);
 
                 ft.replace(R.id.container_video,videoFragment);
+                ft.addToBackStack(null);    //добавляем транзакцию в бэкстэк для возврата кнопкой на
                 ft.commit();
             }
         });

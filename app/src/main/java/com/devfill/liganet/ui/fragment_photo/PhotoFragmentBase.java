@@ -26,18 +26,6 @@ public class PhotoFragmentBase extends Fragment {
         ft.replace(R.id.container_photo, photoListFragment);
         ft.commit();
 
-       /* ft.addToBackStack(null);
-        ft.commit();
-
-        getFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
-            @Override
-            public void onBackStackChanged() {
-
-                Log.d(LOG_TAG, "onBackStackChanged ");
-
-
-            }
-        });*/
         return  rootview;
     }
 

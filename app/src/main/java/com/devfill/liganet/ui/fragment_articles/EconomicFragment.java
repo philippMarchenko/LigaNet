@@ -43,7 +43,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class EconomicFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
 
-    private static final String LOG_TAG = "AllNewsFragmentTag";
+    private static final String LOG_TAG = "EconomicFragmentTag";
 
     private List<News> economicList = new ArrayList<>();
     private RecyclerView recyclerView;
@@ -58,6 +58,8 @@ public class EconomicFragment extends android.support.v4.app.Fragment implements
 
     int start = 0,end = 21;
     ProgressBar progressBarEconomic;
+    private boolean listIsShowed = false;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -77,26 +79,7 @@ public class EconomicFragment extends android.support.v4.app.Fragment implements
         economicAdapter = new EconomicAdapter(getContext(),getActivity(),economicList,recyclerView);
         recyclerView.setAdapter(economicAdapter);
 
-        economicAdapter.setOnLoadMoreListener(new OnLoadMoreListener() {
-            @Override
-            public void onLoadMore() {
-                //add null , so the adapter will check view_type and show progress bar at bottom
-                economicList.add(null);
-                economicAdapter.notifyItemInserted(economicList.size() - 1);
 
-
-                economicList.remove(economicList.size() - 1);
-                economicAdapter.notifyItemRemoved(economicList.size());
-                //add items one by one
-                start = economicList.size();
-                end = start + 21;
-
-                progressBarEconomic.setVisibility(View.VISIBLE);
-                getEconomicList();
-
-
-            }
-        });
 
 
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh_layout_economic);
@@ -104,10 +87,14 @@ public class EconomicFragment extends android.support.v4.app.Fragment implements
 
         swipeRefreshLayout.setOnRefreshListener(this);
 
+        initLoadMoreListener();
         initRetrofit ();
         initTargetPicasso();
 
-        getEconomicList();
+        if(!listIsShowed){
+            getEconomicList();
+            listIsShowed = true;
+        }
 
         return rootView;
     }
@@ -133,9 +120,32 @@ public class EconomicFragment extends android.support.v4.app.Fragment implements
         serverAPI = retrofit.create(ServerAPI.class);
     }
 
+    private void initLoadMoreListener(){
+
+        economicAdapter.setOnLoadMoreListener(new OnLoadMoreListener() {
+            @Override
+            public void onLoadMore() {
+                //add null , so the adapter will check view_type and show progress bar at bottom
+                economicList.add(null);
+                economicAdapter.notifyItemInserted(economicList.size() - 1);
+
+
+                economicList.remove(economicList.size() - 1);
+                economicAdapter.notifyItemRemoved(economicList.size());
+                //add items one by one
+                start = economicList.size();
+                end = start + 21;
+
+                progressBarEconomic.setVisibility(View.VISIBLE);
+                getEconomicList();
+
+
+            }
+        });
+    }
+
     private void getEconomicList (){
 
-        //  allNewsList.clear();
         swipeRefreshLayout.setRefreshing(true);
         Log.i(LOG_TAG, "getAllNewsList ");
 
@@ -153,10 +163,6 @@ public class EconomicFragment extends android.support.v4.app.Fragment implements
                     public void onResponse(Call<ListNews> call, Response<ListNews> response) {
 
                         ListNews listNews = response.body();
-
-
-                        Log.i(LOG_TAG, "onResponse getListNews ");
-
 
                         try {
 
@@ -215,6 +221,8 @@ public class EconomicFragment extends android.support.v4.app.Fragment implements
         start = 0;
         end = 21;
         getEconomicList();
+        listIsShowed = true;
+
     }
 
     private void loadNextImage(){
@@ -234,8 +242,6 @@ public class EconomicFragment extends android.support.v4.app.Fragment implements
 
         }
 
-
-
         if(count_bitmap == economicList.size()) {
             count_bitmap = 0;
         }
@@ -249,7 +255,6 @@ public class EconomicFragment extends android.support.v4.app.Fragment implements
                 Log.d(LOG_TAG, "Error load image " + e.getMessage());
 
                 count_bitmap++;
-               // Picasso.with(getContext()).load(economicList.get(count_bitmap).getImgUrl()).resize(width, height).into(loadtarget);
             }
         }
 
@@ -278,7 +283,6 @@ public class EconomicFragment extends android.support.v4.app.Fragment implements
 
                 count_bitmap++;
                 loadNextImage();
-                // Log.d(LOG_TAG, "onBitmapFailed " + errorDrawable.toString());
 
             }
 

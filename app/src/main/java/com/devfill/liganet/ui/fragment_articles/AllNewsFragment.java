@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
@@ -53,10 +54,12 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
 
     private Retrofit retrofit;
     private ServerAPI serverAPI;
-    Target loadtarget = null;
+    private Target loadtarget = null;
 
-    int start = 0,end = 21;
-    ProgressBar progressBarAllNews;
+    private int start = 0,end = 21;
+    private ProgressBar progressBarAllNews;
+    private boolean listIsShowed = false;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -75,6 +78,45 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
 
         allNewsAdapter = new AllNewsAdapter(getContext(),getActivity(),allNewsList,recyclerView);
         recyclerView.setAdapter(allNewsAdapter);
+
+        swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh_layout_all_news);
+        swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
+
+        swipeRefreshLayout.setOnRefreshListener(this);
+
+        initLoadMoreListener();
+        initRetrofit ();
+        initTargetPicasso();
+
+        if(!listIsShowed){
+            getAllNewsList();
+            listIsShowed = true;
+        }
+        return rootView;
+    }
+
+    private void initRetrofit (){
+
+       HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+       interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+       OkHttpClient client = new OkHttpClient.Builder()
+               .readTimeout(60, TimeUnit.SECONDS)
+               .connectTimeout(60, TimeUnit.SECONDS)
+               .addInterceptor(interceptor)
+               .build();
+
+       retrofit = new Retrofit.Builder()
+               .baseUrl(ServerAPI.BASE_URL)
+               .client(client)
+               .addConverterFactory(GsonConverterFactory.create())
+               .build();
+
+
+       serverAPI = retrofit.create(ServerAPI.class);
+   }
+
+    private void initLoadMoreListener(){
 
         allNewsAdapter.setOnLoadMoreListener(new OnLoadMoreListener() {
             @Override
@@ -96,43 +138,9 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
 
             }
         });
-
-
-        swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh_layout_all_news);
-        swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
-
-        swipeRefreshLayout.setOnRefreshListener(this);
-
-        initRetrofit ();
-        initTargetPicasso();
-
-        getAllNewsList();
-
-        return rootView;
     }
 
-   private void initRetrofit (){
-
-       HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-       interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-
-       OkHttpClient client = new OkHttpClient.Builder()
-               .readTimeout(60, TimeUnit.SECONDS)
-               .connectTimeout(60, TimeUnit.SECONDS)
-               .addInterceptor(interceptor)
-               .build();
-
-       retrofit = new Retrofit.Builder()
-               .baseUrl(ServerAPI.BASE_URL)
-               .client(client)
-               .addConverterFactory(GsonConverterFactory.create())
-               .build();
-
-
-       serverAPI = retrofit.create(ServerAPI.class);
-   }
-
-   private void getAllNewsList (){
+    private void getAllNewsList (){
 
      //  allNewsList.clear();
        swipeRefreshLayout.setRefreshing(true);
@@ -155,12 +163,10 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
 
                        for(int i = 0; i < listNews.getNews().size(); i++){
 
-                           Log.i(LOG_TAG, "getImgUrl " + listNews.getNews().get(i).getImgUrl());
+                        //   Log.i(LOG_TAG, "getImgUrl " + listNews.getNews().get(i).getImgUrl());
 
 
                        }
-
-
 
                        try {
 
@@ -180,7 +186,7 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
 
                        loadNextImage();
 
-                       Log.i(LOG_TAG, "onResponse getListNews ");
+                       Log.i(LOG_TAG, "onResponse getListNews. start " + start + " end " + end);
 
                    }
 
@@ -200,7 +206,7 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
        }
     }
 
-   private String getNetworkType(Context context) {
+    private String getNetworkType(Context context) {
         ConnectivityManager cm =
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
@@ -220,6 +226,8 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
         start = 0;
         end = 21;
         getAllNewsList();
+        listIsShowed = true;
+
     }
 
     private void loadNextImage(){
@@ -265,7 +273,7 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
 
-                Log.d(LOG_TAG, "onBitmapLoaded  ");
+               // Log.d(LOG_TAG, "onBitmapLoaded  ");
 
                 if (allNewsList.size() > 0) {
                     allNewsList.get(count_bitmap).setBitmap(bitmap);
@@ -296,4 +304,27 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
         };
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+
+
+        Log.i(LOG_TAG, " onResume");
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        Log.i(LOG_TAG, " onPause");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        listIsShowed = false;
+        Log.i(LOG_TAG, " onDestroy");
+    }
 }

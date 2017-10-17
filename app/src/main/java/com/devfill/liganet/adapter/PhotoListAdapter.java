@@ -80,6 +80,7 @@ public class PhotoListAdapter extends RecyclerView.Adapter<PhotoListAdapter.MyVi
                 photoFragment.setArguments(bundle);
 
                 ft.replace(R.id.container_photo,photoFragment);
+                ft.addToBackStack(null);    //добавляем транзакцию в бэкстэк для возврата кнопкой на
                 ft.commit();
             }
         });

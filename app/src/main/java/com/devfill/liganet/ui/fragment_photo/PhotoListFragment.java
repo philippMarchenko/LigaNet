@@ -75,7 +75,6 @@ public class PhotoListFragment extends android.support.v4.app.Fragment implement
 
         ft = getFragmentManager().beginTransaction();
 
-
         recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view_photo);
         photoListAdapter = new PhotoListAdapter(getContext(),getActivity(),ft,photoList);
         RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(getContext(), 1);
@@ -185,7 +184,6 @@ public class PhotoListFragment extends android.support.v4.app.Fragment implement
     @Override
     public void onRefresh() {
 
-
         swipeRefreshLayout.setRefreshing(true);
         getPhotoList();
     }
@@ -206,8 +204,6 @@ public class PhotoListFragment extends android.support.v4.app.Fragment implement
             Log.d(LOG_TAG, "Не удалось загрузить ресурсы " + e.getMessage());
 
         }
-
-
 
         if(count_bitmap == photoList.size()) {
             count_bitmap = 0;
@@ -250,7 +246,6 @@ public class PhotoListFragment extends android.support.v4.app.Fragment implement
 
                 count_bitmap++;
                 loadNextImage();
-                // Log.d(LOG_TAG, "onBitmapFailed " + errorDrawable.toString());
 
             }
 

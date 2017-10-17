@@ -20,6 +20,7 @@ import com.devfill.liganet.helper.OnLoadMoreListener;
 import com.devfill.liganet.model.News;
 import com.devfill.liganet.model.PhotoContent;
 import com.devfill.liganet.ui.activity.ArticleNewsActivity;
+import com.devfill.liganet.ui.activity.PhotoActivity;
 import com.devfill.liganet.ui.activity.VideoActivity;
 
 import java.util.List;
@@ -67,8 +68,7 @@ public class PoliticAdapter extends RecyclerView.Adapter<PoliticAdapter.MyViewHo
                     .getLayoutManager();
 
 
-            recyclerView
-                    .addOnScrollListener(new RecyclerView.OnScrollListener() {
+            recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
                         @Override
                         public void onScrolled(RecyclerView recyclerView,
                                                int dx, int dy) {
@@ -105,6 +105,7 @@ public class PoliticAdapter extends RecyclerView.Adapter<PoliticAdapter.MyViewHo
     public void setLoaded() {
         loading = false;
     }
+
     @Override
     public void onBindViewHolder(final MyViewHolder viewHolder, final int position) {
         final News news = mPoliticNewsList.get(position);
@@ -115,22 +116,27 @@ public class PoliticAdapter extends RecyclerView.Adapter<PoliticAdapter.MyViewHo
 
         if(!news.getVideoUrl().equals("")){
 
-            viewHolder.image.setImageDrawable(mContext.getDrawable(R.drawable.video));
+            viewHolder.image.setImageDrawable(mContext.getDrawable(R.drawable.video2));
 
+        }
+        else if (news.getIs_photo().equals("1")) {
+
+            viewHolder.image.setImageDrawable(mContext.getDrawable(R.drawable.foto));
         }
         else{
 
             viewHolder.image.setImageBitmap(news.getBitmap());
         }
 
+        // define an on click listener to open PlaybackFragment
         viewHolder.card_view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(news.getVideoUrl().equals("")){
+                if(news.getVideoUrl().equals("") && !news.getIs_photo().equals("1")){   //если это не видео и не фото
 
                     Log.d(LOG_TAG, "Это не видео");
                     try {
-                        Intent intent = new Intent(mContext, ArticleNewsActivity.class);
+                        Intent intent = new Intent(mContext, ArticleNewsActivity.class);    //ЭТО СТАТЬЯ
                         intent.putExtra("linkHref", news.getlinkHref());
                         intent.putExtra("imgHref", news.getImgUrl());
                         mContext.startActivity(intent);
@@ -140,11 +146,11 @@ public class PoliticAdapter extends RecyclerView.Adapter<PoliticAdapter.MyViewHo
                         Log.d(LOG_TAG, "exception", e);
                     }
                 }
-                else if (news.getIs_photo().equals("1")) {
+                else if (news.getIs_photo().equals("1")) {          //это фото
 
                     try {
 
-                        Intent intent = new Intent(mContext, PhotoContent.class);
+                        Intent intent = new Intent(mContext, PhotoActivity.class);
                         intent.putExtra("linkHref", news.getlinkHref());
                         mContext.startActivity(intent);
 
@@ -158,7 +164,7 @@ public class PoliticAdapter extends RecyclerView.Adapter<PoliticAdapter.MyViewHo
                 else{
                     try {
 
-                        Intent intent = new Intent(mContext, VideoActivity.class);
+                        Intent intent = new Intent(mContext, VideoActivity.class);      // а это видео
                         intent.putExtra("linkHref", news.getlinkHref());
                         mContext.startActivity(intent);
 

@@ -70,6 +70,7 @@ public class ArticlesFragment extends android.support.v4.app.Fragment  {
         viewPager.setAdapter(adapter);
 
     }
+
     class ViewPagerAdapter extends FragmentPagerAdapter {
         private final List<Fragment> mFragmentList = new ArrayList<>();
         private final List<String> mFragmentTitleList = new ArrayList<>();
@@ -105,8 +106,6 @@ public class ArticlesFragment extends android.support.v4.app.Fragment  {
     @Override
     public void onResume() {
         super.onResume();
-
-
 
         Log.i(LOG_TAG, " onResume");
     }
