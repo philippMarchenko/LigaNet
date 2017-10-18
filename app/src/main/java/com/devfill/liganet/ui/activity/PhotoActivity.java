@@ -85,6 +85,14 @@ public class PhotoActivity extends AppCompatActivity{
         text_article_photo  = (TextView) findViewById(R.id.text_article_photo);
         progressBar = (ProgressBar) findViewById(R.id.progressPhoto);
 
+        Typeface typefaceR = Typeface.createFromAsset(getAssets(),
+                "fonts/UbuntuMono-R.ttf");
+        Typeface typefaceB = Typeface.createFromAsset(getAssets(),
+                "fonts/UbuntuMono-B.ttf");
+        title_photo_news.setTypeface(typefaceB);
+        text_article_photo.setTypeface(typefaceR);
+
+
         imageSliderAdapter = new ImageSliderAdapter(getBaseContext(),bitmapList);
         mPager = (ViewPager) findViewById(R.id.pager);
         mPager.setAdapter(imageSliderAdapter);
@@ -209,7 +217,7 @@ public class PhotoActivity extends AppCompatActivity{
 
                 Log.d(LOG_TAG, "onBitmapLoaded  ");
 
-                bitmapList.add(bitmap);
+                bitmapList.add(Bitmap.createBitmap(bitmap, 0, 0,bitmap.getWidth(), bitmap.getHeight()-18)); //обрежем сколько нужно нам пикселей
                 imageSliderAdapter.notifyDataSetChanged();
 
                 count_bitmap++;

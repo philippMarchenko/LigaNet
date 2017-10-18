@@ -217,7 +217,7 @@ public class PhotoListFragment extends android.support.v4.app.Fragment implement
                 Log.d(LOG_TAG, "Error load image " + e.getMessage());
 
                 count_bitmap++;
-                Picasso.with(getContext()).load(photoList.get(count_bitmap).getImgUrl()).resize(width, height).into(loadtarget);
+              //  Picasso.with(getContext()).load(photoList.get(count_bitmap).getImgUrl()).resize(width, height).into(loadtarget);
             }
         }
 

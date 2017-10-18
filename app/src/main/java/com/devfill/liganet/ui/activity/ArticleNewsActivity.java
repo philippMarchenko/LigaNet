@@ -115,7 +115,12 @@ public class ArticleNewsActivity extends AppCompatActivity {
         getNewsContent(linkHref);                                           //запрос к серверу по контент статьи
 
         try {
-            Picasso.with(getBaseContext()).load(imgHref).into(backdrop);    //загружаем картинку в тулбар
+
+            final float scale = getBaseContext().getResources().getDisplayMetrics().density;
+            int height = (int) (220 * scale + 0.5f);
+            int width = (int) (295 * scale + 0.5f);
+
+            Picasso.with(getBaseContext()).load(imgHref).resize(width,height-20).into(backdrop);    //загружаем картинку в тулбар
         }
         catch (Exception e){
             Log.d(LOG_TAG, "Error load image " + e.getMessage());

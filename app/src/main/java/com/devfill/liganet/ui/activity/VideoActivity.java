@@ -63,7 +63,6 @@ public class VideoActivity extends YouTubeBaseActivity  {
 
     private TextView text_video,annotation_video;
     private ProgressBar progressBar;
-    private YouTubePlayer.OnInitializedListener onInitializedListener;
     private YouTubePlayer mPlayer;
     private YouTubePlayerView youTubePlayerView;
 
@@ -81,21 +80,26 @@ public class VideoActivity extends YouTubeBaseActivity  {
 
     String videoUrl,linkHref;
 
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.video_activity);
 
-        Log.d(LOG_TAG, "onCreate ArticleNewsFragment");
+        Log.d(LOG_TAG, "onCreate VideoActivity");
 
 
         youTubePlayerView = (YouTubePlayerView) findViewById(R.id.youtube);
         text_video = (TextView) findViewById(R.id.text_video);
         annotation_video = (TextView) findViewById(R.id.annotation_video);
         progressBar = (ProgressBar) findViewById(R.id.progressVideo);
+
+        Typeface typefaceR = Typeface.createFromAsset(getAssets(),
+                "fonts/UbuntuMono-R.ttf");
+        Typeface typefaceB = Typeface.createFromAsset(getAssets(),
+                "fonts/UbuntuMono-B.ttf");
+        annotation_video.setTypeface(typefaceB);
+        text_video.setTypeface(typefaceR);
+
 
         text_video.setVisibility(View.INVISIBLE);
         annotation_video.setVisibility(View.INVISIBLE);
@@ -141,7 +145,7 @@ public class VideoActivity extends YouTubeBaseActivity  {
                         player.setPlayerStyle(YouTubePlayer.PlayerStyle.DEFAULT);
                         player.play();
                         mPlayer = player;
-                        getVideoContent(linkHref);  // когда инициализировался плеерб отправляем запрос к серверу на парсинг страниці с виде
+                        getVideoContent(linkHref);  // когда инициализировался плеерб отправляем запрос к серверу на парсинг страниці с видео
                     }
                 }
 
@@ -196,6 +200,7 @@ public class VideoActivity extends YouTubeBaseActivity  {
 
     private void getVideoContent (String linkHref){
 
+
         String netType = getNetworkType(this);
         if(netType == null){
             Toast.makeText(this, "Подключение к сети отсутствует!", Toast.LENGTH_LONG).show();
@@ -207,16 +212,12 @@ public class VideoActivity extends YouTubeBaseActivity  {
                     @Override
                     public void onResponse(Call<VideoContent> call, Response<VideoContent> response) {
 
-                         videoContent = response.body();
+                        Log.i(LOG_TAG, "onResponse getVideoContent ");
+
+                        videoContent = response.body();
 
                         try {
 
-                            text_video.setVisibility(View.VISIBLE);
-                            annotation_video.setVisibility(View.VISIBLE);
-                            progressBar.setVisibility(View.INVISIBLE);
-                            youTubePlayerView.setVisibility(View.VISIBLE);
-
-                           // text_video.setText(Html.fromHtml(videoContent.getData().getText()));
                             annotation_video.setText(Html.fromHtml(videoContent.getData().getAnnotation()));
                             videoUrl = videoContent.getData().getVideo_url();
 
@@ -224,31 +225,18 @@ public class VideoActivity extends YouTubeBaseActivity  {
 
                             if (videoContent.getUrls().size() > 0) {
 
-                                for (int i = 0; i < videoContent.getUrls().size(); i++) {
+                                Log.i(LOG_TAG, "videoContent size " + videoContent.getUrls().size());
 
-                                    Log.i(LOG_TAG, "urlPhoto " + videoContent.getUrls().get(i));
-
-                                    try {
-                                        int height = 90;
-                                        int width = 120;
-                                        final float scale = getBaseContext().getResources().getDisplayMetrics().density;
-                                        height = (int) (200 * scale + 0.5f);
-                                        width = (int) (380 * scale + 0.5f);
-
-                                        Picasso.with(getBaseContext()).load(videoContent.getUrls().get(i)).into(loadtarget);
-                                    } catch (Exception e) {
-
-                                        Log.d(LOG_TAG, "Error load image " + e.getMessage());
-                                    }
-                                }
+                                    loadNextImage();
                             }
                             else{
+                                text_video.setVisibility(View.VISIBLE);
+                                annotation_video.setVisibility(View.VISIBLE);
+                                progressBar.setVisibility(View.INVISIBLE);
+                                youTubePlayerView.setVisibility(View.VISIBLE);
 
                                 text_video.setText(Html.fromHtml(videoContent.getData().getText()));
                             }
-
-                            youTubePlayerView.setVisibility(View.VISIBLE);
-
 
                             mPlayer.cueVideo(videoUrl);
 
@@ -279,6 +267,30 @@ public class VideoActivity extends YouTubeBaseActivity  {
         }
     }
 
+    private void loadNextImage(){
+
+        if(count_bitmap == imageUrls.size()) {
+            Log.i(LOG_TAG, "Загрузили все картинки ");
+
+
+
+            count_bitmap = 0;
+        }
+        else{
+
+
+
+            try {
+                Picasso.with(getBaseContext()).load(imageUrls.get(count_bitmap)).into(loadtarget);
+            }
+            catch (Exception e){
+                Log.d(LOG_TAG, "Error load image " + e.getMessage());
+                count_bitmap++;
+                Picasso.with(getBaseContext()).load(imageUrls.get(count_bitmap)).into(loadtarget);            }
+        }
+
+    }
+
     void initTargetPicasso(){
 
         loadtarget = new Target() {
@@ -290,17 +302,23 @@ public class VideoActivity extends YouTubeBaseActivity  {
 
                 if (imageUrls.size() > 0) {
 
-                    Drawable drawable = new BitmapDrawable(getResources(), bitmap);
+                    Drawable drawable = new BitmapDrawable(getResources(),Bitmap.createBitmap(bitmap, 0, 0,bitmap.getWidth(), bitmap.getHeight()-18)); //обрежем сколько нужно нам пикселей) //создали драврэбл из битмап
                     drawable.setBounds(0, 0, drawable.getIntrinsicWidth(),
                             drawable.getIntrinsicHeight());
-                    drawableHashMap.put(imageUrls.get(count_bitmap),drawable);
+                    drawableHashMap.put(imageUrls.get(count_bitmap),drawable);  //ложим картинку с ключем адресом в хэшмап
 
                     count_bitmap++;
+                    loadNextImage();
 
-                    Log.d(LOG_TAG, "set drawable  ");
+                    text_video.setVisibility(View.VISIBLE);
+                    annotation_video.setVisibility(View.VISIBLE);
+                    progressBar.setVisibility(View.INVISIBLE);
+                    youTubePlayerView.setVisibility(View.VISIBLE);
+
+                    text_video.setText(Html.fromHtml(videoContent.getData().getText(), igLoader, null));
+
                 }
-                //И сразу же используем его
-                text_video.setText(Html.fromHtml(videoContent.getData().getText(), igLoader, null));
+
             }
 
             @Override

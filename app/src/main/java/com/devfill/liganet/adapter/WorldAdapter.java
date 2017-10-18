@@ -3,6 +3,8 @@ package com.devfill.liganet.adapter;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
@@ -53,6 +55,13 @@ public class WorldAdapter extends RecyclerView.Adapter<WorldAdapter.MyViewHolder
             this.title = (TextView) v.findViewById(R.id.title_news_world);
             this.card_view = v.findViewById(R.id.card_view_world);
             this.image = (ImageView) v.findViewById(R.id.image_world);
+
+            Typeface typefaceRI = Typeface.createFromAsset(mContext.getAssets(),
+                    "fonts/UbuntuMono-RI.ttf");
+            Typeface typefaceR = Typeface.createFromAsset(mContext.getAssets(),
+                    "fonts/UbuntuMono-R.ttf");
+            this.title.setTypeface(typefaceR);
+            this.time.setTypeface(typefaceRI);
         }
     }
 
@@ -107,6 +116,17 @@ public class WorldAdapter extends RecyclerView.Adapter<WorldAdapter.MyViewHolder
         viewHolder.title.setText(Html.fromHtml(news.getTitle()));
         viewHolder.image.setImageBitmap(news.getBitmap());
 
+        Bitmap.Config conf = Bitmap.Config.ARGB_8888; // see other conf types
+        Bitmap croppedBmp =  Bitmap.createBitmap(100, 100, conf); // this creates a MUTABLE bitmap;
+
+        try{
+            croppedBmp = Bitmap.createBitmap(news.getBitmap(), 0, 0, news.getBitmap().getWidth(), news.getBitmap().getHeight()-18);
+
+        }
+        catch (Exception e){
+
+        }
+
         if(!news.getVideoUrl().equals("")){
 
             viewHolder.image.setImageDrawable(mContext.getDrawable(R.drawable.video2));
@@ -118,7 +138,7 @@ public class WorldAdapter extends RecyclerView.Adapter<WorldAdapter.MyViewHolder
         }
         else{
 
-            viewHolder.image.setImageBitmap(news.getBitmap());
+            viewHolder.image.setImageBitmap(croppedBmp);
         }
 
         // define an on click listener to open PlaybackFragment

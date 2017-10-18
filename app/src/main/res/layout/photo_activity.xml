@@ -9,7 +9,7 @@
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/pager">
+       >
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -46,21 +46,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/title_photo_news"
-                android:layout_marginTop="5dp"
-                android:layout_marginStart="5dp"
                 android:fontFamily="serif"
                 android:textStyle="normal|bold"
-                android:textSize="18sp" />
+                android:textSize="20sp"
+                android:layout_margin="5dp" />
 
             <TextView
                 android:text="TextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/pager"
-                android:layout_marginTop="5dp"
                 android:id="@+id/text_article_photo"
-                android:layout_marginStart="5dp"
-                android:fontFamily="serif" />
+                android:fontFamily="serif"
+                android:layout_margin="5dp"
+                android:textSize="16sp" />
 
 
         </RelativeLayout>

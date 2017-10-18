@@ -261,7 +261,7 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
                 Log.d(LOG_TAG, "Error load image " + e.getMessage());
 
                 count_bitmap++;
-                Picasso.with(getContext()).load(allNewsList.get(count_bitmap).getImgUrl()).resize(width, height).into(loadtarget);
+              //  Picasso.with(getContext()).load(allNewsList.get(count_bitmap).getImgUrl()).resize(width, height).into(loadtarget);
             }
         }
 

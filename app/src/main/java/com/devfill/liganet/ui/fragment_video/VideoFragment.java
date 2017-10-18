@@ -1,6 +1,7 @@
 package com.devfill.liganet.ui.fragment_video;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -63,6 +64,14 @@ public class VideoFragment extends android.support.v4.app.Fragment{
         text_video = (TextView) rootView.findViewById(R.id.text_video);
         annotation_video = (TextView) rootView.findViewById(R.id.annotation_video);
         progressBar = (ProgressBar) rootView.findViewById(R.id.progressVideo);
+
+        Typeface typefaceR = Typeface.createFromAsset(getContext().getAssets(),
+                "fonts/UbuntuMono-R.ttf");
+        Typeface typefaceB = Typeface.createFromAsset(getContext().getAssets(),
+                "fonts/UbuntuMono-B.ttf");
+
+        annotation_video.setTypeface(typefaceB);
+        text_video.setTypeface(typefaceR);
 
         text_video.setVisibility(View.INVISIBLE);
         annotation_video.setVisibility(View.INVISIBLE);

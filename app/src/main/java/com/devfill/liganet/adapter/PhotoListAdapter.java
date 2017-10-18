@@ -2,6 +2,7 @@ package com.devfill.liganet.adapter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
@@ -39,6 +40,13 @@ public class PhotoListAdapter extends RecyclerView.Adapter<PhotoListAdapter.MyVi
             this.title = (TextView) v.findViewById(R.id.title_news_photo);
             this.card_view = v.findViewById(R.id.card_view_photo);
             this.image = (ImageView) v.findViewById(R.id.image_photo);
+
+            Typeface typefaceRI = Typeface.createFromAsset(mContext.getAssets(),
+                    "fonts/UbuntuMono-RI.ttf");
+            Typeface typefaceR = Typeface.createFromAsset(mContext.getAssets(),
+                    "fonts/UbuntuMono-R.ttf");
+            this.title.setTypeface(typefaceR);
+            this.time.setTypeface(typefaceRI);
 
         }
     }

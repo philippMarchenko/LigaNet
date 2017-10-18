@@ -19,9 +19,10 @@
                 android:id="@+id/annotation_video"
                 android:layout_marginTop="5dp"
                 android:layout_marginStart="5dp"
-                android:textSize="18sp"
+                android:textSize="20sp"
                 android:fontFamily="serif"
-                android:textStyle="normal|bold" />
+                android:textStyle="normal|bold"
+                android:layout_marginRight="5dp" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -41,10 +42,10 @@
                 android:text="text_video"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
                 android:id="@+id/text_video"
-                android:layout_marginStart="5dp"
-                android:layout_below="@+id/layout" />
+                android:layout_below="@+id/layout"
+                android:textSize="16sp"
+                android:layout_margin="5dp" />
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
     <ProgressBar

@@ -2,14 +2,12 @@ package com.devfill.liganet.ui.fragment_photo;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-
-import android.os.Handler;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.text.Html;
@@ -17,8 +15,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,7 +22,6 @@ import android.widget.Toast;
 
 import com.devfill.liganet.R;
 import com.devfill.liganet.adapter.ImageSliderAdapter;
-import com.devfill.liganet.model.NewsContent;
 import com.devfill.liganet.model.PhotoContent;
 import com.devfill.liganet.network.ServerAPI;
 import com.squareup.picasso.Picasso;
@@ -34,11 +29,8 @@ import com.squareup.picasso.Target;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
-import me.relex.circleindicator.CircleIndicator;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
@@ -73,6 +65,13 @@ public class PhotoFragment extends android.support.v4.app.Fragment {
         title_photo_news  = (TextView) rootView.findViewById(R.id.title_photo_news);
         text_article_photo  = (TextView) rootView.findViewById(R.id.text_article_photo);
         progressBar = (ProgressBar) rootView.findViewById(R.id.progressPhoto);
+
+        Typeface typefaceR = Typeface.createFromAsset(getContext().getAssets(),
+                "fonts/UbuntuMono-R.ttf");
+        Typeface typefaceB = Typeface.createFromAsset(getContext().getAssets(),
+                "fonts/UbuntuMono-B.ttf");
+        title_photo_news.setTypeface(typefaceB);
+        text_article_photo.setTypeface(typefaceR);
 
         imageSliderAdapter = new ImageSliderAdapter(getContext(),bitmapList);
         mPager = (ViewPager) rootView.findViewById(R.id.pager);
@@ -198,7 +197,7 @@ public class PhotoFragment extends android.support.v4.app.Fragment {
 
                 Log.d(LOG_TAG, "onBitmapLoaded  ");
 
-                bitmapList.add(bitmap);
+                bitmapList.add(Bitmap.createBitmap(bitmap, 0, 0,bitmap.getWidth(), bitmap.getHeight()-18)); //обрежем сколько нужно нам пикселей
                 imageSliderAdapter.notifyDataSetChanged();
 
                 count_bitmap++;
