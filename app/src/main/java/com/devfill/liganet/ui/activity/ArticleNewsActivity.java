@@ -200,10 +200,7 @@ public class ArticleNewsActivity extends AppCompatActivity {
                     public void onResponse(Call<NewsContent> call, Response<NewsContent> response) {
 
                         newsContent = response.body();
-                        progressArticle.setVisibility(View.INVISIBLE);
-                        dateAtricle.setVisibility(View.VISIBLE);
-                        anotation.setVisibility(View.VISIBLE);
-                        textArticle.setVisibility(View.VISIBLE);
+
 
                         try {
 
@@ -214,26 +211,15 @@ public class ArticleNewsActivity extends AppCompatActivity {
                             imageUrls = newsContent.getUrls();
 
                             if (newsContent.getUrls().size() > 0) {
-                                for (int i = 0; i < newsContent.getUrls().size(); i++) {
 
-                                    Log.i(LOG_TAG, "urlPhoto " + newsContent.getUrls().get(i));
-
-                                    try {
-                                        int height = 90;
-                                        int width = 120;
-                                        final float scale = getBaseContext().getResources().getDisplayMetrics().density;
-                                        height = (int) (200 * scale + 0.5f);
-                                        width = (int) (380 * scale + 0.5f);
-
-
-                                        Picasso.with(getBaseContext()).load(newsContent.getUrls().get(i)).resize(width,height).into(loadtarget);
-                                    } catch (Exception e) {
-
-                                        Log.d(LOG_TAG, "Error load image " + e.getMessage());
-                                    }
-                                }
+                                loadNextImage();
                               }
                             else{
+
+                                progressArticle.setVisibility(View.INVISIBLE);
+                                dateAtricle.setVisibility(View.VISIBLE);
+                                anotation.setVisibility(View.VISIBLE);
+                                textArticle.setVisibility(View.VISIBLE);
 
                                 textArticle.setText(Html.fromHtml(newsContent.getData().getText()));
 
@@ -271,6 +257,27 @@ public class ArticleNewsActivity extends AppCompatActivity {
         }
     }
 
+    private void loadNextImage(){
+        Log.i(LOG_TAG, "loadNextImage  count_bitmap " + count_bitmap);
+
+        if(count_bitmap == imageUrls.size()) {
+            Log.i(LOG_TAG, "Загрузили все картинки ");
+
+            count_bitmap = 0;
+        }
+        else{
+
+            try {
+                Picasso.with(getBaseContext()).load(imageUrls.get(count_bitmap)).into(loadtarget);
+            }
+            catch (Exception e){
+                Log.d(LOG_TAG, "Error load image " + e.getMessage());
+                count_bitmap++;
+                Picasso.with(getBaseContext()).load(imageUrls.get(count_bitmap)).into(loadtarget);            }
+        }
+
+    }
+
     void initTargetPicasso(){
 
         loadtarget = new Target() {
@@ -287,11 +294,15 @@ public class ArticleNewsActivity extends AppCompatActivity {
                     drawableHashMap.put(imageUrls.get(count_bitmap),drawable);
 
                     count_bitmap++;
+                    loadNextImage();
 
-                    Log.d(LOG_TAG, "set drawable  ");
+                    progressArticle.setVisibility(View.INVISIBLE);
+                    dateAtricle.setVisibility(View.VISIBLE);
+                    anotation.setVisibility(View.VISIBLE);
+                    textArticle.setVisibility(View.VISIBLE);
+
+                    textArticle.setText(Html.fromHtml(newsContent.getData().getText(), igLoader, null));
                 }
-                //И сразу же используем его
-                textArticle.setText(Html.fromHtml(newsContent.getData().getText(), igLoader, null));
             }
 
             @Override

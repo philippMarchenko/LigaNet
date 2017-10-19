@@ -271,15 +271,9 @@ public class VideoActivity extends YouTubeBaseActivity  {
 
         if(count_bitmap == imageUrls.size()) {
             Log.i(LOG_TAG, "Загрузили все картинки ");
-
-
-
             count_bitmap = 0;
         }
         else{
-
-
-
             try {
                 Picasso.with(getBaseContext()).load(imageUrls.get(count_bitmap)).into(loadtarget);
             }

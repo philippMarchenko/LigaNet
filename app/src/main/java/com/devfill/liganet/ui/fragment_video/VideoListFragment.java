@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.URLUtil;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 
@@ -24,6 +25,7 @@ import com.devfill.liganet.R;
 import com.devfill.liganet.adapter.AllNewsAdapter;
 import com.devfill.liganet.adapter.PhotoListAdapter;
 import com.devfill.liganet.adapter.VideoListAdapter;
+import com.devfill.liganet.helper.OnLoadMoreListener;
 import com.devfill.liganet.model.ArticleNews;
 import com.devfill.liganet.model.ListNews;
 import com.devfill.liganet.model.News;
@@ -66,21 +68,29 @@ public class VideoListFragment extends android.support.v4.app.Fragment implement
     Target loadtarget = null;
 
     FragmentTransaction ft;
+
+    private int start = 0,end = 21;
+    private ProgressBar progressBarVideoList;
+    private boolean listIsShowed = false;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_video_list, container, false);
 
         Log.i(LOG_TAG, "onCreateView ");
 
+        progressBarVideoList = (ProgressBar) rootView.findViewById(R.id.progressBarVideoList);
+        progressBarVideoList.setVisibility(View.INVISIBLE);
 
         ft = getFragmentManager().beginTransaction();
 
 
         recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view_video);
-        videoListAdapter = new VideoListAdapter(getContext(),getActivity(),ft,videoList);
+
         RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(getContext(), 1);
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
+
+        videoListAdapter = new VideoListAdapter(getContext(),getActivity(),ft,videoList,recyclerView);
         recyclerView.setAdapter(videoListAdapter);
 
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh_layout_video);
@@ -88,13 +98,40 @@ public class VideoListFragment extends android.support.v4.app.Fragment implement
 
         swipeRefreshLayout.setOnRefreshListener(this);
 
-
+        initLoadMoreListener();
         initRetrofit ();
         initTargetPicasso();
 
-        getVideoList();
+        if(!listIsShowed){
+            getVideoList();
+            listIsShowed = true;
+        }
 
         return rootView;
+    }
+
+    private void initLoadMoreListener(){
+
+                 videoListAdapter.setOnLoadMoreListener(new OnLoadMoreListener() {
+            @Override
+            public void onLoadMore() {
+                //add null , so the adapter will check view_type and show progress bar at bottom
+                videoList.add(null);
+                videoListAdapter.notifyItemInserted(videoList.size() - 1);
+
+
+                videoList.remove(videoList.size() - 1);
+                videoListAdapter.notifyItemRemoved(videoList.size());
+                //add items one by one
+                start = videoList.size();
+                end = start + 21;
+
+                progressBarVideoList.setVisibility(View.VISIBLE);
+                getVideoList();
+
+
+            }
+        });
     }
 
     private void initRetrofit (){
@@ -133,7 +170,7 @@ public class VideoListFragment extends android.support.v4.app.Fragment implement
         else {
             try {
 
-                serverAPI.getVideoNews().enqueue(new Callback<ListNews>() {
+                serverAPI.getVideoNews(Integer.toString(start),Integer.toString(end)).enqueue(new Callback<ListNews>() {
                     @Override
                     public void onResponse(Call<ListNews> call, Response<ListNews> response) {
 
@@ -185,9 +222,14 @@ public class VideoListFragment extends android.support.v4.app.Fragment implement
     @Override
     public void onRefresh() {
 
-
         swipeRefreshLayout.setRefreshing(true);
+        videoList.clear();
+
+
+        start = 0;
+        end = 21;
         getVideoList();
+        listIsShowed = true;
     }
 
     private void loadNextImage(){

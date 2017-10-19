@@ -18,12 +18,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.URLUtil;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 
 import com.devfill.liganet.R;
 import com.devfill.liganet.adapter.AllNewsAdapter;
 import com.devfill.liganet.adapter.PhotoListAdapter;
+import com.devfill.liganet.helper.OnLoadMoreListener;
 import com.devfill.liganet.model.ArticleNews;
 import com.devfill.liganet.model.ListNews;
 import com.devfill.liganet.model.News;
@@ -51,7 +53,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class PhotoListFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
-
     private static final String LOG_TAG = "PhotoListFragmentTag";
 
     private List<News> photoList = new ArrayList<>();
@@ -66,20 +67,29 @@ public class PhotoListFragment extends android.support.v4.app.Fragment implement
     Target loadtarget = null;
 
     FragmentTransaction ft;
+
+    private int start = 0,end = 21;
+    private ProgressBar progressBarPhotoList;
+    private boolean listIsShowed = false;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_photo_list, container, false);
 
         Log.i(LOG_TAG, "onCreateView ");
 
+        progressBarPhotoList = (ProgressBar) rootView.findViewById(R.id.progressBarPhotoList);
+        progressBarPhotoList.setVisibility(View.INVISIBLE);
 
         ft = getFragmentManager().beginTransaction();
 
         recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view_photo);
-        photoListAdapter = new PhotoListAdapter(getContext(),getActivity(),ft,photoList);
+
         RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(getContext(), 1);
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
+
+        photoListAdapter = new PhotoListAdapter(getContext(),getActivity(),ft,photoList,recyclerView);
         recyclerView.setAdapter(photoListAdapter);
 
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh_layout_photo);
@@ -87,13 +97,40 @@ public class PhotoListFragment extends android.support.v4.app.Fragment implement
 
         swipeRefreshLayout.setOnRefreshListener(this);
 
-
+        initLoadMoreListener();
         initRetrofit ();
         initTargetPicasso();
 
-        getPhotoList();
+        if(!listIsShowed){
+            getPhotoList();
+            listIsShowed = true;
+        }
 
         return rootView;
+    }
+
+    private void initLoadMoreListener(){
+
+                photoListAdapter.setOnLoadMoreListener(new OnLoadMoreListener() {
+            @Override
+            public void onLoadMore() {
+                //add null , so the adapter will check view_type and show progress bar at bottom
+                photoList.add(null);
+                photoListAdapter.notifyItemInserted(photoList.size() - 1);
+
+
+                photoList.remove(photoList.size() - 1);
+                photoListAdapter.notifyItemRemoved(photoList.size());
+                //add items one by one
+                start = photoList.size();
+                end = start + 21;
+
+                progressBarPhotoList.setVisibility(View.VISIBLE);
+                getPhotoList();
+
+
+            }
+        });
     }
 
     private void initRetrofit (){
@@ -119,7 +156,6 @@ public class PhotoListFragment extends android.support.v4.app.Fragment implement
 
     private void getPhotoList (){
 
-        photoList.clear();
         swipeRefreshLayout.setRefreshing(true);
 
 
@@ -132,19 +168,24 @@ public class PhotoListFragment extends android.support.v4.app.Fragment implement
         else {
             try {
 
-                serverAPI.getPhotoNews().enqueue(new Callback<ListNews>() {
+                serverAPI.getPhotoNews(Integer.toString(start),Integer.toString(end)).enqueue(new Callback<ListNews>() {
                     @Override
                     public void onResponse(Call<ListNews> call, Response<ListNews> response) {
 
                         ListNews listNews = response.body();
 
                         try {
+
                             photoList.addAll(listNews.getNews());
                             photoListAdapter.notifyDataSetChanged();
+                            photoListAdapter.setLoaded();
                             swipeRefreshLayout.setRefreshing(false);
+                            progressBarPhotoList.setVisibility(View.INVISIBLE);
+
                         }
                         catch(Exception e){
-
+                            swipeRefreshLayout.setRefreshing(false);
+                            progressBarPhotoList.setVisibility(View.INVISIBLE);
                             Toast.makeText(getActivity(), "Нет новостей на сервере!", Toast.LENGTH_LONG).show();
 
                         }
@@ -185,7 +226,12 @@ public class PhotoListFragment extends android.support.v4.app.Fragment implement
     public void onRefresh() {
 
         swipeRefreshLayout.setRefreshing(true);
+        photoList.clear();
+
+        start = 0;
+        end = 21;
         getPhotoList();
+        listIsShowed = true;
     }
 
     private void loadNextImage(){
@@ -232,7 +278,7 @@ public class PhotoListFragment extends android.support.v4.app.Fragment implement
                 Log.d(LOG_TAG, "onBitmapLoaded  ");
 
                 if (photoList.size() > 0) {
-                    photoList.get(count_bitmap).setBitmap(bitmap);
+                    photoList.get(count_bitmap).setBitmap(Bitmap.createBitmap(bitmap, 0, 0,bitmap.getWidth(), bitmap.getHeight()-18));
                     photoListAdapter.notifyDataSetChanged();
 
                     count_bitmap++;

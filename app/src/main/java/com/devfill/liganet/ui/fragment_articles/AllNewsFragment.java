@@ -42,7 +42,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class AllNewsFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
-
     private static final String LOG_TAG = "AllNewsFragmentTag";
 
     private List<News> allNewsList = new ArrayList<>();
@@ -59,7 +58,6 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
     private int start = 0,end = 21;
     private ProgressBar progressBarAllNews;
     private boolean listIsShowed = false;
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -118,7 +116,7 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
 
     private void initLoadMoreListener(){
 
-        allNewsAdapter.setOnLoadMoreListener(new OnLoadMoreListener() {
+                allNewsAdapter.setOnLoadMoreListener(new OnLoadMoreListener() {
             @Override
             public void onLoadMore() {
                 //add null , so the adapter will check view_type and show progress bar at bottom

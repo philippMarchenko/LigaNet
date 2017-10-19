@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     >
-    <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+    <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipe_refresh_layout_photo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -12,16 +13,32 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true">
 
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recycler_view_photo"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentTop="true" />
+            android:layout_height="match_parent">
 
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycler_view_photo"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentTop="true"
+                android:scrollbars="vertical"
+                android:scrollbarSize="5dp"/>
+
+            <ProgressBar
+                android:id="@+id/progressBarPhotoList"
+                android:layout_width="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="65dp"
+                android:layout_alignParentBottom="true" />
+        </RelativeLayout>
     </android.support.v4.widget.SwipeRefreshLayout>
+
+
 
 
 </RelativeLayout>

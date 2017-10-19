@@ -36,9 +36,11 @@ public interface ServerAPI {
                                 @Query(value = "end") String end);
 
     @GET("/liga_net/get_photo_list.php")
-    Call<ListNews> getPhotoNews();
+    Call<ListNews> getPhotoNews(@Query(value = "start") String start,
+                                @Query(value = "end") String end);
     @GET("/liga_net/get_video_list.php")
-    Call<ListNews> getVideoNews();
+    Call<ListNews> getVideoNews(@Query(value = "start") String start,
+                                @Query(value = "end") String end);
 
 }
 

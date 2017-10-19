@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -13,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.devfill.liganet.R;
+import com.devfill.liganet.helper.OnLoadMoreListener;
 import com.devfill.liganet.model.News;
 import com.devfill.liganet.ui.fragment_photo.PhotoFragment;
 import com.devfill.liganet.ui.fragment_video.VideoFragment;
@@ -28,6 +30,14 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.MyVi
     private Activity myActivity;
     private List<News> mListNewsShort;
     FragmentTransaction ft;
+
+    private OnLoadMoreListener onLoadMoreListener;
+
+    // The minimum amount of items to have below your current scroll position
+    // before loading more.
+    private int visibleThreshold = 5;
+    private int lastVisibleItem, totalItemCount;
+    private boolean loading;
 
     public class MyViewHolder extends RecyclerView.ViewHolder{
 
@@ -52,12 +62,41 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.MyVi
     }
 
 
-    public VideoListAdapter(Context context, Activity activity,FragmentTransaction ft, List<News> list) {
+    public VideoListAdapter(Context context, Activity activity,FragmentTransaction ft, List<News> list,RecyclerView recyclerView) {
 
         mContext = context;
         myActivity = activity;
         mListNewsShort = list;
         this.ft = ft;
+
+        if (recyclerView.getLayoutManager() instanceof LinearLayoutManager) {
+
+            final LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView
+                    .getLayoutManager();
+
+
+            recyclerView
+                    .addOnScrollListener(new RecyclerView.OnScrollListener() {
+                        @Override
+                        public void onScrolled(RecyclerView recyclerView,
+                                               int dx, int dy) {
+                            super.onScrolled(recyclerView, dx, dy);
+
+                            totalItemCount = linearLayoutManager.getItemCount();
+                            lastVisibleItem = linearLayoutManager
+                                    .findLastVisibleItemPosition();
+                            if (!loading
+                                    && totalItemCount <= (lastVisibleItem + visibleThreshold)) {
+                                // End has been reached
+                                // Do something
+                                if (onLoadMoreListener != null) {
+                                    onLoadMoreListener.onLoadMore();
+                                }
+                                loading = true;
+                            }
+                        }
+                    });
+        }
     }
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
@@ -99,4 +138,11 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.MyVi
         return mListNewsShort.size();
     }
 
+    public void setOnLoadMoreListener(OnLoadMoreListener onLoadMoreListener) {
+        this.onLoadMoreListener = onLoadMoreListener;
+    }
+
+    public void setLoaded() {
+        loading = false;
+    }
 }

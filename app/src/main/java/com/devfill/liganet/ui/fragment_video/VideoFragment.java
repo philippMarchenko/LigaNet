@@ -84,11 +84,6 @@ public class VideoFragment extends android.support.v4.app.Fragment{
 
         initYouTube();
 
-
-
-
-
-
         return rootView;
     }
 
