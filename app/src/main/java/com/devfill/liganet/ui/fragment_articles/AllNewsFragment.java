@@ -29,6 +29,7 @@ import com.devfill.liganet.network.ServerAPI;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -59,6 +60,9 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
     private ProgressBar progressBarAllNews;
     private boolean listIsShowed = false;
 
+    private int height = 90;
+    private int width = 120;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_all_news, container, false);
@@ -81,6 +85,18 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
         swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
 
         swipeRefreshLayout.setOnRefreshListener(this);
+
+        try{
+
+            final float scale = getContext().getResources().getDisplayMetrics().density;
+            height = (int) (90 * scale + 0.5f);
+            width = (int) (120 * scale + 0.5f);
+        }
+        catch(Exception e){
+
+            Log.d(LOG_TAG, "Не удалось загрузить ресурсы " + e.getMessage());
+
+        }
 
         initLoadMoreListener();
         initRetrofit ();
@@ -140,11 +156,11 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
 
     private void getAllNewsList (){
 
-     //  allNewsList.clear();
-       swipeRefreshLayout.setRefreshing(true);
-       Log.i(LOG_TAG, "getAllNewsList ");
+        if(start == 0){
+            swipeRefreshLayout.setRefreshing(true);
+        }
 
-       String netType = getNetworkType(getContext());
+        String netType = getNetworkType(getContext());
        if(netType == null){
            Toast.makeText(getActivity(), "Подключение к сети отсутствует!", Toast.LENGTH_LONG).show();
            swipeRefreshLayout.setRefreshing(false);
@@ -159,15 +175,10 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
 
                        ListNews listNews = response.body();
 
-                       for(int i = 0; i < listNews.getNews().size(); i++){
-
-                        //   Log.i(LOG_TAG, "getImgUrl " + listNews.getNews().get(i).getImgUrl());
-
-
-                       }
 
                        try {
 
+                           Collections.reverse(listNews.getNews());
                            allNewsList.addAll(listNews.getNews());
                            allNewsAdapter.notifyDataSetChanged();
                            allNewsAdapter.setLoaded();
@@ -230,23 +241,6 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
 
     private void loadNextImage(){
 
-        int height = 90;
-        int width = 120;
-
-        try{
-
-            final float scale = getContext().getResources().getDisplayMetrics().density;
-            height = (int) (90 * scale + 0.5f);
-            width = (int) (120 * scale + 0.5f);
-        }
-        catch(Exception e){
-
-            Log.d(LOG_TAG, "Не удалось загрузить ресурсы " + e.getMessage());
-
-        }
-
-
-
         if(count_bitmap == allNewsList.size()) {
             count_bitmap = 0;
         }
@@ -280,9 +274,6 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
                     count_bitmap++;
                     loadNextImage();
                 }
-
-
-
             }
 
             @Override
@@ -293,21 +284,15 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
                 // Log.d(LOG_TAG, "onBitmapFailed " + errorDrawable.toString());
 
             }
-
             @Override
             public void onPrepareLoad(Drawable placeHolderDrawable) {
-
             }
-
         };
     }
 
     @Override
     public void onResume() {
         super.onResume();
-
-
-
         Log.i(LOG_TAG, " onResume");
     }
 

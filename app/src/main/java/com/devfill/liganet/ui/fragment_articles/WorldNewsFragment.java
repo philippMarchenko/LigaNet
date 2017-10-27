@@ -30,6 +30,7 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -144,7 +145,9 @@ public class WorldNewsFragment extends android.support.v4.app.Fragment implement
 
         private void getWorldNewsList (){
 
-            swipeRefreshLayout.setRefreshing(true);
+            if(start == 0){
+                swipeRefreshLayout.setRefreshing(true);
+            }
 
             String netType = getNetworkType(getContext());
             if(netType == null){
@@ -160,11 +163,22 @@ public class WorldNewsFragment extends android.support.v4.app.Fragment implement
 
                             ListNews listNews = response.body();
 
-                            worldList.addAll(listNews.getNews());
-                            worldAdapter.notifyDataSetChanged();
-                            worldAdapter.setLoaded();
-                            swipeRefreshLayout.setRefreshing(false);
-                            progressBarWorld.setVisibility(View.INVISIBLE);
+                            try {
+
+                                Collections.reverse(listNews.getNews());
+                                worldList.addAll(listNews.getNews());
+                                worldAdapter.notifyDataSetChanged();
+                                worldAdapter.setLoaded();
+                                swipeRefreshLayout.setRefreshing(false);
+                                progressBarWorld.setVisibility(View.INVISIBLE);
+
+                            }
+                            catch(Exception e){
+                                swipeRefreshLayout.setRefreshing(false);
+                                progressBarWorld.setVisibility(View.INVISIBLE);
+                                Toast.makeText(getActivity(), "Нет новостей на сервере!", Toast.LENGTH_LONG).show();
+
+                            }
 
 
                             loadNextImage();

@@ -25,6 +25,7 @@ import com.devfill.liganet.ui.activity.PhotoActivity;
 import com.devfill.liganet.ui.activity.VideoActivity;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -135,12 +136,12 @@ public class AllNewsAdapter extends RecyclerView.Adapter<AllNewsAdapter.MyViewHo
 
 
 
-        if(!news.getVideoUrl().equals("")){
+        if(news.getIsVideo().equals("1")){
 
                 myViewHolder.image.setImageDrawable(mContext.getDrawable(R.drawable.video2));
 
             }
-            else if (news.getIs_photo().equals("1")) {
+        else if (news.getIs_photo().equals("1")) {
 
                 myViewHolder.image.setImageDrawable(mContext.getDrawable(R.drawable.foto));
             }
@@ -155,13 +156,23 @@ public class AllNewsAdapter extends RecyclerView.Adapter<AllNewsAdapter.MyViewHo
             myViewHolder.card_view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if(news.getVideoUrl().equals("") && !news.getIs_photo().equals("1")){   //если это не видео и не фото
+                    if(!news.getIsVideo().equals("1") && !news.getIs_photo().equals("1")){   //если это не видео и не фото
 
-                        Log.d(LOG_TAG, "Это не видео");
+                        Log.d(LOG_TAG, "Это СТАТЬЯ");
                         try {
                             Intent intent = new Intent(mContext, ArticleNewsActivity.class);    //ЭТО СТАТЬЯ
-                            intent.putExtra("linkHref", news.getlinkHref());
-                            intent.putExtra("imgHref", news.getImgUrl());
+                            ArrayList<String> newsList = new ArrayList<String>();
+
+                           for(int i = 0; i < mListNewsShort.size(); i ++){
+                              //  if(mListNewsShort.get(i).getIs_photo().equals("0") && mListNewsShort.get(i).getIsVideo().equals("0")){
+
+                                    newsList.add(mListNewsShort.get(i).getLinkHref());
+                              //  }
+                           }
+                            intent.putExtra("newsList", newsList);
+                            intent.putExtra("position", position);
+
+
                             mContext.startActivity(intent);
 
 
@@ -174,7 +185,7 @@ public class AllNewsAdapter extends RecyclerView.Adapter<AllNewsAdapter.MyViewHo
                         try {
 
                             Intent intent = new Intent(mContext, PhotoActivity.class);
-                            intent.putExtra("linkHref", news.getlinkHref());
+                            intent.putExtra("linkHref", news.getLinkHref());
                             mContext.startActivity(intent);
 
 
@@ -188,7 +199,7 @@ public class AllNewsAdapter extends RecyclerView.Adapter<AllNewsAdapter.MyViewHo
                         try {
 
                             Intent intent = new Intent(mContext, VideoActivity.class);      // а это видео
-                            intent.putExtra("linkHref", news.getlinkHref());
+                            intent.putExtra("linkHref", news.getLinkHref());
                             mContext.startActivity(intent);
 
 

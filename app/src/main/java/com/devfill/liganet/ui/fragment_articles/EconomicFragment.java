@@ -29,6 +29,7 @@ import com.devfill.liganet.network.ServerAPI;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -146,8 +147,9 @@ public class EconomicFragment extends android.support.v4.app.Fragment implements
 
     private void getEconomicList (){
 
-        swipeRefreshLayout.setRefreshing(true);
-        Log.i(LOG_TAG, "getAllNewsList ");
+        if(start == 0){
+            swipeRefreshLayout.setRefreshing(true);
+        }
 
         String netType = getNetworkType(getContext());
         if(netType == null){
@@ -166,6 +168,7 @@ public class EconomicFragment extends android.support.v4.app.Fragment implements
 
                         try {
 
+                            Collections.reverse(listNews.getNews());
                             economicList.addAll(listNews.getNews());
                             economicAdapter.notifyDataSetChanged();
                             economicAdapter.setLoaded();

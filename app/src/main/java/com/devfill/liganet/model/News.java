@@ -21,17 +21,24 @@ public class News {
     @SerializedName("imgUrl")
     @Expose
     private String imgUrl;
-    @SerializedName("videoUrl")
-    @Expose
-    private String videoUrl;
-
 
     @SerializedName("isPhoto")
     @Expose
     private String isPhoto;
 
-    private Bitmap bitmap;
+    @SerializedName("isVideo")
+    @Expose
+    private String isVideo;
 
+   private Bitmap bitmap;
+
+    public String getIsVideo() {
+        return isVideo;
+    }
+
+    public void setBitmap(Bitmap bitmap) {
+        this.bitmap = bitmap;
+    }
 
     public News(String time, String title,String linkHref,Bitmap bitmap){
 
@@ -40,44 +47,21 @@ public class News {
         this.title = title;
         this.linkHref = linkHref;
     }
+
     public String getIs_photo() {
         return isPhoto;
-    }
-
-    public void setIs_photo(String is_photo) {
-        this.isPhoto = is_photo;
     }
 
     public String getTime() {
         return time;
     }
 
-    public void setTime(String time) {
-        this.time = time;
-    }
-
     public String getTitle() {
         return title;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public void setLinkHref(String linkHref) {
-        this.linkHref = linkHref;
-    }
-
-    public String getlinkHref() {
-        return linkHref;
-    }
-
     public Bitmap getBitmap() {
         return bitmap;
-    }
-
-    public void setBitmap(Bitmap bitmap) {
-        this.bitmap = bitmap;
     }
 
     public String getLinkHref() {
@@ -88,16 +72,7 @@ public class News {
         return imgUrl;
     }
 
-    public void setImgUrl(String imgUrl) {
-        this.imgUrl = imgUrl;
-    }
 
-    public String getVideoUrl() {
-        return videoUrl;
-    }
 
-    public void setVideoUrl(String videoUrl) {
-        this.videoUrl = videoUrl;
-    }
 
 }

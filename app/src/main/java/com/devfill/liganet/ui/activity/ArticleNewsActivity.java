@@ -9,6 +9,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.text.Spanned;
@@ -23,9 +24,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.devfill.liganet.R;
+import com.devfill.liganet.adapter.ArticleNewsAdapter;
 import com.devfill.liganet.model.ArticleNews;
 import com.devfill.liganet.model.ListNews;
 import com.devfill.liganet.model.NewsContent;
+import com.devfill.liganet.model.VideoContent;
 import com.devfill.liganet.network.GetDataNews;
 import com.devfill.liganet.network.ServerAPI;
 import com.squareup.picasso.Picasso;
@@ -55,82 +58,85 @@ public class ArticleNewsActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = "ArticleNewsActivityTag";
 
-    private TextView dateAtricle,anotation,textArticle;
-    private ImageView backdrop;
-    private ProgressBar progressArticle;
-
     private Retrofit retrofit;
     private ServerAPI serverAPI;
-    Target loadtarget = null;
+    Target loadtargetArrayImage = null;
+    Target loadtargetToolbar = null;
 
-    Map<String, Drawable> drawableHashMap = new HashMap<String, Drawable>();
+
+    public static Map<String, Drawable> drawableHashMap = new HashMap<String, Drawable>();
     List<String> imageUrls = new ArrayList<>();
     NewsContent newsContent;
 
-    static final Map<String, WeakReference<Drawable>> mDrawableCache = Collections.synchronizedMap(new WeakHashMap<String, WeakReference<Drawable>>());
+    private int positionPage = 0;       //позиция текущей страницы
+    private int positionArticle = 0;    //позиция статьи по которой нажали
 
     private int count_bitmap = 0;
 
-    Html.ImageGetter igLoader;
+    private List<NewsContent> listContent = new ArrayList<>();
+    ArrayList<String> myList;
+
+    ArticleNewsAdapter articleNewsAdapter;
+    ViewPager mPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_article_news);
-
-        Log.d(LOG_TAG, "onCreate ArticleNewsFragment");
-
-        dateAtricle = (TextView) findViewById(R.id.dateAtricle);
-        anotation = (TextView) findViewById(R.id.anotation);
-        textArticle = (TextView) findViewById(R.id.textArticle);
-        backdrop = (ImageView) findViewById(R.id.backdrop);
-        progressArticle = (ProgressBar) findViewById(R.id.progressArticle);
-
-        Typeface typefaceRI = Typeface.createFromAsset(getAssets(),
-                "fonts/UbuntuMono-RI.ttf");
-        Typeface typefaceR = Typeface.createFromAsset(getAssets(),
-                "fonts/UbuntuMono-R.ttf");
-        Typeface typefaceB = Typeface.createFromAsset(getAssets(),
-                "fonts/UbuntuMono-B.ttf");
-        anotation.setTypeface(typefaceB);
-        textArticle.setTypeface(typefaceR);
-        dateAtricle.setTypeface(typefaceRI);
+        setContentView(R.layout.activity_article_news_pager);
 
 
-        dateAtricle.setVisibility(View.INVISIBLE);
-        anotation.setVisibility(View.INVISIBLE);
-        textArticle.setVisibility(View.INVISIBLE);
-        progressArticle.setVisibility(View.VISIBLE);
+        myList = (ArrayList<String>) getIntent().getSerializableExtra("newsList");
 
 
-        String linkHref = getIntent().getStringExtra("linkHref");           //получим ссылку на саму статью
-        String imgHref = getIntent().getStringExtra("imgHref");             //получим ссылку на картинку для тулбара
 
-        Log.d(LOG_TAG, "imgHref " + imgHref);
-        Log.d(LOG_TAG, "linkHref " + linkHref);
+        
+        for(int i = 0; i < myList.size(); i++){
 
-        initRetrofit();                                                     //настроем ретрофит
-        initTargetPicasso();                                                //настроим пикассо
-        initImageLoader ();                                                 //настроим загружчик картинки для HTML
-        getNewsContent(linkHref);                                           //запрос к серверу по контент статьи
+            NewsContent newsContent = new NewsContent();
+            newsContent.setData(new NewsContent.Data("","",""));
+            listContent.add(newsContent);
 
-        try {
-
-            final float scale = getBaseContext().getResources().getDisplayMetrics().density;
-            int height = (int) (220 * scale + 0.5f);
-            int width = (int) (295 * scale + 0.5f);
-
-            Picasso.with(getBaseContext()).load(imgHref).resize(width,height-20).into(backdrop);    //загружаем картинку в тулбар
-        }
-        catch (Exception e){
-            Log.d(LOG_TAG, "Error load image " + e.getMessage());
+            Log.d(LOG_TAG, myList.get(i));
         }
 
+        mPager = (ViewPager) findViewById(R.id.pagerArticles);
+        articleNewsAdapter = new ArticleNewsAdapter(getBaseContext(),listContent);
+        mPager.setAdapter(articleNewsAdapter);
+
+        positionArticle = getIntent().getIntExtra("position",0);
+
+        initPagerListener();
+        initRetrofit();                                                    //настроем ретрофит
+        initTargetPicassoArrayImage();                                               //настроим пикассо
+        initTargetPicassoToolbar();                                               //настроим пикассо
+        getNewsContent(myList.get(positionArticle));                             //запрос к серверу по контент статьи
+
+    }
+
+    private void initPagerListener(){
+
+        mPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
 
 
+                positionPage = position;
 
+                getNewsContent(myList.get(positionArticle + positionPage));               //запрос к серверу по контент статьи
 
+                Log.d(LOG_TAG, "onPageSelected " + position);
+            }
 
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
 
     }
 
@@ -165,32 +171,29 @@ public class ArticleNewsActivity extends AppCompatActivity {
         serverAPI = retrofit.create(ServerAPI.class);
     }
 
-    private void initImageLoader (){
+    private void loadImageInToolbar(String url){
 
-        igLoader = new Html.ImageGetter() {
-            public Drawable getDrawable(String source) {
+        try {
 
-                Drawable drawable = null;
+            final float scale = getBaseContext().getResources().getDisplayMetrics().density;
+            int height = (int) (220 * scale + 0.5f);
+            int width = (int) (295 * scale + 0.5f);
 
-                for(int i = 0 ; i < imageUrls.size(); i++){
-
-                    if(source.equals(imageUrls.get(i))){
-                        drawable = drawableHashMap.get(imageUrls.get(i));
-
-                    }
-                }
-
-                Log.d(LOG_TAG, "getDrawable  " + drawable);
-
-                return drawable;
-            }
-        };
+            Picasso.with(getBaseContext()).load(url).resize(width,height-20).into(loadtargetToolbar);    //загружаем картинку в тулбар
+        }
+        catch (Exception e){
+            Log.d(LOG_TAG, "Error load image " + e.getMessage());
+        }
     }
 
     private void getNewsContent (String linkHref){
-        String netType = getNetworkType(getBaseContext());
+
+        Log.i(LOG_TAG, "getNewsContent " + linkHref);
+
+
+        String netType = getNetworkType(this);
         if(netType == null){
-            Toast.makeText(getBaseContext(), "Подключение к сети отсутствует!", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Подключение к сети отсутствует!", Toast.LENGTH_LONG).show();
         }
         else {
             try {
@@ -199,52 +202,40 @@ public class ArticleNewsActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(Call<NewsContent> call, Response<NewsContent> response) {
 
-                        newsContent = response.body();
+                        Log.i(LOG_TAG, "onResponse getNewsContent ");
 
+                        NewsContent newsContent = response.body();
 
                         try {
-
-                            dateAtricle.setText(newsContent.getData().getDate());
-                            anotation.setText(Html.fromHtml(newsContent.getData().getAnnotation()));
-                            // textArticle.setText(Html.fromHtml(newsContent.getData().getText()));
 
                             imageUrls = newsContent.getUrls();
 
                             if (newsContent.getUrls().size() > 0) {
 
+                                listContent.set(positionPage,newsContent);
+                                loadImageInToolbar(newsContent.getData().getImageUrl());
                                 loadNextImage();
-                              }
+                            }
                             else{
 
-                                progressArticle.setVisibility(View.INVISIBLE);
-                                dateAtricle.setVisibility(View.VISIBLE);
-                                anotation.setVisibility(View.VISIBLE);
-                                textArticle.setVisibility(View.VISIBLE);
+                                listContent.set(positionPage,newsContent);
+                                loadImageInToolbar(newsContent.getData().getImageUrl());
 
-                                textArticle.setText(Html.fromHtml(newsContent.getData().getText()));
-
-                                }
+                                articleNewsAdapter.notifyDataSetChanged();
                             }
-                            catch(Exception e){
+                        }
+                        catch(Exception e){
 
-                                Toast.makeText(getBaseContext(), "Не удалось распознать статью!", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getBaseContext(), "Не удалось распознать статью!", Toast.LENGTH_LONG).show();
 
-                            }
-
-
-
-
-                        Log.i(LOG_TAG, "onResponse getNewsContent ");
+                        }
 
                     }
 
                     @Override
                     public void onFailure(Call<NewsContent> call, Throwable t) {
 
-                        progressArticle.setVisibility(View.INVISIBLE);
-                        dateAtricle.setVisibility(View.VISIBLE);
-                        anotation.setVisibility(View.VISIBLE);
-                        textArticle.setVisibility(View.VISIBLE);
+
                         Toast.makeText(getBaseContext(), "Ошибка запроса к серверу!" + t.getMessage(), Toast.LENGTH_LONG).show();
 
                         Log.i(LOG_TAG, "onFailure. Ошибка REST запроса getNewsContent " + t.toString());
@@ -264,29 +255,35 @@ public class ArticleNewsActivity extends AppCompatActivity {
             Log.i(LOG_TAG, "Загрузили все картинки ");
 
             count_bitmap = 0;
+
+            //listContent.get(positionPage).getData().setDrawableHashMap(drawableHashMap);
+
+            articleNewsAdapter.notifyDataSetChanged();
         }
         else{
 
             try {
-                Picasso.with(getBaseContext()).load(imageUrls.get(count_bitmap)).into(loadtarget);
+                Picasso.with(getBaseContext()).load(imageUrls.get(count_bitmap)).into(loadtargetArrayImage);
             }
             catch (Exception e){
                 Log.d(LOG_TAG, "Error load image " + e.getMessage());
                 count_bitmap++;
-                Picasso.with(getBaseContext()).load(imageUrls.get(count_bitmap)).into(loadtarget);            }
+              //  Picasso.with(getBaseContext()).load(imageUrls.get(count_bitmap)).into(loadtarget);
+
+            }
         }
 
     }
 
-    void initTargetPicasso(){
+    void initTargetPicassoArrayImage(){
 
-        loadtarget = new Target() {
+        loadtargetArrayImage = new Target() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
 
                 Log.d(LOG_TAG, "onBitmapLoaded  ");
 
-                if (imageUrls.size() > 0) {
+                if (imageUrls.size() > 0) { //это качаются картинки в саму статью
 
                     Drawable drawable = new BitmapDrawable(getResources(), bitmap);
                     drawable.setBounds(0, 0, drawable.getIntrinsicWidth(),
@@ -296,13 +293,14 @@ public class ArticleNewsActivity extends AppCompatActivity {
                     count_bitmap++;
                     loadNextImage();
 
-                    progressArticle.setVisibility(View.INVISIBLE);
+                 /*   progressArticle.setVisibility(View.INVISIBLE);
                     dateAtricle.setVisibility(View.VISIBLE);
                     anotation.setVisibility(View.VISIBLE);
-                    textArticle.setVisibility(View.VISIBLE);
+                    textArticle.setVisibility(View.VISIBLE);*/
 
-                    textArticle.setText(Html.fromHtml(newsContent.getData().getText(), igLoader, null));
+                    //textArticle.setText(Html.fromHtml(newsContent.getData().getText(), igLoader, null));
                 }
+
             }
 
             @Override
@@ -316,5 +314,35 @@ public class ArticleNewsActivity extends AppCompatActivity {
             }
 
         };
+    }
+
+    void initTargetPicassoToolbar(){
+
+        loadtargetToolbar = new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+
+                Log.d(LOG_TAG, "onBitmapLoaded  loadtargetToolbar");
+
+                    listContent.get(positionPage).getData().setBitmapToolbar(bitmap);
+                    articleNewsAdapter.notifyDataSetChanged();
+
+            }
+
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+            }
+
+        };
+    }
+
+    boolean checkForWord(String line, String word){
+        return line.contains(word);
     }
 }

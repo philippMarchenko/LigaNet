@@ -74,7 +74,7 @@ public class PhotoFragment extends android.support.v4.app.Fragment {
         text_article_photo.setTypeface(typefaceR);
 
         imageSliderAdapter = new ImageSliderAdapter(getContext(),bitmapList);
-        mPager = (ViewPager) rootView.findViewById(R.id.pager);
+        mPager = (ViewPager) rootView.findViewById(R.id.pagerArticles);
         mPager.setAdapter(imageSliderAdapter);
 
         TabLayout tabLayout = (TabLayout) rootView.findViewById(R.id.tab_layout_photo_slider);

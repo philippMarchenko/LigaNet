@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginBottom="60dp">
+    android:layout_marginBottom="80dp">
 
 
     <android.support.v4.widget.NestedScrollView
@@ -18,7 +18,7 @@
 
 
             <android.support.v4.view.ViewPager
-                android:id="@+id/pager"
+                android:id="@+id/pagerArticles"
                 android:layout_marginRight="5dp"
                 android:layout_marginLeft="5dp"
                 android:layout_marginTop="10dp"
@@ -36,7 +36,7 @@
                 app:tabBackground="@drawable/tab_selector"
                 app:tabIndicatorHeight="0dp"
                 android:layout_alignParentBottom="false"
-                android:layout_alignBottom="@+id/pager"
+                android:layout_alignBottom="@+id/pagerArticles"
                 app:tabGravity="center"
                 android:layout_centerHorizontal="true"
                 android:layout_width="100dp" />
@@ -55,7 +55,7 @@
                 android:text="TextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/pager"
+                android:layout_below="@+id/pagerArticles"
                 android:id="@+id/text_article_photo"
                 android:fontFamily="serif"
                 android:layout_margin="5dp"

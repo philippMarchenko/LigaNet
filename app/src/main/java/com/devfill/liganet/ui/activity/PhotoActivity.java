@@ -7,41 +7,23 @@ import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.provider.ContactsContract;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.webkit.URLUtil;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.devfill.liganet.R;
 import com.devfill.liganet.adapter.ImageSliderAdapter;
-import com.devfill.liganet.model.ArticleNews;
-import com.devfill.liganet.model.ListNews;
-import com.devfill.liganet.model.NewsContent;
 import com.devfill.liganet.model.PhotoContent;
-import com.devfill.liganet.model.VideoContent;
-import com.devfill.liganet.network.GetDataNews;
 import com.devfill.liganet.network.ServerAPI;
-import com.google.android.youtube.player.YouTubeBaseActivity;
-import com.google.android.youtube.player.YouTubeInitializationResult;
-import com.google.android.youtube.player.YouTubePlayer;
-import com.google.android.youtube.player.YouTubePlayerSupportFragment;
-import com.google.android.youtube.player.YouTubePlayerView;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -94,10 +76,10 @@ public class PhotoActivity extends AppCompatActivity{
 
 
         imageSliderAdapter = new ImageSliderAdapter(getBaseContext(),bitmapList);
-        mPager = (ViewPager) findViewById(R.id.pager);
+        mPager = (ViewPager) findViewById(R.id.pagerArticles);
         mPager.setAdapter(imageSliderAdapter);
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout_photo_slider);
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout_photo_slider);   //индикатор страниц(кружочки)
         tabLayout.setupWithViewPager(mPager, true);
 
         title_photo_news.setVisibility(View.INVISIBLE);

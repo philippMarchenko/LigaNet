@@ -131,7 +131,7 @@ public class EconomicAdapter extends RecyclerView.Adapter<EconomicAdapter.MyView
 
         }
 
-        if(!news.getVideoUrl().equals("")){
+        if(news.getIsVideo().equals("1")){
 
             myViewHolder.image.setImageDrawable(mContext.getDrawable(R.drawable.video2));
 
@@ -151,12 +151,12 @@ public class EconomicAdapter extends RecyclerView.Adapter<EconomicAdapter.MyView
         myViewHolder.card_view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(news.getVideoUrl().equals("") && !news.getIs_photo().equals("1")){   //если это не видео и не фото
+                if(news.getIsVideo().equals("0") && news.getIs_photo().equals("0")){   //если это не видео и не фото
 
                     Log.d(LOG_TAG, "Это не видео");
                     try {
                         Intent intent = new Intent(mContext, ArticleNewsActivity.class);    //ЭТО СТАТЬЯ
-                        intent.putExtra("linkHref", news.getlinkHref());
+                        intent.putExtra("linkHref", news.getLinkHref());
                         intent.putExtra("imgHref", news.getImgUrl());
                         mContext.startActivity(intent);
 
@@ -170,7 +170,7 @@ public class EconomicAdapter extends RecyclerView.Adapter<EconomicAdapter.MyView
                     try {
 
                         Intent intent = new Intent(mContext, PhotoActivity.class);
-                        intent.putExtra("linkHref", news.getlinkHref());
+                        intent.putExtra("linkHref", news.getLinkHref());
                         mContext.startActivity(intent);
 
 
@@ -184,7 +184,7 @@ public class EconomicAdapter extends RecyclerView.Adapter<EconomicAdapter.MyView
                     try {
 
                         Intent intent = new Intent(mContext, VideoActivity.class);      // а это видео
-                        intent.putExtra("linkHref", news.getlinkHref());
+                        intent.putExtra("linkHref", news.getLinkHref());
                         mContext.startActivity(intent);
 
 

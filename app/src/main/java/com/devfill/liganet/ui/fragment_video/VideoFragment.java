@@ -109,7 +109,17 @@ public class VideoFragment extends android.support.v4.app.Fragment{
                 public void onInitializationFailure(YouTubePlayer.Provider provider, YouTubeInitializationResult error) {
                     // YouTube error
                     String errorMessage = error.toString();
-                    Toast.makeText(getActivity(), errorMessage, Toast.LENGTH_LONG).show();
+
+                    if(error == YouTubeInitializationResult.SERVICE_MISSING){
+
+                        Toast.makeText(getActivity(), " Вам нужно установить приложение YouTube", Toast.LENGTH_LONG).show();
+                    }
+                    else{
+
+                        Toast.makeText(getActivity(), errorMessage, Toast.LENGTH_LONG).show();
+                    }
+
+
                     Log.d("errorMessage:", errorMessage);
                 }
             });

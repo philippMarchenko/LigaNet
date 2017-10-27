@@ -39,6 +39,7 @@ import com.squareup.picasso.Target;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -177,6 +178,8 @@ public class VideoListFragment extends android.support.v4.app.Fragment implement
                         ListNews listNews = response.body();
 
                         try {
+                            Collections.reverse(listNews.getNews());
+
                             videoList.addAll(listNews.getNews());
                             videoListAdapter.notifyDataSetChanged();
                             swipeRefreshLayout.setRefreshing(false);
@@ -263,7 +266,7 @@ public class VideoListFragment extends android.support.v4.app.Fragment implement
                 Log.d(LOG_TAG, "Error load image " + e.getMessage());
 
                 count_bitmap++;
-                Picasso.with(getContext()).load(videoList.get(count_bitmap).getImgUrl()).resize(width, height).into(loadtarget);
+//                Picasso.with(getContext()).load(videoList.get(count_bitmap).getImgUrl()).resize(width, height).into(loadtarget);
             }
         }
 

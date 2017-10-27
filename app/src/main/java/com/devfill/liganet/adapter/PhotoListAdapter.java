@@ -123,7 +123,7 @@ public class PhotoListAdapter extends RecyclerView.Adapter<PhotoListAdapter.MyVi
                 PhotoFragment photoFragment = new PhotoFragment();
 
                 Bundle bundle = new Bundle();
-                bundle.putString("linkHref",news.getlinkHref());
+                bundle.putString("linkHref",news.getLinkHref());
                 photoFragment.setArguments(bundle);
 
                 ft.replace(R.id.container_photo,photoFragment);

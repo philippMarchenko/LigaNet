@@ -123,7 +123,7 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.MyVi
                 VideoFragment videoFragment = new VideoFragment();
 
                 Bundle bundle = new Bundle();
-                bundle.putString("linkHref",news.getlinkHref());
+                bundle.putString("linkHref",news.getLinkHref());
                 videoFragment.setArguments(bundle);
 
                 ft.replace(R.id.container_video,videoFragment);

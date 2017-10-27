@@ -39,6 +39,7 @@ import com.squareup.picasso.Target;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -175,6 +176,7 @@ public class PhotoListFragment extends android.support.v4.app.Fragment implement
                         ListNews listNews = response.body();
 
                         try {
+                            Collections.reverse(listNews.getNews());
 
                             photoList.addAll(listNews.getNews());
                             photoListAdapter.notifyDataSetChanged();
