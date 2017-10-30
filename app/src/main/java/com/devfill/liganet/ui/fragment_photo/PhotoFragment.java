@@ -58,6 +58,7 @@ public class PhotoFragment extends android.support.v4.app.Fragment {
     private List<Bitmap> bitmapList = new ArrayList<>();
     private ProgressBar progressBar;
     private FragmentTransaction ft;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_photo, container, false);
@@ -128,6 +129,7 @@ public class PhotoFragment extends android.support.v4.app.Fragment {
     }
 
     private void getPhotoContent (String linkHref){
+
         String netType = getNetworkType(getContext());
         if(netType == null){
             Toast.makeText(getContext(), "Подключение к сети отсутствует!", Toast.LENGTH_LONG).show();

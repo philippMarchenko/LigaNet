@@ -38,15 +38,25 @@ public class NewsContent {
         String title;
         String imageUrl;
         Bitmap bitmapToolbar;
-       // Map<String, Drawable> drawableHashMap = new HashMap<String, Drawable>();
-/*
-        public Map<String, Drawable> getDrawableHashMap() {
-            return drawableHashMap;
+        boolean isPhoto;
+        boolean isVideo;
+
+        public boolean isPhoto() {
+            return isPhoto;
         }
 
-        public void setDrawableHashMap(Map<String, Drawable> drawableHashMap) {
-            this.drawableHashMap = drawableHashMap;
-        }*/
+        public void setisPhoto(boolean photo) {
+            isPhoto = photo;
+        }
+
+        public boolean isVideo() {
+            return isVideo;
+        }
+
+        public void setisVideo(boolean video) {
+            isVideo = video;
+        }
+
 
         public Bitmap getBitmaToolbar() {
             return bitmapToolbar;

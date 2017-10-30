@@ -48,7 +48,7 @@ public class VideoFragment extends android.support.v4.app.Fragment{
     private TextView text_video,annotation_video;
     private ProgressBar progressBar;
     private YouTubePlayer.OnInitializedListener onInitializedListener;
-    private  YouTubePlayer mPlayer;
+    private YouTubePlayer mPlayer;
 
     private Retrofit retrofit;
     private ServerAPI serverAPI;
@@ -79,6 +79,7 @@ public class VideoFragment extends android.support.v4.app.Fragment{
         youTubePlayerSupportFragment.getView().setVisibility(View.INVISIBLE);
 
         linkHref = getArguments().getString("linkHref");
+        Log.i(LOG_TAG, " onCreateView linkHref" + linkHref);
 
         initRetrofit();
 
@@ -120,7 +121,6 @@ public class VideoFragment extends android.support.v4.app.Fragment{
                     }
 
 
-                    Log.d("errorMessage:", errorMessage);
                 }
             });
 
@@ -216,6 +216,29 @@ public class VideoFragment extends android.support.v4.app.Fragment{
                 Log.i(LOG_TAG, "Ошибка REST запроса к серверу  getNewsContent " + e.getMessage());
             }
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        getVideoContent(linkHref);          // делаем запрос по сожержимое статьи посл возобновления
+        Log.i(LOG_TAG, " onResume");
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        onStop();
+        Log.i(LOG_TAG, " onPause");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        Log.i(LOG_TAG, " onDestroy");
     }
 
 }

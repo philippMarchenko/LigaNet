@@ -24,9 +24,9 @@
                 android:layout_margin="5dp" />
 
             <RelativeLayout
-        android:layout_width="match_parent"
+                android:layout_width="match_parent"
                 android:layout_below="@+id/annotation_video"
-        android:id="@+id/layout"
+                android:id="@+id/layout"
                 android:layout_height="235dp">
 
         <fragment
