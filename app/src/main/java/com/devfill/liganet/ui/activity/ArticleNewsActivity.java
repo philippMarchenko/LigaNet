@@ -44,6 +44,8 @@ import com.devfill.liganet.ui.fragment_articles.WorldNewsFragment;
 import com.devfill.liganet.ui.fragment_articles_view_pager.ArticlesFragmentViewPager;
 import com.devfill.liganet.ui.fragment_photo.PhotoFragment;
 import com.devfill.liganet.ui.fragment_video.VideoFragment;
+import com.eftimoff.viewpagertransformers.DepthPageTransformer;
+import com.eftimoff.viewpagertransformers.RotateUpTransformer;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -146,13 +148,18 @@ public class ArticleNewsActivity extends AppCompatActivity {
         }
         else{*/
 
-        addFragment();
-        addFragment();
-      //  }
+
+        for(int i = 0; i <= positionArticle + 1; i++){
+
+            addFragment(i);
+
+        }
+
 
         mPager.setAdapter(adapter);
+        mPager.setCurrentItem(positionArticle);
+        mPager.setPageTransformer(true, new DepthPageTransformer());
         initPagerListener();
-
 
         //   adapter.addFragment(new ArticlesFragmentViewPager(new NewsContent()));
       //  adapter.addFragment(new ArticlesFragmentViewPager());
@@ -167,7 +174,7 @@ public class ArticleNewsActivity extends AppCompatActivity {
         }
 
         mPager.setAdapter(adapter);
-        initPagerListener();*/
+       */
 
      /*   for(int i = 0; i < adapter.getCount(); i++){
 
@@ -199,40 +206,74 @@ public class ArticleNewsActivity extends AppCompatActivity {
         }
     }
 
-    private void addFragment(){
+    private void addFragment(int position){
 
-        if((positionArticle + adapter.getCount() < myList.size())){
+        if((position < myList.size())){
 
-            checkPhotoVideo(positionArticle + adapter.getCount());
+            checkPhotoVideo(position);
 
             if(isVideo){
 
                     VideoFragment videoFragment = new VideoFragment();
                     Bundle bundle = new Bundle();
-                    bundle.putString("linkHref",myList.get(positionArticle + adapter.getCount()));
+                    bundle.putString("linkHref",myList.get(position));
                     videoFragment.setArguments(bundle);
 
-                    adapter.addFragment(videoFragment);
+                    adapter.addFragmentForward(videoFragment);
+
                     adapter.notifyDataSetChanged();
             }
             else if(isPhoto){
 
                     PhotoFragment photoFragment = new PhotoFragment();
                     Bundle bundle = new Bundle();
-                    bundle.putString("linkHref",myList.get(positionArticle + adapter.getCount()));
+                    bundle.putString("linkHref",myList.get(position));
                     photoFragment.setArguments(bundle);
 
-                    adapter.addFragment(photoFragment);
+                    adapter.addFragmentForward(photoFragment);
                     adapter.notifyDataSetChanged();
             }
             else{
 
-                    adapter.addFragment(new ArticlesFragmentViewPager(myList.get(positionArticle + adapter.getCount())));
+                    adapter.addFragmentForward(new ArticlesFragmentViewPager(myList.get(position)));
                     adapter.notifyDataSetChanged();
              }
         }
     }
+    private void addFragmentBack(int position){
 
+        if((position < myList.size())){
+
+            checkPhotoVideo(position);
+
+            if(isVideo){
+
+                VideoFragment videoFragment = new VideoFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("linkHref",myList.get(position));
+                videoFragment.setArguments(bundle);
+
+                adapter.addFragmentBack(videoFragment);
+
+                adapter.notifyDataSetChanged();
+            }
+            else if(isPhoto){
+
+                PhotoFragment photoFragment = new PhotoFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("linkHref",myList.get(position));
+                photoFragment.setArguments(bundle);
+
+                adapter.addFragmentBack(photoFragment);
+                adapter.notifyDataSetChanged();
+            }
+            else{
+
+                adapter.addFragmentBack(new ArticlesFragmentViewPager(myList.get(position)));
+                adapter.notifyDataSetChanged();
+            }
+        }
+    }
     private void initPagerListener(){
 
         mPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -245,22 +286,25 @@ public class ArticleNewsActivity extends AppCompatActivity {
             public void onPageSelected(int position) {
 
                 Log.d(LOG_TAG, "onPageSelected " + position);
+                Log.d(LOG_TAG, "adapter.getCount() " + adapter.getCount());
 
                 if(positionPage > position){//User Move to left
                     Log.d(LOG_TAG, "User Move to left ");
-
+                   // addFragmentBack(positionArticle - 2);
+                    adapter.notifyDataSetChanged();
                 }
                 else if (positionPage < position){ //User Move to right
-                    Log.d(LOG_TAG, "User Move to rig");
+                    Log.d(LOG_TAG, "User Move to right");
+
                 }
 
-
-
-                positionPage = position;
-
-                addFragment();
+                addFragment(positionArticle + position);
+                adapter.notifyDataSetChanged();
 
                 positionPage = position;
+
+                Log.d(LOG_TAG, "adapter.getCount() " + adapter.getCount());
+
             }
 
             @Override
@@ -667,9 +711,23 @@ public class ArticleNewsActivity extends AppCompatActivity {
             return mFragmentList.size();
         }
 
-        public void addFragment(android.support.v4.app.Fragment fragment) {
+        public void addFragmentForward(android.support.v4.app.Fragment fragment) {
+
             mFragmentList.add(fragment);
 
+        }
+
+        public void addFragmentBack(android.support.v4.app.Fragment fragment) {
+
+
+            //make a loop to run through the array list
+            for(int i = mFragmentList.size()-1; i > 0; i--)
+            {
+                //set the last element to the value of the 2nd to last element
+                mFragmentList.set(i,mFragmentList.get(i-1));
+            }
+
+            mFragmentList.set(0,fragment);
         }
 
     }

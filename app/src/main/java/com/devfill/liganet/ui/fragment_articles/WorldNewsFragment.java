@@ -181,7 +181,7 @@ public class WorldNewsFragment extends android.support.v4.app.Fragment implement
                             }
 
 
-                            loadNextImage();
+                        //    loadNextImage();
 
                             Log.i(LOG_TAG, "onResponse getListNews size" + listNews.getNews().size());
                             Log.i(LOG_TAG, "onResponse getListNews getTitle()" + listNews.getNews().get(0).getTitle());
@@ -192,7 +192,7 @@ public class WorldNewsFragment extends android.support.v4.app.Fragment implement
                         public void onFailure(Call<ListNews> call, Throwable t) {
 
                             swipeRefreshLayout.setRefreshing(false);
-                            Toast.makeText(getActivity(), "Ошибка запроса к серверу!" + t.getMessage(), Toast.LENGTH_LONG).show();
+                          //  Toast.makeText(getActivity(), "Ошибка запроса к серверу!" + t.getMessage(), Toast.LENGTH_LONG).show();
 
                             Log.i(LOG_TAG, "onFailure. Ошибка REST запроса getListNews " + t.toString());
                         }
@@ -294,5 +294,26 @@ public class WorldNewsFragment extends android.support.v4.app.Fragment implement
             end = 21;
             getWorldNewsList();
             listIsShowed = true;
+        }
+
+        @Override
+        public void onResume() {
+            super.onResume();
+            Log.i(LOG_TAG, " onResume");
+        }
+
+        @Override
+        public void onPause() {
+            super.onPause();
+
+            Log.i(LOG_TAG, " onPause");
+        }
+
+        @Override
+        public void onDestroy() {
+            super.onDestroy();
+
+            listIsShowed = false;
+            Log.i(LOG_TAG, " onDestroy");
         }
 }

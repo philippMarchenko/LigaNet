@@ -98,7 +98,6 @@ public class ArticlesFragmentViewPager extends android.support.v4.app.Fragment{
         initTargetPicassoArrayImage();
         initIloader();
 
-        getNewsContent(link);
 
         return rootView;
     }
@@ -155,8 +154,10 @@ public class ArticlesFragmentViewPager extends android.support.v4.app.Fragment{
                     @Override
                     public void onFailure(Call<NewsContent> call, Throwable t) {
 
+                              progressArticle.setVisibility(View.INVISIBLE);
 
-                        Toast.makeText(getContext(), "Ошибка запроса к серверу!" + t.getMessage(), Toast.LENGTH_LONG).show();
+
+//                        Toast.makeText(getContext(), "Ошибка запроса к серверу!" + t.getMessage(), Toast.LENGTH_LONG).show();
 
                         Log.i(LOG_TAG, "onFailure. Ошибка REST запроса getNewsContent " + t.toString());
                     }
@@ -310,6 +311,8 @@ public class ArticlesFragmentViewPager extends android.support.v4.app.Fragment{
     @Override
     public void onResume() {
         super.onResume();
+
+        getNewsContent(link);
 
         Log.i(LOG_TAG, " onResume");
     }

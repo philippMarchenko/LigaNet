@@ -193,7 +193,7 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
 
                        }
 
-                       loadNextImage();
+                     //  loadNextImage();
 
                        Log.i(LOG_TAG, "onResponse getListNews. start " + start + " end " + end);
 
@@ -247,7 +247,10 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
         else{
 
             try {
-                Picasso.with(getContext()).load(allNewsList.get(count_bitmap).getImgUrl()).resize(width, height).into(loadtarget);
+                Picasso.with(getContext()).load(allNewsList.get(count_bitmap).getImgUrl()).
+                        resize(width, height).
+                        noFade().
+                        into(loadtarget);
             }
             catch (Exception e){
                 Log.d(LOG_TAG, "Error load image " + e.getMessage());

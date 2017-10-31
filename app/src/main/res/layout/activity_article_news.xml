@@ -14,7 +14,7 @@
             android:layout_height="match_parent"
             app:toolbarId="@+id/toolbar"
             app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed"
-            app:contentScrim="?attr/colorPrimary">
+            app:contentScrim="@android:color/transparent">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -54,10 +54,9 @@
                 android:id="@+id/anotation"
                 android:layout_alignParentStart="true"
                 android:textStyle="normal|bold"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="5dp"
                 android:textSize="20sp"
-                android:fontFamily="sans-serif-condensed" />
+                android:fontFamily="sans-serif-condensed"
+                android:layout_margin="5dp" />
 
             <TextView
                 android:text="12:00"
@@ -66,23 +65,20 @@
                 android:layout_alignParentStart="true"
                 android:id="@+id/dateAtricle"
                 android:textStyle="normal|italic"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="10dp"
                 android:layout_below="@+id/anotation"
                 android:textSize="16sp"
-                android:fontFamily="sans-serif-condensed" />
+                android:fontFamily="sans-serif-condensed"
+                android:layout_margin="5dp" />
 
             <TextView
                 android:text="очень длинный текст"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/textArticle"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
                 android:layout_below="@+id/dateAtricle"
-                android:layout_marginTop="10dp"
                 android:textSize="16sp"
-                android:fontFamily="sans-serif-condensed" />
+                android:fontFamily="sans-serif-condensed"
+                android:layout_margin="5dp" />
 
             <ProgressBar
                 style="@style/Widget.AppCompat.ProgressBar"

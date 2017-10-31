@@ -178,7 +178,7 @@ public class PoliticFragment extends android.support.v4.app.Fragment implements 
                         }
 
 
-                        loadNextImage();
+                       // loadNextImage();
 
                         Log.i(LOG_TAG, "onResponse getListNews ");
 
@@ -188,7 +188,7 @@ public class PoliticFragment extends android.support.v4.app.Fragment implements 
                     public void onFailure(Call<ListNews> call, Throwable t) {
 
                         swipeRefreshLayout.setRefreshing(false);
-                        Toast.makeText(getActivity(), "Ошибка запроса к серверу!" + t.getMessage(), Toast.LENGTH_LONG).show();
+                     //   Toast.makeText(getActivity(), "Ошибка запроса к серверу!" + t.getMessage(), Toast.LENGTH_LONG).show();
 
                         Log.i(LOG_TAG, "onFailure. Ошибка REST запроса getListNews " + t.toString());
                     }
@@ -292,5 +292,26 @@ public class PoliticFragment extends android.support.v4.app.Fragment implements 
         getPoliticsNewsList();
         listIsShowed = true;
 
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.i(LOG_TAG, " onResume");
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        Log.i(LOG_TAG, " onPause");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        listIsShowed = false;
+        Log.i(LOG_TAG, " onDestroy");
     }
 }
