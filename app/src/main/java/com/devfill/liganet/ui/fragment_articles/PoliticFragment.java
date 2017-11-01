@@ -22,6 +22,7 @@ import com.devfill.liganet.R;
 import com.devfill.liganet.adapter.AllNewsAdapter;
 import com.devfill.liganet.adapter.PoliticAdapter;
 import com.devfill.liganet.helper.OnLoadMoreListener;
+import com.devfill.liganet.helper.OnScrollingListener;
 import com.devfill.liganet.model.ListNews;
 import com.devfill.liganet.model.News;
 import com.devfill.liganet.network.GetListNews;
@@ -60,11 +61,16 @@ public class PoliticFragment extends android.support.v4.app.Fragment implements 
     private ProgressBar progressBarPolitic;
     public static boolean listIsShowed = false;
 
+    private Picasso picasso;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_politic, container, false);
 
         Log.i(LOG_TAG, "onCreateView ");
+
+
+        picasso = Picasso.with(getContext());
 
         progressBarPolitic = (ProgressBar) rootView.findViewById(R.id.progressBarPolitic);
         progressBarPolitic.setVisibility(View.INVISIBLE);
@@ -84,6 +90,7 @@ public class PoliticFragment extends android.support.v4.app.Fragment implements 
         swipeRefreshLayout.setOnRefreshListener(this);
 
         initLoadMoreListener();
+        initOnScrollingListener();
         initRetrofit();
         initTargetPicasso();
 
@@ -114,6 +121,38 @@ public class PoliticFragment extends android.support.v4.app.Fragment implements 
 
 
         serverAPI = retrofit.create(ServerAPI.class);
+    }
+
+    private void initOnScrollingListener(){
+
+        politicAdapter.setOnScrollingListener(new OnScrollingListener() {
+            @Override
+            public void onScrollNow() {
+                Log.d(LOG_TAG, "onScrollNow ");
+
+                picasso.pauseTag("load");
+            }
+
+            @Override
+            public void onStopScrolling() {
+                Log.d(LOG_TAG, "onStopScrolling ");
+
+                picasso.resumeTag("load");
+            }
+        });
+
+    }
+
+    public void pauseLoadImage(){
+
+        picasso.pauseTag("load");
+
+    }
+
+    public void resumeLoadImage(){
+
+        picasso.resumeTag("load");
+
     }
 
     private void initLoadMoreListener(){
@@ -237,7 +276,10 @@ public class PoliticFragment extends android.support.v4.app.Fragment implements 
         else{
 
             try {
-                Picasso.with(getContext()).load(politicList.get(count_bitmap).getImgUrl()).resize(width, height).into(loadtarget);
+                picasso.load(politicList.get(count_bitmap).getImgUrl()).
+                        tag("load").
+                        resize(width, height).
+                        into(loadtarget);
             }
             catch (Exception e){
 

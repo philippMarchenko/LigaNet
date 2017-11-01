@@ -23,6 +23,7 @@ import com.devfill.liganet.R;
 import com.devfill.liganet.adapter.AllNewsAdapter;
 import com.devfill.liganet.adapter.EconomicAdapter;
 import com.devfill.liganet.helper.OnLoadMoreListener;
+import com.devfill.liganet.helper.OnScrollingListener;
 import com.devfill.liganet.model.ListNews;
 import com.devfill.liganet.model.News;
 import com.devfill.liganet.network.ServerAPI;
@@ -88,6 +89,7 @@ public class EconomicFragment extends android.support.v4.app.Fragment implements
         swipeRefreshLayout.setOnRefreshListener(this);
 
         initLoadMoreListener();
+        initOnScrollingListener();
         initRetrofit ();
         initTargetPicasso();
 /*
@@ -102,15 +104,14 @@ public class EconomicFragment extends android.support.v4.app.Fragment implements
 
     public void pauseLoadImage(){
 
-
-        picasso.pauseTag("imageList");
-        Log.i(LOG_TAG, "pauseLoadImag ");
+        picasso.pauseTag("load");
 
     }
 
     public void resumeLoadImage(){
 
         picasso.resumeTag("load");
+
     }
 
     private void initRetrofit (){
@@ -132,6 +133,26 @@ public class EconomicFragment extends android.support.v4.app.Fragment implements
 
 
         serverAPI = retrofit.create(ServerAPI.class);
+    }
+
+    private void initOnScrollingListener(){
+
+        economicAdapter.setOnScrollingListener(new OnScrollingListener() {
+            @Override
+            public void onScrollNow() {
+                Log.d(LOG_TAG, "onScrollNow ");
+
+                picasso.pauseTag("load");
+            }
+
+            @Override
+            public void onStopScrolling() {
+                Log.d(LOG_TAG, "onStopScrolling ");
+
+                picasso.resumeTag("load");
+            }
+        });
+
     }
 
     private void initLoadMoreListener(){
@@ -268,7 +289,7 @@ public class EconomicFragment extends android.support.v4.app.Fragment implements
             try {
                 if(!economicList.get(count_bitmap).getImgUrl().equals(""))
                     picasso.load(economicList.get(count_bitmap).getImgUrl()).
-                            tag("imageList").
+                            tag("load").
                             resize(width, height).
                             into(loadtarget);
             }

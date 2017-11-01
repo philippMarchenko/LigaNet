@@ -26,11 +26,17 @@ public class News {
     @Expose
     private String isPhoto;
 
+
+
     @SerializedName("isVideo")
     @Expose
     private String isVideo;
 
-   private Bitmap bitmap;
+    @SerializedName("time_ms")
+    @Expose
+    private String time_ms;
+
+    private Bitmap bitmap;
 
     public String getIsVideo() {
         return isVideo;
@@ -72,7 +78,13 @@ public class News {
         return imgUrl;
     }
 
+    public String getTime_ms() {
+        return time_ms;
+    }
 
+    public void setTime_ms(String time_ms) {
+        this.time_ms = time_ms;
+    }
 
 
 }

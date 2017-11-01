@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.devfill.liganet.R;
 import com.devfill.liganet.helper.OnLoadMoreListener;
+import com.devfill.liganet.helper.OnScrollingListener;
 import com.devfill.liganet.model.News;
 import com.devfill.liganet.model.PhotoContent;
 import com.devfill.liganet.ui.activity.ArticleNewsActivity;
@@ -36,6 +37,7 @@ public class WorldAdapter extends RecyclerView.Adapter<WorldAdapter.MyViewHolder
     public static List<News> mWorldList;
 
     private OnLoadMoreListener onLoadMoreListener;
+    private OnScrollingListener onScrollingListener;
 
     // The minimum amount of items to have below your current scroll position
     // before loading more.
@@ -65,7 +67,7 @@ public class WorldAdapter extends RecyclerView.Adapter<WorldAdapter.MyViewHolder
         }
     }
 
-    public WorldAdapter(Context context, Activity activity, List<News> list,RecyclerView recyclerView) {
+    public WorldAdapter(Context context, Activity activity, List<News> list, RecyclerView recyclerView) {
         mWorldList = list;
         mContext = context;
         myActivity = activity;
@@ -76,27 +78,49 @@ public class WorldAdapter extends RecyclerView.Adapter<WorldAdapter.MyViewHolder
                     .getLayoutManager();
 
 
-            recyclerView
-                    .addOnScrollListener(new RecyclerView.OnScrollListener() {
-                        @Override
-                        public void onScrolled(RecyclerView recyclerView,
-                                               int dx, int dy) {
-                            super.onScrolled(recyclerView, dx, dy);
+            RecyclerView.OnScrollListener onScrollListener = new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                    super.onScrollStateChanged(recyclerView, newState);
 
-                            totalItemCount = linearLayoutManager.getItemCount();
-                            lastVisibleItem = linearLayoutManager
-                                    .findLastVisibleItemPosition();
-                            if (!loading
-                                    && totalItemCount <= (lastVisibleItem + visibleThreshold)) {
-                                // End has been reached
-                                // Do something
-                                if (onLoadMoreListener != null) {
-                                    onLoadMoreListener.onLoadMore();
-                                }
-                                loading = true;
-                            }
+                    switch (newState) {
+                        case RecyclerView.SCROLL_STATE_IDLE:
+                            onScrollingListener.onStopScrolling();
+                            Log.d(LOG_TAG, "The RecyclerView is not scrolling ");
+                            break;
+                        case RecyclerView.SCROLL_STATE_DRAGGING:
+                            onScrollingListener.onScrollNow();
+                            Log.d(LOG_TAG, "Scrolling now ");
+                            break;
+                        case RecyclerView.SCROLL_STATE_SETTLING:
+                            Log.d(LOG_TAG, "Scroll Settling ");
+                            break;
+
+                    }
+
+                }
+
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+
+                    totalItemCount = linearLayoutManager.getItemCount();
+                    lastVisibleItem = linearLayoutManager
+                            .findLastVisibleItemPosition();
+                    if (!loading
+                            && totalItemCount <= (lastVisibleItem + visibleThreshold)) {
+                        // End has been reached
+                        // Do something
+                        if (onLoadMoreListener != null) {
+                            onLoadMoreListener.onLoadMore();
                         }
-                    });
+                        loading = true;
+                    }
+                }
+            };
+
+
+            recyclerView.addOnScrollListener(onScrollListener);
         }
 
     }
@@ -198,6 +222,10 @@ public class WorldAdapter extends RecyclerView.Adapter<WorldAdapter.MyViewHolder
 
     public void setOnLoadMoreListener(OnLoadMoreListener onLoadMoreListener) {
         this.onLoadMoreListener = onLoadMoreListener;
+    }
+
+    public void setOnScrollingListener(OnScrollingListener onScrollingListener) {
+        this.onScrollingListener = onScrollingListener;
     }
 
     public void setLoaded() {

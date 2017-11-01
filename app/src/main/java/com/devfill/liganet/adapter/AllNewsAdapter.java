@@ -13,19 +13,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.devfill.liganet.R;
 import com.devfill.liganet.helper.OnLoadMoreListener;
+import com.devfill.liganet.helper.OnScrollingListener;
 import com.devfill.liganet.model.News;
-import com.devfill.liganet.model.PhotoContent;
 import com.devfill.liganet.ui.activity.ArticleNewsActivity;
 import com.devfill.liganet.ui.activity.PhotoActivity;
 import com.devfill.liganet.ui.activity.VideoActivity;
 
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -38,6 +39,9 @@ public class AllNewsAdapter extends RecyclerView.Adapter<AllNewsAdapter.MyViewHo
     private List<News> mListNewsShort;
 
     private OnLoadMoreListener onLoadMoreListener;
+    private OnScrollingListener onScrollingListener;
+
+
 
     // The minimum amount of items to have below your current scroll position
     // before loading more.
@@ -69,7 +73,6 @@ public class AllNewsAdapter extends RecyclerView.Adapter<AllNewsAdapter.MyViewHo
         }
     }
 
-
     public AllNewsAdapter(Context context, Activity activity, List<News> list,RecyclerView recyclerView) {
 
         mContext = context;
@@ -81,44 +84,49 @@ public class AllNewsAdapter extends RecyclerView.Adapter<AllNewsAdapter.MyViewHo
             final LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView
                     .getLayoutManager();
 
+            RecyclerView.OnScrollListener onScrollListener = new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                    super.onScrollStateChanged(recyclerView, newState);
 
-            recyclerView
-                    .addOnScrollListener(new RecyclerView.OnScrollListener() {
-                        @Override
-                        public void onScrolled(RecyclerView recyclerView,
-                                               int dx, int dy) {
-                            super.onScrolled(recyclerView, dx, dy);
+                    switch (newState) {
+                        case RecyclerView.SCROLL_STATE_IDLE:
+                            onScrollingListener.onStopScrolling();
+                            Log.d(LOG_TAG, "The RecyclerView is not scrolling ");
+                            break;
+                        case RecyclerView.SCROLL_STATE_DRAGGING:
+                            onScrollingListener.onScrollNow();
+                            Log.d(LOG_TAG, "Scrolling now ");
+                            break;
+                        case RecyclerView.SCROLL_STATE_SETTLING:
+                            Log.d(LOG_TAG, "Scroll Settling ");
+                            break;
 
-                            totalItemCount = linearLayoutManager.getItemCount();
-                            lastVisibleItem = linearLayoutManager
-                                    .findLastVisibleItemPosition();
-                            if (!loading
-                                    && totalItemCount <= (lastVisibleItem + visibleThreshold)) {
-                                // End has been reached
-                                // Do something
-                                if (onLoadMoreListener != null) {
-                                    onLoadMoreListener.onLoadMore();
-                                }
-                                loading = true;
-                            }
+                    }
+
+                }
+
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+
+                    totalItemCount = linearLayoutManager.getItemCount();
+                    lastVisibleItem = linearLayoutManager
+                            .findLastVisibleItemPosition();
+                    if (!loading
+                            && totalItemCount <= (lastVisibleItem + visibleThreshold)) {
+                        // End has been reached
+                        // Do something
+                        if (onLoadMoreListener != null) {
+                            onLoadMoreListener.onLoadMore();
                         }
-                        @Override
-                        public void onScrollStateChanged(AbsListView view, int scrollState) {
-
-                            if (scrollState == SCROLL_STATE_IDLE || scrollState == SCROLL_STATE_TOUCH_SCROLL) {
-                                picasso.resumeTag("load");
-
-                                Log.d(LOG_TAG, "Resumed load image " );
-
-                            } else {
-                                Log.d(LOG_TAG, "Paused load image " );
-
-                                picasso.pauseTag("load");
-                            }
-                        }
-                    });
+                        loading = true;
+                    }
+                }
+            };
 
 
+            recyclerView.addOnScrollListener(onScrollListener);
         }
     }
     @Override
@@ -136,7 +144,12 @@ public class AllNewsAdapter extends RecyclerView.Adapter<AllNewsAdapter.MyViewHo
 
             final News news = mListNewsShort.get(position);
 
-            myViewHolder.time.setText(news.getTime());
+            SimpleDateFormat simpleDateFormatDate = new SimpleDateFormat("MM.dd HH:mm");
+            long time = Long.parseLong(news.getTime_ms());
+            Date date = new Date(time);
+            String strTimeDate = simpleDateFormatDate.format(date);
+
+            myViewHolder.time.setText(strTimeDate);
             myViewHolder.title.setText(Html.fromHtml(news.getTitle()));
 
             Bitmap.Config conf = Bitmap.Config.ARGB_8888; // see other conf types
@@ -238,6 +251,11 @@ public class AllNewsAdapter extends RecyclerView.Adapter<AllNewsAdapter.MyViewHo
     public void setOnLoadMoreListener(OnLoadMoreListener onLoadMoreListener) {
         this.onLoadMoreListener = onLoadMoreListener;
     }
+
+    public void setOnScrollingListener(OnScrollingListener onScrollingListener) {
+        this.onScrollingListener = onScrollingListener;
+    }
+
 
     public void setLoaded() {
         loading = false;

@@ -78,12 +78,29 @@ public class ArticlesFragment extends android.support.v4.app.Fragment  {
 
                 try{
 
-                    if(position == 1){
+                   if(position == 0){
+
+
+                   /*    EconomicFragment economicFragment = (EconomicFragment) adapter.getItem(1);
+                       economicFragment.pauseLoadImage();
+                       WorldNewsFragment worldNewsFragment = (WorldNewsFragment) adapter.getItem(2);
+                       worldNewsFragment.pauseLoadImage();
+                       PoliticFragment politicFragment = (PoliticFragment) adapter.getItem(3);
+                       politicFragment.pauseLoadImage();*/
+                   }
+                   else if(position == 1){
 
                         EconomicFragment economicFragment = (EconomicFragment) adapter.getItem(position);
 
                         if(!economicFragment.listIsShowed){
                             economicFragment.getEconomicList();
+
+                            /*AllNewsFragment allNewsFragment = (AllNewsFragment) adapter.getItem(0);
+                            allNewsFragment.pauseLoadImage();
+                            WorldNewsFragment worldNewsFragment = (WorldNewsFragment) adapter.getItem(2);
+                            worldNewsFragment.pauseLoadImage();
+                            PoliticFragment politicFragment = (PoliticFragment) adapter.getItem(3);
+                            politicFragment.pauseLoadImage();*/
 
                         }
                     }
@@ -93,8 +110,14 @@ public class ArticlesFragment extends android.support.v4.app.Fragment  {
                         if(!worldNewsFragment.listIsShowed) {
                             worldNewsFragment.getWorldNewsList();
 
-                              EconomicFragment economicFragment = (EconomicFragment) adapter.getItem(1);
-                              economicFragment.pauseLoadImage();
+
+                           /* AllNewsFragment allNewsFragment = (AllNewsFragment) adapter.getItem(0);
+                            allNewsFragment.pauseLoadImage();
+                            EconomicFragment economicFragment = (EconomicFragment) adapter.getItem(1);
+                            economicFragment.pauseLoadImage();
+                            PoliticFragment politicFragment = (PoliticFragment) adapter.getItem(3);
+                            politicFragment.pauseLoadImage();*/
+
                         }
 
                     }
@@ -103,6 +126,13 @@ public class ArticlesFragment extends android.support.v4.app.Fragment  {
                         PoliticFragment politicFragment = (PoliticFragment) adapter.getItem(position);
                         if(!politicFragment.listIsShowed) {
                             politicFragment.getPoliticsNewsList();
+
+                           /* AllNewsFragment allNewsFragment = (AllNewsFragment) adapter.getItem(0);
+                            allNewsFragment.pauseLoadImage();
+                            EconomicFragment economicFragment = (EconomicFragment) adapter.getItem(1);
+                            economicFragment.pauseLoadImage();
+                            WorldNewsFragment worldNewsFragment = (WorldNewsFragment) adapter.getItem(2);
+                            worldNewsFragment.pauseLoadImage();*/
 
                         }
                     }

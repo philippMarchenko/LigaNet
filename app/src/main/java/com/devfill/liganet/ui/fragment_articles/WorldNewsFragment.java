@@ -22,6 +22,7 @@ import com.devfill.liganet.R;
 import com.devfill.liganet.adapter.PoliticAdapter;
 import com.devfill.liganet.adapter.WorldAdapter;
 import com.devfill.liganet.helper.OnLoadMoreListener;
+import com.devfill.liganet.helper.OnScrollingListener;
 import com.devfill.liganet.model.ListNews;
 import com.devfill.liganet.model.News;
 import com.devfill.liganet.network.GetListNews;
@@ -61,12 +62,15 @@ public class WorldNewsFragment extends android.support.v4.app.Fragment implement
         private ProgressBar progressBarWorld;
         public static boolean listIsShowed = false;
 
+        private Picasso picasso;
 
     @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_world, container, false);
 
             Log.i(LOG_TAG, "onCreateView ");
+
+            picasso = Picasso.with(getContext());
 
             progressBarWorld = (ProgressBar) rootView.findViewById(R.id.progressBarWorld);
             progressBarWorld.setVisibility(View.INVISIBLE);
@@ -87,6 +91,7 @@ public class WorldNewsFragment extends android.support.v4.app.Fragment implement
 
 
             initLoadMoreListener();
+            initOnScrollingListener();
             initRetrofit();
             initTargetPicasso();
 
@@ -142,6 +147,26 @@ public class WorldNewsFragment extends android.support.v4.app.Fragment implement
                }
            });
        }
+
+        private void initOnScrollingListener(){
+
+        worldAdapter.setOnScrollingListener(new OnScrollingListener() {
+            @Override
+            public void onScrollNow() {
+                Log.d(LOG_TAG, "onScrollNow ");
+
+                picasso.pauseTag("load");
+            }
+
+            @Override
+            public void onStopScrolling() {
+                Log.d(LOG_TAG, "onStopScrolling ");
+
+                picasso.resumeTag("load");
+            }
+        });
+
+    }
 
         public void getWorldNewsList (){
 
@@ -247,7 +272,10 @@ public class WorldNewsFragment extends android.support.v4.app.Fragment implement
 
                     Log.d(LOG_TAG, "Error load image " + e.getMessage());
                     count_bitmap++;
-                    Picasso.with(getContext()).load(worldList.get(count_bitmap).getImgUrl()).resize(width, height).into(loadtarget);
+                    picasso.load(worldList.get(count_bitmap).getImgUrl()).
+                            tag("load").
+                            resize(width, height).
+                            into(loadtarget);
                 }
 
             }
@@ -284,6 +312,18 @@ public class WorldNewsFragment extends android.support.v4.app.Fragment implement
                 }
 
             };
+        }
+
+        public void pauseLoadImage(){
+
+            picasso.pauseTag("load");
+
+        }
+
+        public void resumeLoadImage(){
+
+            picasso.resumeTag("load");
+
         }
 
         @Override
