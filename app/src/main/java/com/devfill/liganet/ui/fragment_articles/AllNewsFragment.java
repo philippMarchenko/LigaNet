@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -62,12 +63,16 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
 
     private int height = 90;
     private int width = 120;
+    Picasso picasso;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_all_news, container, false);
 
         Log.i(LOG_TAG, "onCreateView ");
+
+        picasso = Picasso.with(getContext());
+
 
         progressBarAllNews = (ProgressBar) rootView.findViewById(R.id.progressBarAllNews);
         progressBarAllNews.setVisibility(View.INVISIBLE);
@@ -78,6 +83,10 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
+        recyclerView.setOnScrollListener(new SampleScrollListener(getContext()));
+
+        recyclerView.setOnScrollChangeListener();
+
         allNewsAdapter = new AllNewsAdapter(getContext(),getActivity(),allNewsList,recyclerView);
         recyclerView.setAdapter(allNewsAdapter);
 
@@ -85,6 +94,8 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
         swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
 
         swipeRefreshLayout.setOnRefreshListener(this);
+
+
 
         try{
 
@@ -193,7 +204,7 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
 
                        }
 
-                     //  loadNextImage();
+                       loadNextImage();
 
                        Log.i(LOG_TAG, "onResponse getListNews. start " + start + " end " + end);
 
@@ -247,7 +258,8 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
         else{
 
             try {
-                Picasso.with(getContext()).load(allNewsList.get(count_bitmap).getImgUrl()).
+                picasso.load(allNewsList.get(count_bitmap).getImgUrl()).
+                        tag("load").
                         resize(width, height).
                         noFade().
                         into(loadtarget);
@@ -256,7 +268,6 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
                 Log.d(LOG_TAG, "Error load image " + e.getMessage());
 
                 count_bitmap++;
-              //  Picasso.with(getContext()).load(allNewsList.get(count_bitmap).getImgUrl()).resize(width, height).into(loadtarget);
             }
         }
 
@@ -293,24 +304,67 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
         };
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        Log.i(LOG_TAG, " onResume");
+
+    public class SampleScrollListener extends RecyclerView.OnScrollListener implements AbsListView.OnScrollListener {
+        private final Context context;
+
+        public SampleScrollListener(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+            if (scrollState == SCROLL_STATE_IDLE || scrollState == SCROLL_STATE_TOUCH_SCROLL) {
+                picasso.resumeTag("load");
+
+                Log.d(LOG_TAG, "Resumed load image " );
+
+            } else {
+                Log.d(LOG_TAG, "Paused load image " );
+
+                picasso.pauseTag("load");
+            }
+        }
+
+        @Override
+        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
+                             int totalItemCount) {
+            // Do nothing.
+        }
+    }
+    public class SampleOnScrollChangeListener extends RecyclerView.OnScrollChangeListener implements AbsListView.OnScrollListener {
+        private final Context context;
+
+        public SampleOnScrollChangeListener(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+            if (scrollState == SCROLL_STATE_IDLE || scrollState == SCROLL_STATE_TOUCH_SCROLL) {
+                picasso.resumeTag("load");
+
+                Log.d(LOG_TAG, "Resumed load image " );
+
+            } else {
+                Log.d(LOG_TAG, "Paused load image " );
+
+                picasso.pauseTag("load");
+            }
+        }
+
+        @Override
+        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
+                             int totalItemCount) {
+            // Do nothing.
+        }
+
+        @Override
+        public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+
+        }
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-
-        Log.i(LOG_TAG, " onPause");
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        listIsShowed = false;
-        Log.i(LOG_TAG, " onDestroy");
-    }
 }

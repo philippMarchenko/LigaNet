@@ -103,10 +103,10 @@ public class VideoListFragment extends android.support.v4.app.Fragment implement
         initRetrofit ();
         initTargetPicasso();
 
-        if(!listIsShowed){
+   /*     if(!listIsShowed){
             getVideoList();
             listIsShowed = true;
-        }
+        }*/
 
         return rootView;
     }
@@ -156,7 +156,7 @@ public class VideoListFragment extends android.support.v4.app.Fragment implement
         serverAPI = retrofit.create(ServerAPI.class);
     }
 
-    private void getVideoList (){
+    public void getVideoList (){
 
         videoList.clear();
         swipeRefreshLayout.setRefreshing(true);

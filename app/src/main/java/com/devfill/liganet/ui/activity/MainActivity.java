@@ -41,24 +41,22 @@ public class MainActivity extends AppCompatActivity {
 
 
         navigationView = (BottomNavigationView) findViewById(R.id.bottomNavigationView);
-        //navigationView.swi
-
 
         navigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 if (item.getItemId() == R.id.articles) {
-                    viewPager.setCurrentItem(0);
+                    viewPager.setCurrentItem(0);    //переключаемся между фрагментами
 
                     return true;
                 }
                 else if (item.getItemId() == R.id.photo) {
-                    viewPager.setCurrentItem(1);
+                    viewPager.setCurrentItem(1);   //переключаемся между фрагментами
 
                     return true;
                 }
                 else if (item.getItemId() == R.id.video) {
-                    viewPager.setCurrentItem(2);
+                    viewPager.setCurrentItem(2);   //переключаемся между фрагментами
 
                     return true;
                 }
@@ -69,14 +67,47 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void setupViewPager(ViewPager viewPager)
+    private void setupViewPager(final ViewPager viewPager)
     {
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        final ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(new ArticlesFragment());
         adapter.addFragment(new PhotoFragmentBase());
         adapter.addFragment(new VideoFragmentBase());
+
+
+        viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+                Log.i(LOG_TAG, "onPageSelected " + position);
+
+
+                if(position == 1){      //если выбрали раздел фото,запустим запрос к серверу
+
+                    PhotoFragmentBase photoFragmentBase = (PhotoFragmentBase) adapter.getItem(position);
+                    photoFragmentBase.getPhotoList();
+                }
+                else if(position == 2){  //если выбрали раздел видео,запустим запрос к серверу
+
+                    VideoFragmentBase videoFragmentBase = (VideoFragmentBase) adapter.getItem(position);
+                    videoFragmentBase.getVideoList();
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
         viewPager.setAdapter(adapter);
     }
+
     class ViewPagerAdapter extends FragmentPagerAdapter {
         private final List<Fragment> mFragmentList = new ArrayList<>();
         private final List<String> mFragmentTitleList = new ArrayList<>();
@@ -98,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
 
         public void addFragment(android.support.v4.app.Fragment fragment) {
             mFragmentList.add(fragment);
-          //  mFragmentTitleList.add(title);
+
         }
 
         @Override
@@ -106,6 +137,7 @@ public class MainActivity extends AppCompatActivity {
             return mFragmentTitleList.get(position);
 
         }
+
     }
 
     @Override
@@ -142,10 +174,5 @@ public class MainActivity extends AppCompatActivity {
         Log.i(LOG_TAG, " onPause");
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
 
-        Log.i(LOG_TAG, " onDestroy");
-    }
 }

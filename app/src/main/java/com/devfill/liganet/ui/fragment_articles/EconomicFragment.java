@@ -59,14 +59,16 @@ public class EconomicFragment extends android.support.v4.app.Fragment implements
 
     int start = 0,end = 21;
     ProgressBar progressBarEconomic;
-    private boolean listIsShowed = false;
-
+    public static boolean listIsShowed = false;
+    Picasso picasso;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_economic, container, false);
 
         Log.i(LOG_TAG, "onCreateView ");
+
+        picasso = Picasso.with(getContext());
 
         progressBarEconomic = (ProgressBar) rootView.findViewById(R.id.progressBarEconomic);
         progressBarEconomic.setVisibility(View.INVISIBLE);
@@ -80,9 +82,6 @@ public class EconomicFragment extends android.support.v4.app.Fragment implements
         economicAdapter = new EconomicAdapter(getContext(),getActivity(),economicList,recyclerView);
         recyclerView.setAdapter(economicAdapter);
 
-
-
-
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh_layout_economic);
         swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
 
@@ -91,13 +90,27 @@ public class EconomicFragment extends android.support.v4.app.Fragment implements
         initLoadMoreListener();
         initRetrofit ();
         initTargetPicasso();
-
-        if(!listIsShowed){
+/*
+       if(!listIsShowed){
             getEconomicList();
             listIsShowed = true;
-        }
+        }*/
+
 
         return rootView;
+    }
+
+    public void pauseLoadImage(){
+
+
+        picasso.pauseTag("imageList");
+        Log.i(LOG_TAG, "pauseLoadImag ");
+
+    }
+
+    public void resumeLoadImage(){
+
+        picasso.resumeTag("load");
     }
 
     private void initRetrofit (){
@@ -145,7 +158,9 @@ public class EconomicFragment extends android.support.v4.app.Fragment implements
         });
     }
 
-    private void getEconomicList (){
+    public void getEconomicList (){
+
+        listIsShowed = true;
 
         if(start == 0){
             swipeRefreshLayout.setRefreshing(true);
@@ -183,7 +198,7 @@ public class EconomicFragment extends android.support.v4.app.Fragment implements
 
                         }
 
-                     //   loadNextImage();
+                        loadNextImage();
 
                         Log.i(LOG_TAG, "onResponse getListNews ");
 
@@ -252,7 +267,10 @@ public class EconomicFragment extends android.support.v4.app.Fragment implements
 
             try {
                 if(!economicList.get(count_bitmap).getImgUrl().equals(""))
-                    Picasso.with(getContext()).load(economicList.get(count_bitmap).getImgUrl()).resize(width, height).into(loadtarget);
+                    picasso.load(economicList.get(count_bitmap).getImgUrl()).
+                            tag("imageList").
+                            resize(width, height).
+                            into(loadtarget);
             }
             catch (Exception e){
                 Log.d(LOG_TAG, "Error load image " + e.getMessage());

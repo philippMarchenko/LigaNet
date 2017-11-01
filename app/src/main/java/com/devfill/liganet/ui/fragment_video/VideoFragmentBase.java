@@ -25,4 +25,9 @@ public class VideoFragmentBase extends Fragment {
 
         return  rootview;
     }
+
+    public void getVideoList(){
+
+        videoListFragment.getVideoList();
+    }
 }

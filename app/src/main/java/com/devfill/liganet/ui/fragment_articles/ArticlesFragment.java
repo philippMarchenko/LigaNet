@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 
 
 import com.devfill.liganet.R;
+import com.devfill.liganet.adapter.WorldAdapter;
 import com.devfill.liganet.ui.fragment_articles.AllNewsFragment;
 import com.devfill.liganet.ui.fragment_articles.EconomicFragment;
 import com.devfill.liganet.ui.fragment_articles.PoliticFragment;
@@ -59,13 +60,64 @@ public class ArticlesFragment extends android.support.v4.app.Fragment  {
     }
 
     private void setupViewPager(ViewPager viewPager) {
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getChildFragmentManager());
+        final ViewPagerAdapter adapter = new ViewPagerAdapter(getChildFragmentManager());
 
         adapter.addFragment(new AllNewsFragment(), "Все новости");
         adapter.addFragment(new EconomicFragment(), "Экономика");
         adapter.addFragment(new WorldNewsFragment(), "Мир");
         adapter.addFragment(new PoliticFragment(), "Политика");
 
+        viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+                try{
+
+                    if(position == 1){
+
+                        EconomicFragment economicFragment = (EconomicFragment) adapter.getItem(position);
+
+                        if(!economicFragment.listIsShowed){
+                            economicFragment.getEconomicList();
+
+                        }
+                    }
+                    else if(position == 2){
+
+                        WorldNewsFragment worldNewsFragment  = (WorldNewsFragment) adapter.getItem(position);
+                        if(!worldNewsFragment.listIsShowed) {
+                            worldNewsFragment.getWorldNewsList();
+
+                              EconomicFragment economicFragment = (EconomicFragment) adapter.getItem(1);
+                              economicFragment.pauseLoadImage();
+                        }
+
+                    }
+                    else if(position == 3){
+
+                        PoliticFragment politicFragment = (PoliticFragment) adapter.getItem(position);
+                        if(!politicFragment.listIsShowed) {
+                            politicFragment.getPoliticsNewsList();
+
+                        }
+                    }
+                }
+                catch(Exception e){
+
+
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
 
         viewPager.setAdapter(adapter);
 
@@ -103,26 +155,6 @@ public class ArticlesFragment extends android.support.v4.app.Fragment  {
 
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        Log.i(LOG_TAG, " onResume");
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
 
 
-
-        Log.i(LOG_TAG, " onPause");
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        Log.i(LOG_TAG, " onDestroy");
-    }
 }

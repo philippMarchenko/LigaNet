@@ -691,8 +691,6 @@ public class ArticleNewsActivity extends AppCompatActivity {
         return line.contains(word);
     }
 
-
-
     class ViewPagerAdapter extends FragmentStatePagerAdapter {
 
         private final List<Fragment> mFragmentList = new ArrayList<>();
@@ -731,6 +729,5 @@ public class ArticleNewsActivity extends AppCompatActivity {
         }
 
     }
-
 
 }

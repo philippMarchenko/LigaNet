@@ -29,4 +29,9 @@ public class PhotoFragmentBase extends Fragment {
         return  rootview;
     }
 
+    public void getPhotoList(){
+
+        photoListFragment.getPhotoList();
+    }
+
 }

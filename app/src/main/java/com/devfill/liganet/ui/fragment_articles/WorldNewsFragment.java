@@ -59,7 +59,7 @@ public class WorldNewsFragment extends android.support.v4.app.Fragment implement
 
         private int start = 0,end = 21;
         private ProgressBar progressBarWorld;
-        private boolean listIsShowed = false;
+        public static boolean listIsShowed = false;
 
 
     @Override
@@ -90,10 +90,10 @@ public class WorldNewsFragment extends android.support.v4.app.Fragment implement
             initRetrofit();
             initTargetPicasso();
 
-            if(!listIsShowed){
+        /*    if(!listIsShowed){
                 getWorldNewsList();
                 listIsShowed = true;
-            }
+            }*/
 
             return rootView;
         }
@@ -143,7 +143,9 @@ public class WorldNewsFragment extends android.support.v4.app.Fragment implement
            });
        }
 
-        private void getWorldNewsList (){
+        public void getWorldNewsList (){
+
+            listIsShowed = true;
 
             if(start == 0){
                 swipeRefreshLayout.setRefreshing(true);
@@ -181,7 +183,7 @@ public class WorldNewsFragment extends android.support.v4.app.Fragment implement
                             }
 
 
-                        //    loadNextImage();
+                            loadNextImage();
 
                             Log.i(LOG_TAG, "onResponse getListNews size" + listNews.getNews().size());
                             Log.i(LOG_TAG, "onResponse getListNews getTitle()" + listNews.getNews().get(0).getTitle());

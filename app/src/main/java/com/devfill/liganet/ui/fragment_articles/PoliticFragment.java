@@ -58,7 +58,7 @@ public class PoliticFragment extends android.support.v4.app.Fragment implements 
 
     private int start = 0,end = 21;
     private ProgressBar progressBarPolitic;
-    private boolean listIsShowed = false;
+    public static boolean listIsShowed = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -87,10 +87,10 @@ public class PoliticFragment extends android.support.v4.app.Fragment implements 
         initRetrofit();
         initTargetPicasso();
 
-        if(!listIsShowed){
+    /*    if(!listIsShowed){
             getPoliticsNewsList();
             listIsShowed = true;
-        }
+        }*/
 
         return rootView;
     }
@@ -140,7 +140,9 @@ public class PoliticFragment extends android.support.v4.app.Fragment implements 
         });
     }
 
-    private void getPoliticsNewsList (){
+    public void getPoliticsNewsList (){
+
+        listIsShowed = true;
 
         if(start == 0){
             swipeRefreshLayout.setRefreshing(true);
@@ -178,7 +180,7 @@ public class PoliticFragment extends android.support.v4.app.Fragment implements 
                         }
 
 
-                       // loadNextImage();
+                        loadNextImage();
 
                         Log.i(LOG_TAG, "onResponse getListNews ");
 

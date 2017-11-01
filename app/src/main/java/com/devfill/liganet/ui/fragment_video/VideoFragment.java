@@ -218,27 +218,5 @@ public class VideoFragment extends android.support.v4.app.Fragment{
         }
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        getVideoContent(linkHref);          // делаем запрос по сожержимое статьи посл возобновления
-        Log.i(LOG_TAG, " onResume");
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-
-        onStop();
-        Log.i(LOG_TAG, " onPause");
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        Log.i(LOG_TAG, " onDestroy");
-    }
 
 }

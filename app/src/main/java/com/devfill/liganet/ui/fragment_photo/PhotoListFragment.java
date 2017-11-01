@@ -6,7 +6,6 @@ import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -16,32 +15,22 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.URLUtil;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 
 import com.devfill.liganet.R;
-import com.devfill.liganet.adapter.AllNewsAdapter;
 import com.devfill.liganet.adapter.PhotoListAdapter;
 import com.devfill.liganet.helper.OnLoadMoreListener;
-import com.devfill.liganet.model.ArticleNews;
 import com.devfill.liganet.model.ListNews;
 import com.devfill.liganet.model.News;
-import com.devfill.liganet.network.GetArticleImage;
-import com.devfill.liganet.network.GetDataNews;
-import com.devfill.liganet.network.GetListNews;
 import com.devfill.liganet.network.ServerAPI;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
@@ -52,7 +41,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class PhotoListFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener {
+public class PhotoListFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener{
 
     private static final String LOG_TAG = "PhotoListFragmentTag";
 
@@ -72,9 +61,11 @@ public class PhotoListFragment extends android.support.v4.app.Fragment implement
     private int start = 0,end = 21;
     private ProgressBar progressBarPhotoList;
     private boolean listIsShowed = false;
-
+    boolean mUserVisibleHint = true;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        setUserVisibleHint(false);
+
         View rootView = inflater.inflate(R.layout.fragment_photo_list, container, false);
 
         Log.i(LOG_TAG, "onCreateView ");
@@ -102,10 +93,10 @@ public class PhotoListFragment extends android.support.v4.app.Fragment implement
         initRetrofit ();
         initTargetPicasso();
 
-        if(!listIsShowed){
+        /*if(!listIsShowed){
             getPhotoList();
             listIsShowed = true;
-        }
+        }*/
 
         return rootView;
     }
@@ -155,7 +146,7 @@ public class PhotoListFragment extends android.support.v4.app.Fragment implement
         serverAPI = retrofit.create(ServerAPI.class);
     }
 
-    private void getPhotoList (){
+    public void getPhotoList (){
 
         swipeRefreshLayout.setRefreshing(true);
 
@@ -192,7 +183,7 @@ public class PhotoListFragment extends android.support.v4.app.Fragment implement
 
                         }
 
-                        loadNextImage();
+                     //   loadNextImage();
 
                         Log.i(LOG_TAG, "onResponse getListNews ");
 
@@ -304,5 +295,6 @@ public class PhotoListFragment extends android.support.v4.app.Fragment implement
 
         };
     }
+
 
 }

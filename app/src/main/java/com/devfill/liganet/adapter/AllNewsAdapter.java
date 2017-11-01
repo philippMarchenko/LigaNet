@@ -102,7 +102,23 @@ public class AllNewsAdapter extends RecyclerView.Adapter<AllNewsAdapter.MyViewHo
                                 loading = true;
                             }
                         }
+                        @Override
+                        public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+                            if (scrollState == SCROLL_STATE_IDLE || scrollState == SCROLL_STATE_TOUCH_SCROLL) {
+                                picasso.resumeTag("load");
+
+                                Log.d(LOG_TAG, "Resumed load image " );
+
+                            } else {
+                                Log.d(LOG_TAG, "Paused load image " );
+
+                                picasso.pauseTag("load");
+                            }
+                        }
                     });
+
+
         }
     }
     @Override
