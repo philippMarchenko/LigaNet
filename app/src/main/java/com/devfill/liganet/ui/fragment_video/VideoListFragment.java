@@ -15,33 +15,23 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.URLUtil;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 
 import com.devfill.liganet.R;
-import com.devfill.liganet.adapter.AllNewsAdapter;
-import com.devfill.liganet.adapter.PhotoListAdapter;
 import com.devfill.liganet.adapter.VideoListAdapter;
-import com.devfill.liganet.helper.OnLoadMoreListener;
-import com.devfill.liganet.model.ArticleNews;
+import com.devfill.liganet.listeners.OnLoadMoreListener;
 import com.devfill.liganet.model.ListNews;
 import com.devfill.liganet.model.News;
-import com.devfill.liganet.network.GetArticleImage;
-import com.devfill.liganet.network.GetDataNews;
-import com.devfill.liganet.network.GetListNews;
 import com.devfill.liganet.network.ServerAPI;
+import com.devfill.liganet.ui.fragment_articles.SavedFragment;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
@@ -72,12 +62,25 @@ public class VideoListFragment extends android.support.v4.app.Fragment implement
 
     private int start = 0,end = 21;
     private ProgressBar progressBarVideoList;
-    private boolean listIsShowed = false;
+    private SavedFragment savedFragment;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_video_list, container, false);
 
         Log.i(LOG_TAG, "onCreateView ");
+
+        savedFragment = (SavedFragment) getFragmentManager().findFragmentByTag("video_list");
+
+        if (savedFragment != null){
+            videoList = savedFragment.getNews();
+        }
+        else{
+            savedFragment = new SavedFragment();
+            getFragmentManager().beginTransaction()
+                    .add(savedFragment, "video_list")
+                    .commit();
+        }
 
         progressBarVideoList = (ProgressBar) rootView.findViewById(R.id.progressBarVideoList);
         progressBarVideoList.setVisibility(View.INVISIBLE);
@@ -159,8 +162,9 @@ public class VideoListFragment extends android.support.v4.app.Fragment implement
     public void getVideoList (){
 
         videoList.clear();
-        swipeRefreshLayout.setRefreshing(true);
 
+        try{
+            swipeRefreshLayout.setRefreshing(true);
 
         String netType = getNetworkType(getContext());
         if(netType == null){
@@ -186,6 +190,10 @@ public class VideoListFragment extends android.support.v4.app.Fragment implement
                         }
                         catch(Exception e){
 
+                            swipeRefreshLayout.setRefreshing(false);
+                            progressBarVideoList.setVisibility(View.INVISIBLE);
+                            loadNextImage();
+
                             Toast.makeText(getActivity(), "Нет новостей на сервере!", Toast.LENGTH_LONG).show();
 
                         }
@@ -201,14 +209,19 @@ public class VideoListFragment extends android.support.v4.app.Fragment implement
 
                         swipeRefreshLayout.setRefreshing(false);
                         Toast.makeText(getActivity(), "Ошибка запроса к серверу!" + t.getMessage(), Toast.LENGTH_LONG).show();
+                        progressBarVideoList.setVisibility(View.INVISIBLE);
 
-                        Log.i(LOG_TAG, "onFailure. Ошибка REST запроса getListNews " + t.toString());
+                        Log.i(LOG_TAG, "onFailure. Ошибка REST запроса getVideoNews " + t.toString());
                     }
                 });
             } catch (Exception e) {
 
-                Log.i(LOG_TAG, "Ошибка REST запроса к серверу  getListNews " + e.getMessage());
+                Log.i(LOG_TAG, "Ошибка REST запроса к серверу  getVideoNews " + e.getMessage());
             }
+        }
+        }
+        catch(Exception e){
+            Log.i(LOG_TAG, "Ошибка REST запроса к серверу  getVideoNews " + e.getMessage());
         }
     }
 
@@ -232,7 +245,7 @@ public class VideoListFragment extends android.support.v4.app.Fragment implement
         start = 0;
         end = 21;
         getVideoList();
-        listIsShowed = true;
+
     }
 
     private void loadNextImage(){
@@ -305,6 +318,13 @@ public class VideoListFragment extends android.support.v4.app.Fragment implement
             }
 
         };
+    }
+
+    public void onPause() {
+        super.onPause();
+
+        savedFragment.setNews(videoList);
+
     }
 
 }

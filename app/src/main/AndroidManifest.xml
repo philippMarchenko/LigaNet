@@ -18,8 +18,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.activity.ArticleNewsActivity"></activity>
-        <activity android:name=".ui.activity.VideoActivity"></activity>
-        <activity android:name=".ui.activity.PhotoActivity"></activity>
 
     </application>
 

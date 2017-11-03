@@ -19,9 +19,9 @@ import android.widget.Toast;
 
 
 import com.devfill.liganet.R;
-import com.devfill.liganet.adapter.AllNewsAdapter;
-import com.devfill.liganet.helper.OnLoadMoreListener;
-import com.devfill.liganet.helper.OnScrollingListener;
+import com.devfill.liganet.adapter.NewsAdapter;
+import com.devfill.liganet.listeners.OnLoadMoreListener;
+import com.devfill.liganet.listeners.OnScrollingListener;
 import com.devfill.liganet.model.ListNews;
 import com.devfill.liganet.model.News;
 import com.devfill.liganet.network.ServerAPI;
@@ -40,34 +40,50 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class AllNewsFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener {
+public class NewsFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
-    private static final String LOG_TAG = "AllNewsFragmentTag";
+    private static final String LOG_TAG = "NewsFragmentTag";
 
-    private List<News> allNewsList = new ArrayList<>();
+    private List<News> newsList = new ArrayList<>();
     private RecyclerView recyclerView;
-    private AllNewsAdapter allNewsAdapter;
+    private NewsAdapter newsAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
-
-    private int count_bitmap = 0;
+    private ProgressBar progressBarAllNews;
 
     private Retrofit retrofit;
     private ServerAPI serverAPI;
     private Target loadtarget = null;
+    private Picasso picasso;
 
+    private int count_bitmap = 0;
     private int start = 0,end = 21;
-    private ProgressBar progressBarAllNews;
-    private boolean listIsShowed = false;
-
     private int height = 90;
     private int width = 120;
-    Picasso picasso;
+
+    private boolean listIsShowed = false;
+
+    private String url_news = "";
+
+    private SavedFragment savedFragment;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_all_news, container, false);
 
-        Log.i(LOG_TAG, "onCreateView ");
+        url_news = getArguments().getString("url_news");
+
+        savedFragment = (SavedFragment) getFragmentManager().findFragmentByTag(url_news);
+
+        if (savedFragment != null){
+            newsList = savedFragment.getNews();
+        }
+        else{
+            savedFragment = new SavedFragment();
+            getFragmentManager().beginTransaction()
+                    .add(savedFragment, url_news)
+                    .commit();
+        }
+
 
         picasso = Picasso.with(getContext());
 
@@ -80,8 +96,8 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        allNewsAdapter = new AllNewsAdapter(getContext(),getActivity(),allNewsList,recyclerView);
-        recyclerView.setAdapter(allNewsAdapter);
+        newsAdapter = new NewsAdapter(getContext(),getActivity(),newsList,recyclerView);
+        recyclerView.setAdapter(newsAdapter);
 
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh_layout_all_news);
         swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
@@ -106,10 +122,12 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
         initRetrofit();
         initTargetPicasso();
 
-        if(!listIsShowed){
-            getAllNewsList();
-            listIsShowed = true;
+
+        if(url_news.equals("http://api.mkdeveloper.ru/liga_net/get_all_news.php")){
+             getNewsList();          //если это первый фрагмент,то запросим данные с сервера
+             listIsShowed = true;    //флаг что мы уже показали список
         }
+
         return rootView;
     }
 
@@ -130,28 +148,27 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
                .addConverterFactory(GsonConverterFactory.create())
                .build();
 
-
        serverAPI = retrofit.create(ServerAPI.class);
    }
 
     private void initLoadMoreListener(){
 
-        allNewsAdapter.setOnLoadMoreListener(new OnLoadMoreListener() {
+        newsAdapter.setOnLoadMoreListener(new OnLoadMoreListener() {
             @Override
             public void onLoadMore() {
                 //add null , so the adapter will check view_type and show progress bar at bottom
                /* allNewsList.add(null);
-                allNewsAdapter.notifyItemInserted(allNewsList.size() - 1);
+                newsAdapter.notifyItemInserted(allNewsList.size() - 1);
 
 
                 allNewsList.remove(allNewsList.size() - 1);
-                allNewsAdapter.notifyItemRemoved(allNewsList.size());*/
+                newsAdapter.notifyItemRemoved(allNewsList.size());*/
                 //add items one by one
-                start = allNewsList.size();
+                start = newsList.size();
                 end = start + 21;
 
                 progressBarAllNews.setVisibility(View.VISIBLE);
-                getAllNewsList();
+                getNewsList();
 
 
             }
@@ -160,7 +177,7 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
 
     private void initOnScrollingListener(){
 
-        allNewsAdapter.setOnScrollingListener(new OnScrollingListener() {
+        newsAdapter.setOnScrollingListener(new OnScrollingListener() {
             @Override
             public void onScrollNow() {
                 Log.d(LOG_TAG, "onScrollNow ");
@@ -178,67 +195,75 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
 
     }
 
-    private void getAllNewsList (){
+    public void getNewsList (){
 
-        if(start == 0){
-            swipeRefreshLayout.setRefreshing(true);
+        try{
+            if(start == 0){
+                swipeRefreshLayout.setRefreshing(true);
+            }
+        }
+        catch (Exception e){
+
         }
 
+
+
         String netType = getNetworkType(getContext());
-       if(netType == null){
-           Toast.makeText(getActivity(), "Подключение к сети отсутствует!", Toast.LENGTH_LONG).show();
-           swipeRefreshLayout.setRefreshing(false);
+        if(netType == null){
+            Toast.makeText(getActivity(), "Подключение к сети отсутствует!", Toast.LENGTH_LONG).show();
+            swipeRefreshLayout.setRefreshing(false);
 
-       }
-       else {
-           try {
+        }
+        else {
+            try {
 
-               serverAPI.getAllNews(Integer.toString(start),Integer.toString(end)).enqueue(new Callback<ListNews>() {
-                   @Override
-                   public void onResponse(Call<ListNews> call, Response<ListNews> response) {
+                serverAPI.getNews(url_news,Integer.toString(start),Integer.toString(end)).enqueue(new Callback<ListNews>() {
+                    @Override
+                    public void onResponse(Call<ListNews> call, Response<ListNews> response) {
 
-                       ListNews listNews = response.body();
+                        ListNews listNews = response.body();
+
+                        try {
+
+                            Collections.reverse(listNews.getNews());
+                            newsList.addAll(listNews.getNews());
+                            newsAdapter.notifyDataSetChanged();
+                            newsAdapter.setLoaded();
+                            swipeRefreshLayout.setRefreshing(false);
+                            progressBarAllNews.setVisibility(View.INVISIBLE);
+
+                        }
+                        catch(Exception e){
+                            swipeRefreshLayout.setRefreshing(false);
+                            progressBarAllNews.setVisibility(View.INVISIBLE);
+                            Toast.makeText(getActivity(), "Нет новостей на сервере!", Toast.LENGTH_LONG).show();
+
+                        }
+
+                        loadNextImage();
 
 
-                       try {
 
-                           Collections.reverse(listNews.getNews());
-                           allNewsList.addAll(listNews.getNews());
-                           allNewsAdapter.notifyDataSetChanged();
-                           allNewsAdapter.setLoaded();
-                           swipeRefreshLayout.setRefreshing(false);
-                           progressBarAllNews.setVisibility(View.INVISIBLE);
+                     //   Log.i(LOG_TAG, "onResponse getListNews. url_news " + url_news);
 
-                       }
-                       catch(Exception e){
-                           swipeRefreshLayout.setRefreshing(false);
-                           progressBarAllNews.setVisibility(View.INVISIBLE);
-                           Toast.makeText(getActivity(), "Нет новостей на сервере!", Toast.LENGTH_LONG).show();
+                      //  Log.i(LOG_TAG, "onResponse getListNews. start " + start + " end " + end);
 
-                       }
+                    }
 
-                       loadNextImage();
+                    @Override
+                    public void onFailure(Call<ListNews> call, Throwable t) {
 
-                       Log.i(LOG_TAG, "onResponse getListNews. getTime_ms " + listNews.getNews().get(0).getTime_ms());
+                        swipeRefreshLayout.setRefreshing(false);
+                        Toast.makeText(getActivity(), "Ошибка запроса к серверу!" + t.getMessage(), Toast.LENGTH_LONG).show();
 
-                       Log.i(LOG_TAG, "onResponse getListNews. start " + start + " end " + end);
+                        Log.i(LOG_TAG, "onFailure. Ошибка REST запроса getListNews " + t.toString());
+                    }
+                });
+            } catch (Exception e) {
 
-                   }
-
-                   @Override
-                   public void onFailure(Call<ListNews> call, Throwable t) {
-
-                       swipeRefreshLayout.setRefreshing(false);
-                       Toast.makeText(getActivity(), "Ошибка запроса к серверу!" + t.getMessage(), Toast.LENGTH_LONG).show();
-
-                       Log.i(LOG_TAG, "onFailure. Ошибка REST запроса getListNews " + t.toString());
-                   }
-               });
-           } catch (Exception e) {
-
-               Log.i(LOG_TAG, "Ошибка REST запроса к серверу  getListNews " + e.getMessage());
-           }
-       }
+                Log.i(LOG_TAG, "Ошибка REST запроса к серверу  getListNews " + e.getMessage());
+            }
+        }
     }
 
     private String getNetworkType(Context context) {
@@ -254,34 +279,37 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
     @Override
     public void onRefresh() {
 
-
         swipeRefreshLayout.setRefreshing(true);
-        allNewsList.clear();
+        newsList.clear();
 
         start = 0;
         end = 21;
-        getAllNewsList();
+        getNewsList();
         listIsShowed = true;
 
     }
 
     private void loadNextImage(){
 
-        if(count_bitmap == allNewsList.size()) {
+        if(count_bitmap == newsList.size()) {
             count_bitmap = 0;
         }
         else{
 
             try {
-                picasso.load(allNewsList.get(count_bitmap).getImgUrl()).
+                picasso.load(newsList.get(count_bitmap).getImgUrl()).
                         tag("load").
                         resize(width, height).
                         into(loadtarget);
             }
             catch (Exception e){
                 Log.d(LOG_TAG, "Error load image " + e.getMessage());
-
                 count_bitmap++;
+
+                picasso.load(newsList.get(count_bitmap).getImgUrl()).
+                        tag("load").
+                        resize(width, height).
+                        into(loadtarget);
             }
         }
 
@@ -295,9 +323,9 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
 
                // Log.d(LOG_TAG, "onBitmapLoaded  ");
 
-                if (allNewsList.size() > 0) {
-                    allNewsList.get(count_bitmap).setBitmap(bitmap);
-                    allNewsAdapter.notifyDataSetChanged();
+                if (newsList.size() > 0) {
+                    newsList.get(count_bitmap).setBitmap(bitmap);
+                    newsAdapter.notifyDataSetChanged();
 
                     count_bitmap++;
                     loadNextImage();
@@ -320,14 +348,65 @@ public class AllNewsFragment extends android.support.v4.app.Fragment implements 
 
     public void pauseLoadImage(){
 
-        picasso.pauseTag("load");
+        try{
+            Log.i(LOG_TAG, " pauseLoadImage " + url_news);
+            picasso.pauseTag("load");
+        }
+        catch(Exception e){
 
+        }
     }
 
     public void resumeLoadImage(){
+        try{
 
-        picasso.resumeTag("load");
+            Log.i(LOG_TAG, " resumeLoadImage " + url_news);
+            picasso.resumeTag("load");
+        }
+        catch(Exception e){
+
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        savedFragment.setNews(newsList);
 
     }
 
-}
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+      //  Log.i(LOG_TAG, " onDestroy");
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+
+        try {
+            if (isVisibleToUser) {
+                if (!listIsShowed) {
+                    getNewsList();
+                    listIsShowed = true;
+                }
+                resumeLoadImage();
+            }
+            else {
+                pauseLoadImage();
+
+            }
+        }
+        catch (Exception e){
+        }
+    }
+    }
+

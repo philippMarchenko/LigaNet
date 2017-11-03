@@ -21,10 +21,11 @@ import android.widget.Toast;
 
 import com.devfill.liganet.R;
 import com.devfill.liganet.adapter.PhotoListAdapter;
-import com.devfill.liganet.helper.OnLoadMoreListener;
+import com.devfill.liganet.listeners.OnLoadMoreListener;
 import com.devfill.liganet.model.ListNews;
 import com.devfill.liganet.model.News;
 import com.devfill.liganet.network.ServerAPI;
+import com.devfill.liganet.ui.fragment_articles.SavedFragment;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -54,14 +55,18 @@ public class PhotoListFragment extends android.support.v4.app.Fragment implement
 
     private Retrofit retrofit;
     private ServerAPI serverAPI;
-    Target loadtarget = null;
+    private Target loadtarget = null;
+    private Picasso picasso;
+
 
     FragmentTransaction ft;
 
     private int start = 0,end = 21;
     private ProgressBar progressBarPhotoList;
     private boolean listIsShowed = false;
-    boolean mUserVisibleHint = true;
+
+    private SavedFragment savedFragment;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         setUserVisibleHint(false);
@@ -69,6 +74,22 @@ public class PhotoListFragment extends android.support.v4.app.Fragment implement
         View rootView = inflater.inflate(R.layout.fragment_photo_list, container, false);
 
         Log.i(LOG_TAG, "onCreateView ");
+
+        savedFragment = (SavedFragment) getFragmentManager().findFragmentByTag("photo_list");
+
+        if (savedFragment != null){
+            photoList = savedFragment.getNews();
+        }
+        else{
+            savedFragment = new SavedFragment();
+            getFragmentManager().beginTransaction()
+                    .add(savedFragment, "photo_list")
+                    .commit();
+        }
+
+
+
+        picasso = Picasso.with(getContext());
 
         progressBarPhotoList = (ProgressBar) rootView.findViewById(R.id.progressBarPhotoList);
         progressBarPhotoList.setVisibility(View.INVISIBLE);
@@ -93,7 +114,7 @@ public class PhotoListFragment extends android.support.v4.app.Fragment implement
         initRetrofit ();
         initTargetPicasso();
 
-        /*if(!listIsShowed){
+     /*   if(!listIsShowed){
             getPhotoList();
             listIsShowed = true;
         }*/
@@ -148,61 +169,70 @@ public class PhotoListFragment extends android.support.v4.app.Fragment implement
 
     public void getPhotoList (){
 
-        swipeRefreshLayout.setRefreshing(true);
+        try{
+            swipeRefreshLayout.setRefreshing(true);
 
 
-        String netType = getNetworkType(getContext());
-        if(netType == null){
-            Toast.makeText(getActivity(), "Подключение к сети отсутствует!", Toast.LENGTH_LONG).show();
-            swipeRefreshLayout.setRefreshing(false);
 
-        }
-        else {
-            try {
 
-                serverAPI.getPhotoNews(Integer.toString(start),Integer.toString(end)).enqueue(new Callback<ListNews>() {
-                    @Override
-                    public void onResponse(Call<ListNews> call, Response<ListNews> response) {
+            String netType = getNetworkType(getContext());
+            if(netType == null){
+                Toast.makeText(getActivity(), "Подключение к сети отсутствует!", Toast.LENGTH_LONG).show();
+                swipeRefreshLayout.setRefreshing(false);
 
-                        ListNews listNews = response.body();
+            }
+            else {
+                try {
 
-                        try {
-                            Collections.reverse(listNews.getNews());
+                    serverAPI.getPhotoNews(Integer.toString(start),Integer.toString(end)).enqueue(new Callback<ListNews>() {
+                        @Override
+                        public void onResponse(Call<ListNews> call, Response<ListNews> response) {
 
-                            photoList.addAll(listNews.getNews());
-                            photoListAdapter.notifyDataSetChanged();
-                            photoListAdapter.setLoaded();
-                            swipeRefreshLayout.setRefreshing(false);
-                            progressBarPhotoList.setVisibility(View.INVISIBLE);
+                            ListNews listNews = response.body();
+
+                            try {
+                                Collections.reverse(listNews.getNews());
+
+                                photoList.addAll(listNews.getNews());
+                                photoListAdapter.notifyDataSetChanged();
+                                photoListAdapter.setLoaded();
+                                swipeRefreshLayout.setRefreshing(false);
+                                progressBarPhotoList.setVisibility(View.INVISIBLE);
+
+                            }
+                            catch(Exception e){
+                                swipeRefreshLayout.setRefreshing(false);
+                                progressBarPhotoList.setVisibility(View.INVISIBLE);
+                                Toast.makeText(getActivity(), "Нет новостей на сервере!", Toast.LENGTH_LONG).show();
+
+                            }
+
+                            loadNextImage();
+
+                            Log.i(LOG_TAG, "onResponse getListNews ");
 
                         }
-                        catch(Exception e){
+
+                        @Override
+                        public void onFailure(Call<ListNews> call, Throwable t) {
+
                             swipeRefreshLayout.setRefreshing(false);
-                            progressBarPhotoList.setVisibility(View.INVISIBLE);
-                            Toast.makeText(getActivity(), "Нет новостей на сервере!", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getActivity(), "Ошибка запроса к серверу!" + t.getMessage(), Toast.LENGTH_LONG).show();
 
+                            Log.i(LOG_TAG, "onFailure. Ошибка REST запроса getListNews " + t.toString());
                         }
+                    });
+                } catch (Exception e) {
 
-                     //   loadNextImage();
-
-                        Log.i(LOG_TAG, "onResponse getListNews ");
-
-                    }
-
-                    @Override
-                    public void onFailure(Call<ListNews> call, Throwable t) {
-
-                        swipeRefreshLayout.setRefreshing(false);
-                        Toast.makeText(getActivity(), "Ошибка запроса к серверу!" + t.getMessage(), Toast.LENGTH_LONG).show();
-
-                        Log.i(LOG_TAG, "onFailure. Ошибка REST запроса getListNews " + t.toString());
-                    }
-                });
-            } catch (Exception e) {
-
-                Log.i(LOG_TAG, "Ошибка REST запроса к серверу  getListNews " + e.getMessage());
+                    Log.i(LOG_TAG, "Ошибка REST запроса к серверу  getListNews " + e.getMessage());
+                }
             }
         }
+        catch(Exception e){
+
+        }
+
+
     }
 
     private String getNetworkType(Context context) {
@@ -250,7 +280,10 @@ public class PhotoListFragment extends android.support.v4.app.Fragment implement
         else{
 
             try {
-                Picasso.with(getContext()).load(photoList.get(count_bitmap).getImgUrl()).resize(width, height).into(loadtarget);
+                picasso.load(photoList.get(count_bitmap).getImgUrl())
+                        .tag("load")
+                        .resize(width, height).
+                        into(loadtarget);
             }
             catch (Exception e){
                 Log.d(LOG_TAG, "Error load image " + e.getMessage());
@@ -296,5 +329,66 @@ public class PhotoListFragment extends android.support.v4.app.Fragment implement
         };
     }
 
+    public void onPause() {
+        super.onPause();
 
+        savedFragment.setNews(photoList);
+
+    }
+
+
+    public void pauseLoadImage(){
+
+        try{
+
+            picasso.pauseTag("load");
+        }
+        catch(Exception e){
+
+        }
+    }
+
+    public void resumeLoadImage(){
+        try{
+
+
+            picasso.resumeTag("load");
+        }
+        catch(Exception e){
+
+        }
+    }
+
+    public boolean isListIsShowed() {
+        return listIsShowed;
+    }
+
+    public void setListIsShowed(boolean listIsShowed) {
+        this.listIsShowed = listIsShowed;
+    }
+
+   /* @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        Log.d(LOG_TAG, "setUserVisibleHint ");
+
+        try {
+            if (isVisibleToUser) {
+                Log.d(LOG_TAG, "isVisibleToUser ");
+                if (!listIsShowed) {
+                    getPhotoList();
+                    listIsShowed = true;
+                }
+                resumeLoadImage();
+            }
+            else {
+                pauseLoadImage();
+
+            }
+        }
+        catch (Exception e){
+            Log.d(LOG_TAG, "error " + e.getMessage());
+
+        }
+    }*/
 }

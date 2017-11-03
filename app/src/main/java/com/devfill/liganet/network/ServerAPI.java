@@ -9,6 +9,7 @@ import com.devfill.liganet.model.VideoContent;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
+import retrofit2.http.Url;
 
 public interface ServerAPI {
 
@@ -21,6 +22,14 @@ public interface ServerAPI {
     Call<PhotoContent> getPhotoContent(@Query(value = "link_href") String link_href);
     @GET("/liga_net/get_video_content.php")
     Call<VideoContent> getVideoContent(@Query(value = "link_href") String link_href);
+
+
+    @GET
+    Call<ListNews> getNews(@Url String url,
+                           @Query(value = "start") String start,
+                           @Query(value = "end") String end);
+
+
 
     @GET("/liga_net/get_all_news.php")
     Call<ListNews> getAllNews(@Query(value = "start") String start,

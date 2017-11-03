@@ -1,4 +1,4 @@
-package com.devfill.liganet.helper;
+package com.devfill.liganet.listeners;
 
 
 public interface OnScrollingListener {

@@ -23,7 +23,7 @@ public class PhotoFragmentBase extends Fragment {
         View rootview = inflater.inflate(R.layout.fragment_photo_base, container, false);
 
         ft = getChildFragmentManager().beginTransaction();
-        ft.replace(R.id.container_photo, photoListFragment);
+        ft.replace(R.id.container_photo, photoListFragment,"photoListFragment");
         ft.commit();
 
         return  rootview;

@@ -13,8 +13,9 @@ import android.view.MenuItem;
 
 import com.devfill.liganet.R;
 
-import com.devfill.liganet.ui.fragment_articles.ArticlesFragment;
+import com.devfill.liganet.ui.fragment_articles.NewsFragmentBase;
 import com.devfill.liganet.ui.fragment_photo.PhotoFragmentBase;
+import com.devfill.liganet.ui.fragment_photo.PhotoListFragment;
 import com.devfill.liganet.ui.fragment_video.VideoFragmentBase;
 import com.devfill.liganet.ui.helper.CustomViewPager;
 
@@ -30,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
     BottomNavigationView navigationView;
     private CustomViewPager viewPager;
 
-
+    private int mCurrentPage = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
     private void setupViewPager(final ViewPager viewPager)
     {
         final ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new ArticlesFragment());
+        adapter.addFragment(new NewsFragmentBase());
         adapter.addFragment(new PhotoFragmentBase());
         adapter.addFragment(new VideoFragmentBase());
 
@@ -88,7 +89,6 @@ public class MainActivity extends AppCompatActivity {
 
 
                 if(position == 1){      //если выбрали раздел фото,запустим запрос к серверу
-
                     PhotoFragmentBase photoFragmentBase = (PhotoFragmentBase) adapter.getItem(position);
                     photoFragmentBase.getPhotoList();
                 }
@@ -106,6 +106,13 @@ public class MainActivity extends AppCompatActivity {
         });
 
         viewPager.setAdapter(adapter);
+
+        viewPager.setCurrentItem(mCurrentPage);
+
+        for (int i = 0; i < navigationView.getMenu().size(); i++) {
+            navigationView.getMenu().getItem(i).setChecked(false);
+        }
+        navigationView.getMenu().getItem(mCurrentPage).setChecked(true);
     }
 
     class ViewPagerAdapter extends FragmentPagerAdapter {
@@ -174,5 +181,15 @@ public class MainActivity extends AppCompatActivity {
         Log.i(LOG_TAG, " onPause");
     }
 
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("numberPage", viewPager.getCurrentItem());
+        Log.d(LOG_TAG, "onSaveInstanceState");
+    }
 
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        mCurrentPage = savedInstanceState.getInt("numberPage");
+        Log.d(LOG_TAG, "onRestoreInstanceState");
+    }
 }

@@ -14,9 +14,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.devfill.liganet.R;
-import com.devfill.liganet.helper.OnLoadMoreListener;
+import com.devfill.liganet.listeners.OnLoadMoreListener;
 import com.devfill.liganet.model.News;
-import com.devfill.liganet.ui.fragment_photo.PhotoFragment;
 import com.devfill.liganet.ui.fragment_video.VideoFragment;
 
 import java.util.List;

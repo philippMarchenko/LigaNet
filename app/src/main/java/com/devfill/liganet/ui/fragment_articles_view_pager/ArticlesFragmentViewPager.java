@@ -63,10 +63,6 @@ public class ArticlesFragmentViewPager extends android.support.v4.app.Fragment{
 
     private String link;
 
-    public ArticlesFragmentViewPager(String link){
-
-        this.link = link;
-    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.activity_article_news, container, false);
@@ -93,6 +89,8 @@ public class ArticlesFragmentViewPager extends android.support.v4.app.Fragment{
         anotation.setVisibility(View.INVISIBLE);
         textArticle.setVisibility(View.INVISIBLE);
         progressArticle.setVisibility(View.VISIBLE);
+
+        link = getArguments().getString("linkHref");
 
         initRetrofit();
         initTargetPicassoArrayImage();
@@ -306,7 +304,6 @@ public class ArticlesFragmentViewPager extends android.support.v4.app.Fragment{
         }
         return null;
     }
-
 
     @Override
     public void onResume() {
