@@ -37,6 +37,9 @@ public class NewsFragmentBase extends android.support.v4.app.Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.articles_fragment, container, false);
 
+        Log.i(LOG_TAG, " onCreateView");
+
+
         adapter = new ViewPagerAdapter(getChildFragmentManager());
 
         toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);

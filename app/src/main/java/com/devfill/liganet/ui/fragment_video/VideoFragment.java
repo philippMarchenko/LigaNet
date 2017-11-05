@@ -305,24 +305,31 @@ public class VideoFragment extends android.support.v4.app.Fragment{
 
                 Log.d(LOG_TAG, "onBitmapLoaded  ");
 
-                if (imageUrls.size() > 0) {
+                try{
+                    if (imageUrls.size() > 0) {
 
-                    Drawable drawable = new BitmapDrawable(getResources(),Bitmap.createBitmap(bitmap, 0, 0,bitmap.getWidth(), bitmap.getHeight()-18)); //обрежем сколько нужно нам пикселей) //создали драврэбл из битмап
-                    drawable.setBounds(0, 0, drawable.getIntrinsicWidth(),
-                            drawable.getIntrinsicHeight());
-                    drawableHashMap.put(imageUrls.get(count_bitmap),drawable);  //ложим картинку с ключем адресом в хэшмап
+                        Drawable drawable = new BitmapDrawable(getResources(),Bitmap.createBitmap(bitmap, 0, 0,bitmap.getWidth(), bitmap.getHeight()-18)); //обрежем сколько нужно нам пикселей) //создали драврэбл из битмап
+                        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(),
+                                drawable.getIntrinsicHeight());
+                        drawableHashMap.put(imageUrls.get(count_bitmap),drawable);  //ложим картинку с ключем адресом в хэшмап
 
-                    count_bitmap++;
-                    loadNextImage();
+                        count_bitmap++;
+                        loadNextImage();
 
-                    text_video.setVisibility(View.VISIBLE);
-                    annotation_video.setVisibility(View.VISIBLE);
-                    progressBar.setVisibility(View.INVISIBLE);
-                    youTubePlayerSupportFragment.getView().setVisibility(View.VISIBLE);
+                        text_video.setVisibility(View.VISIBLE);
+                        annotation_video.setVisibility(View.VISIBLE);
+                        progressBar.setVisibility(View.INVISIBLE);
+                        youTubePlayerSupportFragment.getView().setVisibility(View.VISIBLE);
 
-                    text_video.setText(Html.fromHtml(videoContent.getData().getText(), igLoader, null));
+                        text_video.setText(Html.fromHtml(videoContent.getData().getText(), igLoader, null));
+
+                    }
+                }
+                catch(Exception e){
 
                 }
+
+
 
             }
 

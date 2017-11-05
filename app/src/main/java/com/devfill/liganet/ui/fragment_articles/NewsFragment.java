@@ -123,7 +123,7 @@ public class NewsFragment extends android.support.v4.app.Fragment implements Swi
         initTargetPicasso();
 
 
-        if(url_news.equals("http://api.mkdeveloper.ru/liga_net/get_all_news.php")){
+        if(url_news.equals("http://api.mkdeveloper.ru/liga_net/get_all_news.php") && !listIsShowed){
              getNewsList();          //если это первый фрагмент,то запросим данные с сервера
              listIsShowed = true;    //флаг что мы уже показали список
         }
@@ -244,7 +244,7 @@ public class NewsFragment extends android.support.v4.app.Fragment implements Swi
 
 
 
-                     //   Log.i(LOG_TAG, "onResponse getListNews. url_news " + url_news);
+                        Log.i(LOG_TAG, "onResponse getListNews. url_news " + url_news);
 
                       //  Log.i(LOG_TAG, "onResponse getListNews. start " + start + " end " + end);
 
@@ -391,6 +391,7 @@ public class NewsFragment extends android.support.v4.app.Fragment implements Swi
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
+          Log.i(LOG_TAG, " setUserVisibleHint listIsShowed " + listIsShowed);
 
         try {
             if (isVisibleToUser) {
