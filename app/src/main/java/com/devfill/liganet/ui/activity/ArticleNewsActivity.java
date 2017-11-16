@@ -22,8 +22,6 @@ public class ArticleNewsActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = "ArticleNewsActivityTag";
 
-
-    private int positionPage = 0;       //позиция текущей страницы
     private int positionArticle = 0;    //позиция статьи по которой нажали
     private boolean isPhoto = false;
     private boolean isVideo = false;
@@ -38,30 +36,27 @@ public class ArticleNewsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_article_news_pager);
 
-        mPager = (ViewPager) findViewById(R.id.pagerArticles);
+        mPager = (ViewPager) findViewById(R.id.pagerArticles);  //общий пайджер для всех статей
 
-        myList = (ArrayList<String>) getIntent().getSerializableExtra("newsList");
-        positionArticle = getIntent().getIntExtra("position",0);
+        myList = (ArrayList<String>) getIntent().getSerializableExtra("newsList");  //принимаем список ссылок
+        positionArticle = getIntent().getIntExtra("position",0);                    //принимаем позицию сттьи по которой кликнули
 
-        Log.d(LOG_TAG, "myList.size " + myList.size());
-        Log.d(LOG_TAG, "positionArticle " + positionArticle);
+        adapter = new ViewPagerAdapter(getSupportFragmentManager());                //создание адаптера для статей
 
-        adapter = new ViewPagerAdapter(getSupportFragmentManager());
-
-        for(int i = 0; i <= myList.size(); i++){
+        for(int i = 0; i <= myList.size(); i++){                                    //перебираем все ссылки и добавляем в адаптер
 
             addFragment(i);
         }
 
-        mPager.setAdapter(adapter);
-        mPager.setCurrentItem(positionArticle);
-        mPager.setPageTransformer(true, new DepthPageTransformer());
-        initPagerListener();
+        mPager.setAdapter(adapter);                                   //присвоим адаптер для пейджера
+        mPager.setCurrentItem(positionArticle);                       //откроем правильную статью
+        mPager.setPageTransformer(true, new DepthPageTransformer());  //тип анимации свайпа статей в пейджере
+
     }
 
     private void checkPhotoVideo(int position){
 
-        if(checkForWord(myList.get(position),"/photo/")){
+        if(checkForWord(myList.get(position),"/photo/")){   //если в ссылке есть это слово то это фото
 
             isPhoto = true;
         }
@@ -72,7 +67,7 @@ public class ArticleNewsActivity extends AppCompatActivity {
 
         if(checkForWord(myList.get(position),"/video/") || checkForWord(myList.get(position),"/videomaterialy/")){
 
-            isVideo = true;
+            isVideo = true;                      //если в ссылке есть это слово то это видео
         }
         else{
 
@@ -84,17 +79,16 @@ public class ArticleNewsActivity extends AppCompatActivity {
 
         if((position < myList.size())){
 
-            checkPhotoVideo(position);
+            checkPhotoVideo(position);     //проверим на тип статьи
 
             if(isVideo){
 
-                    VideoFragment videoFragment = new VideoFragment();
+                    VideoFragment videoFragment = new VideoFragment();      //создадим фрагмент
                     Bundle bundle = new Bundle();
-                    bundle.putString("linkHref",myList.get(position));
+                    bundle.putString("linkHref",myList.get(position));      //передадим ему ссылку
                     videoFragment.setArguments(bundle);
 
-                    adapter.addFragmentForward(videoFragment);
-
+                    adapter.addFragmentForward(videoFragment);              //обновим адаптер
                     adapter.notifyDataSetChanged();
             }
             else if(isPhoto){
@@ -118,44 +112,6 @@ public class ArticleNewsActivity extends AppCompatActivity {
         }
     }
 
-    private void initPagerListener(){
-
-        mPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-
-                Log.d(LOG_TAG, "onPageSelected " + position);
-                Log.d(LOG_TAG, "adapter.getCount() " + adapter.getCount());
-
-                if(positionPage > position){//User Move to left
-                    Log.d(LOG_TAG, "User Move to left ");
-                  //  addFragmentBack(positionArticle - 2);
-                  //  adapter.notifyDataSetChanged();
-                }
-               /* else if (positionPage < position){ //User Move to right
-                    Log.d(LOG_TAG, "User Move to right");
-                    addFragment(position);
-                    adapter.notifyDataSetChanged();
-                }
-
-                positionPage = position;
-*/
-                Log.d(LOG_TAG, "adapter.getCount() " + adapter.getCount());
-
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
-
-    }
 
     boolean checkForWord(String line, String word){
         return line.contains(word);
@@ -183,19 +139,6 @@ public class ArticleNewsActivity extends AppCompatActivity {
 
             mFragmentList.add(fragment);
 
-        }
-
-        public void addFragmentBack(android.support.v4.app.Fragment fragment) {
-
-
-            //make a loop to run through the array list
-            for(int i = mFragmentList.size()-1; i > 0; i--)
-            {
-                //set the last element to the value of the 2nd to last element
-                mFragmentList.set(i,mFragmentList.get(i-1));
-            }
-
-            mFragmentList.set(0,fragment);
         }
 
     }

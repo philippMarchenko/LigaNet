@@ -89,11 +89,11 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.MyViewHolder> 
 
                     switch (newState) {
                         case RecyclerView.SCROLL_STATE_IDLE:
-                            onScrollingListener.onStopScrolling();
+                            onScrollingListener.onStopScrolling();     //не скроллим
                             Log.d(LOG_TAG, "The RecyclerView is not scrolling ");
                             break;
                         case RecyclerView.SCROLL_STATE_DRAGGING:
-                            onScrollingListener.onScrollNow();
+                            onScrollingListener.onScrollNow(); //передаем в фрагмент слушателя состояния списка для торможения загрузки картинок на момент скроллинга списка
                             Log.d(LOG_TAG, "Scrolling now ");
                             break;
                         case RecyclerView.SCROLL_STATE_SETTLING:
@@ -116,7 +116,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.MyViewHolder> 
                         // End has been reached
                         // Do something
                         if (onLoadMoreListener != null) {
-                            onLoadMoreListener.onLoadMore();
+                            onLoadMoreListener.onLoadMore();    //слушатель долистывания до конца списка для подгрузки новых данных
                         }
                         loading = true;
                     }
@@ -147,14 +147,15 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.MyViewHolder> 
             Date date = new Date(time);
             String strTimeDate = simpleDateFormatDate.format(date);
 
-            myViewHolder.time.setText(strTimeDate);
-         //myViewHolder.time.setText(news.getTime());
+            myViewHolder.time.setText(strTimeDate);     //время берем из мс сервера и преобр. в нормальное
+            //myViewHolder.time.setText(news.getTime());
 
-         myViewHolder.title.setText(Html.fromHtml(news.getTitle()));
+            myViewHolder.title.setText(Html.fromHtml(news.getTitle())); //выводим заголовок
 
             Bitmap.Config conf = Bitmap.Config.ARGB_8888; // see other conf types
             Bitmap croppedBmp =  Bitmap.createBitmap(100, 100, conf); // this creates a MUTABLE bitmap;
 
+        //обрезаем картинку(значек лига.нет)
         try{
             croppedBmp = Bitmap.createBitmap(news.getBitmap(), 0, 0, news.getBitmap().getWidth(), news.getBitmap().getHeight()-18);
 
@@ -165,33 +166,33 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.MyViewHolder> 
 
 
 
-        if(news.getIsVideo().equals("1")){
+        if(news.getIsVideo().equals("1")){  //если есть признак видео то ставим на картинку значек видео
 
                 myViewHolder.image.setImageDrawable(mContext.getDrawable(R.drawable.video2));
 
             }
-        else if (news.getIs_photo().equals("1")) {
+        else if (news.getIs_photo().equals("1")) {  //если фото то фото
 
                 myViewHolder.image.setImageDrawable(mContext.getDrawable(R.drawable.foto));
             }
             else{
 
-                myViewHolder.image.setImageBitmap(croppedBmp);
+                myViewHolder.image.setImageBitmap(croppedBmp);  //иначе картинку статьи, потому что это статья
             }
 
             myViewHolder.card_view.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View view) {
+                public void onClick(View view) {    //слушатель нажатий на елемент списка
                         try {
                             Intent intent = new Intent(mContext, ArticleNewsActivity.class);    //ЭТО СТАТЬЯ
                             ArrayList<String> newsList = new ArrayList<String>();
 
-                           for(int i = 0; i < mListNewsShort.size(); i ++){
+                           for(int i = 0; i < mListNewsShort.size(); i ++){         //создаем список всех ссылок статей
                                newsList.add(mListNewsShort.get(i).getLinkHref());
                            }
-                            intent.putExtra("newsList", newsList);
-                            intent.putExtra("position", position);
-                            mContext.startActivity(intent);
+                            intent.putExtra("newsList", newsList);                  //передаем список в экран статей для свайпинга между ними
+                            intent.putExtra("position", position);                  //и номер статьи  по которой кликнули
+                            mContext.startActivity(intent);                         //запуск экрана
 
                         } catch (Exception e) {
                             Log.d(LOG_TAG, "exception", e);
@@ -207,11 +208,11 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.MyViewHolder> 
     }
 
 
-    public void setOnLoadMoreListener(OnLoadMoreListener onLoadMoreListener) {
+    public void setOnLoadMoreListener(OnLoadMoreListener onLoadMoreListener) {  //инициализация слушателя подгрузки
         this.onLoadMoreListener = onLoadMoreListener;
     }
 
-    public void setOnScrollingListener(OnScrollingListener onScrollingListener) {
+    public void setOnScrollingListener(OnScrollingListener onScrollingListener) {   //инициализация слушателя скролинга
         this.onScrollingListener = onScrollingListener;
     }
 
