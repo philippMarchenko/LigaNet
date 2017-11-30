@@ -119,7 +119,12 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.MyVi
             @Override
             public void onClick(View view) {
 
-                VideoFragment videoFragment = new VideoFragment();
+                VideoFragment videoFragment = new VideoFragment(new VideoFragment.VideoFragmentListener() {
+                    @Override
+                    public void videoFragmentCreate() {
+
+                    }
+                });
 
                 Bundle bundle = new Bundle();
                 bundle.putString("linkHref",news.getLinkHref());

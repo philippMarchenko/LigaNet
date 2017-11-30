@@ -2,7 +2,9 @@
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:id="@+id/coordinatorlayout"
+    >
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar"
@@ -39,7 +41,8 @@
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="android.support.design.widget.AppBarLayout$ScrollingViewBehavior">
+        app:layout_behavior="android.support.design.widget.AppBarLayout$ScrollingViewBehavior"
+        android:id="@+id/neestedscroll">
 
 
         <RelativeLayout
@@ -48,15 +51,17 @@
             android:layout_height="match_parent">
 
             <TextView
-                android:text="anotation"
+                android:text="Как и сколько варить картошку. Полезные лайфкаки."
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/anotation"
                 android:layout_alignParentStart="true"
                 android:textStyle="normal|bold"
-                android:textSize="20sp"
+                android:textSize="24sp"
                 android:fontFamily="sans-serif-condensed"
-                android:layout_margin="5dp" />
+                android:layout_marginRight="13dp"
+                android:layout_marginLeft="13dp"
+                android:layout_marginTop="5dp" />
 
             <TextView
                 android:text="12:00"
@@ -68,7 +73,9 @@
                 android:layout_below="@+id/anotation"
                 android:textSize="16sp"
                 android:fontFamily="sans-serif-condensed"
-                android:layout_margin="5dp" />
+                android:textColor="@color/colorAccent"
+                android:layout_marginLeft="13dp"
+                android:layout_marginTop="5dp" />
 
             <TextView
                 android:text="очень длинный текст"
@@ -76,9 +83,43 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/textArticle"
                 android:layout_below="@+id/dateAtricle"
-                android:textSize="16sp"
+                android:textSize="17sp"
                 android:fontFamily="sans-serif-condensed"
-                android:layout_margin="5dp" />
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="13dp"
+                android:layout_marginLeft="13dp" />
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/textArticle"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:id="@+id/read_more"
+                android:descendantFocusability="blocksDescendants">
+
+                <TextView
+                    android:text="Читайте также:"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/readMoreTV"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="24sp"
+                    android:layout_marginStart="13dp" />
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recycler_view_more_news"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clipToPadding="false"
+                    android:layout_alignParentBottom="false"
+                    android:layout_alignParentTop="false"
+                    android:scrollbars="vertical"
+                    android:scrollbarSize="5dp"
+                    android:layout_below="@+id/textArticle"
+                    android:layout_marginTop="10dp" />
+            </LinearLayout>
 
             <ProgressBar
                 style="@style/Widget.AppCompat.ProgressBar"

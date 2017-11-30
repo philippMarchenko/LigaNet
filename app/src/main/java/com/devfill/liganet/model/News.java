@@ -26,8 +26,6 @@ public class News {
     @Expose
     private String isPhoto;
 
-
-
     @SerializedName("isVideo")
     @Expose
     private String isVideo;
@@ -35,6 +33,8 @@ public class News {
     @SerializedName("time_ms")
     @Expose
     private String time_ms;
+
+
 
     private Bitmap bitmap;
 

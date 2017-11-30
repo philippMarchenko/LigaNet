@@ -72,6 +72,21 @@ public class VideoFragment extends android.support.v4.app.Fragment{
     private Html.ImageGetter igLoader;
     private Target loadtarget = null;
 
+    VideoFragmentListener videoFragmentListener;
+
+    private boolean mWasRestored;
+
+
+    public interface VideoFragmentListener{
+
+        void videoFragmentCreate();
+
+    }
+
+    public VideoFragment(VideoFragmentListener videoFragmentListener){
+
+    this.videoFragmentListener = videoFragmentListener;
+}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -103,7 +118,9 @@ public class VideoFragment extends android.support.v4.app.Fragment{
         initLoaderImage();
         initTargetPicasso();
 
-        initYouTube();
+
+
+
 
         return rootView;
     }
@@ -130,7 +147,7 @@ public class VideoFragment extends android.support.v4.app.Fragment{
         };
     }
 
-    private void initYouTube(){
+    public void initYouTube(){
         Log.i(LOG_TAG, "initYouTube ");
 
         if(youTubePlayerSupportFragment != null){
@@ -140,12 +157,17 @@ public class VideoFragment extends android.support.v4.app.Fragment{
                 public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer player, boolean wasRestored) {
                     Log.i(LOG_TAG, "onInitializationSuccess");
 
-                   // if (!wasRestored) {
-                        player.setPlayerStyle(YouTubePlayer.PlayerStyle.DEFAULT);
-                        // player.loadVideo(videoUrl);
-                        player.play();
-                        mPlayer = player;
-                        getVideoContent(linkHref);
+                    mWasRestored = wasRestored;
+                    mPlayer = player;
+
+                   // mPlayer.setFullscreenControlFlags(FULLSCREEN_FLAG_CUSTOM_LAYOUT);
+                  //  mPlayer.setOnFullscreenListener(this);
+                    mPlayer.setFullscreen(false);
+                    mPlayer.setShowFullscreenButton(true);
+
+
+
+                    getVideoContent(linkHref);
                   //  }
                 }
 
@@ -163,16 +185,12 @@ public class VideoFragment extends android.support.v4.app.Fragment{
 
                         Toast.makeText(getActivity(), errorMessage, Toast.LENGTH_LONG).show();
                     }
-
-
                 }
-
-
             });
 
         }
         else{
-            Toast.makeText(getActivity(), "NULL", Toast.LENGTH_LONG).show();
+          //  Toast.makeText(getActivity(), "NULL", Toast.LENGTH_LONG).show();
             Log.i(LOG_TAG, "NULL");
 
         }
@@ -249,7 +267,7 @@ public class VideoFragment extends android.support.v4.app.Fragment{
                                 text_video.setText(Html.fromHtml(videoContent.getData().getText()));
                             }
 
-                            mPlayer.cueVideo(videoUrl);
+                            videoFragmentListener.videoFragmentCreate();
 
                         }
                         catch(Exception e){
@@ -346,6 +364,26 @@ public class VideoFragment extends android.support.v4.app.Fragment{
             }
 
         };
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        initYouTube();
+        Log.d(LOG_TAG, "onResume ");
+
+    }
+
+    public void playVideo(){
+
+        if (!mWasRestored) {
+            // load your video
+            mPlayer.cueVideo(videoUrl);
+        }
+        else
+        {
+            mPlayer.play();
+        }
     }
 
 }

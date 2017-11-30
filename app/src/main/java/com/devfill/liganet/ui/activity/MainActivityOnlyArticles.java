@@ -1,70 +1,59 @@
-package com.devfill.liganet.ui.fragment_articles;
-
-import android.os.Bundle;
+package com.devfill.liganet.ui.activity;
 
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-
-
 
 import com.devfill.liganet.R;
+import com.devfill.liganet.ui.fragment_articles.NewsFragment;
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
+
 
 import java.util.ArrayList;
 import java.util.List;
 
+public class MainActivityOnlyArticles extends AppCompatActivity {
 
-public class NewsFragmentBase extends android.support.v4.app.Fragment {
+    private String LOG_TAG = "OnlyArticles";
 
-
-    private static final String LOG_TAG = "NewsFragmentBase";
     ViewPagerAdapter adapter;
 
     private Toolbar toolbar;
     private TabLayout tabLayout;
     private ViewPager viewPager;
+    List<Fragment> fragmentList = new ArrayList<>();
 
-
+    SmartTabLayout tabs;
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.articles_fragment, container, false);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.articles_fragment);
 
-        Log.i(LOG_TAG, " onCreateView");
+        adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
 
-        adapter = new ViewPagerAdapter(getChildFragmentManager());
+        setSupportActionBar(toolbar);
 
-        toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        getSupportActionBar().hide();
 
-        AppCompatActivity appCompatActivity = (AppCompatActivity) getActivity();
+        viewPager = (ViewPager) findViewById(R.id.viewpagerArticles);
 
-        appCompatActivity.setSupportActionBar(toolbar);
+      //  tabLayout = (TabLayout) findViewById(R.id.tabs);
+      //  tabLayout.setupWithViewPager(viewPager);
 
-        appCompatActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-        appCompatActivity.getSupportActionBar().hide();
+        setupViewPager(viewPager);
 
-        viewPager = (ViewPager) rootView.findViewById(R.id.viewpagerArticles);
-       // setupViewPager(viewPager);
+        tabs = (SmartTabLayout) findViewById(R.id.tabs);
+        tabs.setViewPager(viewPager);
 
-      //  tabLayout = (TabLayout) rootView.findViewById(R.id.tabLayout);
-        //tabLayout.setupWithViewPager(viewPager);
-
-      //   tabs = (SmartTabLayout) rootView.findViewById(R.id.tabs);
-        // tabs.setViewPager(viewPager);
-
-         setupViewPager(viewPager);
-
-        return rootView;
     }
 
     private void setupViewPager(ViewPager viewPager) {
@@ -74,24 +63,28 @@ public class NewsFragmentBase extends android.support.v4.app.Fragment {
         bundle.putString("url_news", "http://api.mkdeveloper.ru/liga_net/get_all_news.php");
         newsFragment.setArguments(bundle);
         adapter.addFragment(newsFragment, "Все новости");
+        fragmentList.add(newsFragment);
 
         newsFragment = new NewsFragment();
         bundle = new Bundle();
         bundle.putString("url_news", "http://api.mkdeveloper.ru/liga_net/get_economics_news.php");
         newsFragment.setArguments(bundle);
         adapter.addFragment(newsFragment, "Экономика");
+        fragmentList.add(newsFragment);
 
         newsFragment = new NewsFragment();
         bundle = new Bundle();
         bundle.putString("url_news", "http://api.mkdeveloper.ru/liga_net/get_world_news.php");
         newsFragment.setArguments(bundle);
         adapter.addFragment(newsFragment, "Мир");
+        fragmentList.add(newsFragment);
 
         newsFragment = new NewsFragment();
         bundle = new Bundle();
         bundle.putString("url_news", "http://api.mkdeveloper.ru/liga_net/get_politic_news.php");
         newsFragment.setArguments(bundle);
         adapter.addFragment(newsFragment, "Политика");
+        fragmentList.add(newsFragment);
 
         viewPager.setAdapter(adapter);
 
@@ -128,7 +121,7 @@ public class NewsFragmentBase extends android.support.v4.app.Fragment {
         }
 
         @Override
-        public android.support.v4.app.Fragment getItem(int position) {
+        public Fragment getItem(int position) {
             return mFragmentList.get(position);
         }
 
@@ -137,7 +130,7 @@ public class NewsFragmentBase extends android.support.v4.app.Fragment {
             return mFragmentList.size();
         }
 
-        public void addFragment(android.support.v4.app.Fragment fragment, String title) {
+        public void addFragment(Fragment fragment, String title) {
             mFragmentList.add(fragment);
             mFragmentTitleList.add(title);
         }
@@ -148,7 +141,7 @@ public class NewsFragmentBase extends android.support.v4.app.Fragment {
             return mFragmentTitleList.get(position);
         }
 
-        public void clearAdapter(){
+        public void clearAdapter() {
 
             mFragmentList.clear();
             mFragmentTitleList.clear();

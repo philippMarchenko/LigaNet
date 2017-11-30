@@ -139,7 +139,6 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.MyViewHolder> 
     @Override
     public void onBindViewHolder(final MyViewHolder myViewHolder, final int position) {
 
-
             final News news = mListNewsShort.get(position);
 
             SimpleDateFormat simpleDateFormatDate = new SimpleDateFormat("dd.MM HH:mm");
@@ -148,9 +147,9 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.MyViewHolder> 
             String strTimeDate = simpleDateFormatDate.format(date);
 
             myViewHolder.time.setText(strTimeDate);
-         //myViewHolder.time.setText(news.getTime());
+           //myViewHolder.time.setText(news.getTime());
 
-         myViewHolder.title.setText(Html.fromHtml(news.getTitle()));
+            myViewHolder.title.setText(Html.fromHtml(news.getTitle()));
 
             Bitmap.Config conf = Bitmap.Config.ARGB_8888; // see other conf types
             Bitmap croppedBmp =  Bitmap.createBitmap(100, 100, conf); // this creates a MUTABLE bitmap;

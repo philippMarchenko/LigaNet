@@ -2,6 +2,7 @@ package com.devfill.liganet.network;
 
 
 import com.devfill.liganet.model.ListNews;
+import com.devfill.liganet.model.MoreNews;
 import com.devfill.liganet.model.NewsContent;
 import com.devfill.liganet.model.PhotoContent;
 import com.devfill.liganet.model.VideoContent;
@@ -29,6 +30,9 @@ public interface ServerAPI {
                            @Query(value = "start") String start,
                            @Query(value = "end") String end);
 
+
+    @GET
+    Call<MoreNews> getMoreNews(@Url String url);
 
 
     @GET("/liga_net/get_all_news.php")
