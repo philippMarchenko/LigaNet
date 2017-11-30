@@ -57,8 +57,6 @@ public class ArticleNewsActivity extends AppCompatActivity {
         mPager.setCurrentItem(positionArticle);
         mPager.setPageTransformer(true, new DepthPageTransformer());
         initPagerListener();
-
-
     }
 
     private void checkPhotoVideo(int position){
@@ -90,17 +88,7 @@ public class ArticleNewsActivity extends AppCompatActivity {
 
             if(isVideo){
 
-                    VideoFragment videoFragment = new VideoFragment(new VideoFragment.VideoFragmentListener() {
-                        @Override
-                        public void videoFragmentCreate() {
-                            Log.d(LOG_TAG, "videoFragmentCreate ");
-
-                            if(adapter.getItem(positionArticle) instanceof VideoFragment){
-                                VideoFragment videoFragment = (VideoFragment) adapter.getItem(positionArticle);
-                                videoFragment.playVideo();
-                            }
-                        }
-                    });
+                    VideoFragment videoFragment = new VideoFragment();
                     Bundle bundle = new Bundle();
                     bundle.putString("linkHref",myList.get(position));
                     videoFragment.setArguments(bundle);
@@ -142,13 +130,7 @@ public class ArticleNewsActivity extends AppCompatActivity {
             public void onPageSelected(int position) {
 
                 Log.d(LOG_TAG, "onPageSelected " + position);
-
-                if(adapter.getItem(position) instanceof VideoFragment){
-                    Log.d(LOG_TAG, "Next fragment is video ");
-
-                    VideoFragment videoFragment = (VideoFragment) adapter.getItem(position);
-                    videoFragment.playVideo();
-                }
+                Log.d(LOG_TAG, "adapter.getCount() " + adapter.getCount());
 
                 if(positionPage > position){//User Move to left
                     Log.d(LOG_TAG, "User Move to left ");
@@ -163,6 +145,7 @@ public class ArticleNewsActivity extends AppCompatActivity {
 
                 positionPage = position;
 */
+                Log.d(LOG_TAG, "adapter.getCount() " + adapter.getCount());
 
             }
 
