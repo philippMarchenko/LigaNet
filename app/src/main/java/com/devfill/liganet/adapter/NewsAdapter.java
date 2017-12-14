@@ -167,12 +167,12 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.MyViewHolder> 
 
         if(news.getIsVideo().equals("1")){
 
-                myViewHolder.image.setImageDrawable(mContext.getDrawable(R.drawable.video2));
+                myViewHolder.image.setImageDrawable(mContext.getResources().getDrawable(R.drawable.video2));
 
             }
         else if (news.getIs_photo().equals("1")) {
 
-                myViewHolder.image.setImageDrawable(mContext.getDrawable(R.drawable.foto));
+                myViewHolder.image.setImageDrawable(mContext.getResources().getDrawable(R.drawable.foto));
             }
             else{
 
@@ -203,7 +203,11 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.MyViewHolder> 
 
     @Override
     public int getItemCount() {
-        return mListNewsShort.size();
+        if(mListNewsShort != null){
+            return mListNewsShort.size();
+
+        }
+        return  0;
     }
 
 

@@ -1,5 +1,7 @@
-package com.devfill.liganet.ui.fragment_video;
+package com.devfill.liganet.ui.activity.holders;
 
+
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
@@ -7,25 +9,20 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Bundle;
-
+import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 import com.devfill.liganet.R;
-import com.devfill.liganet.model.PhotoContent;
 import com.devfill.liganet.model.VideoContent;
 import com.devfill.liganet.network.ServerAPI;
+import com.devfill.liganet.ui.fragment_video.VideoFragment;
 import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubePlayer;
-import com.google.android.youtube.player.YouTubePlayerFragment;
 import com.google.android.youtube.player.YouTubePlayerSupportFragment;
 import com.google.android.youtube.player.YouTubePlayerView;
 import com.squareup.picasso.Picasso;
@@ -45,24 +42,16 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+public class VideoViewHolder extends RecyclerView.ViewHolder{
 
-public class VideoFragment extends android.support.v4.app.Fragment{
+    private static final String LOG_TAG = "VideoViewHolder";
 
-
-    private static final String LOG_TAG = "VideoFragmentTag";
-
-    private static final int RECOVERY_REQUEST = 1;
-   // private YouTubePlayerSupportFragment youTubePlayerSupportFragment;
-
-    private TextView text_video,annotation_video;
+    private TextView text_video,annotation_video,date;
     private ProgressBar progressBar;
-    private YouTubePlayer.OnInitializedListener onInitializedListener;
     private YouTubePlayer mPlayer;
 
     private Retrofit retrofit;
     private ServerAPI serverAPI;
-
-    private String videoUrl,linkHref;
 
     private VideoContent videoContent;
     private Map<String, Drawable> drawableHashMap = new HashMap<String, Drawable>();
@@ -72,35 +61,26 @@ public class VideoFragment extends android.support.v4.app.Fragment{
     private Html.ImageGetter igLoader;
     private Target loadtarget = null;
 
-    VideoFragmentListener videoFragmentListener;
+    private YouTubePlayerView youTubeView;
 
-    private boolean mWasRestored;
+    String videoUrl;
 
+    Context context;
+    Activity activity;
 
-    public interface VideoFragmentListener{
+    public VideoViewHolder(View itemView, Context context, Activity activity) {
+        super(itemView);
 
-        void videoFragmentCreate();
-
-    }
-
-    public VideoFragment(VideoFragmentListener videoFragmentListener){
-
-    this.videoFragmentListener = videoFragmentListener;
-}
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_video, container, false);
-
-
-       // youTubePlayerSupportFragment = (YouTubePlayerSupportFragment) getChildFragmentManager().findFragmentById(R.id.youtubesupportfragment);
-        text_video = (TextView) rootView.findViewById(R.id.text_video);
-        annotation_video = (TextView) rootView.findViewById(R.id.annotation_video);
-        progressBar = (ProgressBar) rootView.findViewById(R.id.progressVideo);
-
-        Typeface typefaceR = Typeface.createFromAsset(getContext().getAssets(),
+        this.activity = activity;
+        this.context = context;
+        youTubeView = (YouTubePlayerView) itemView.findViewById(R.id.youtube_view);
+        text_video = (TextView) itemView.findViewById(R.id.text_video);
+        annotation_video = (TextView) itemView.findViewById(R.id.annotation_video);
+        progressBar = (ProgressBar) itemView.findViewById(R.id.progressVideo);
+        date = (TextView) itemView.findViewById(R.id.dateAtricle);
+        Typeface typefaceR = Typeface.createFromAsset(context.getAssets(),
                 "fonts/UbuntuMono-R.ttf");
-        Typeface typefaceB = Typeface.createFromAsset(getContext().getAssets(),
+        Typeface typefaceB = Typeface.createFromAsset(context.getAssets(),
                 "fonts/UbuntuMono-B.ttf");
 
         annotation_video.setTypeface(typefaceB);
@@ -109,20 +89,12 @@ public class VideoFragment extends android.support.v4.app.Fragment{
         text_video.setVisibility(View.INVISIBLE);
         annotation_video.setVisibility(View.INVISIBLE);
         progressBar.setVisibility(View.VISIBLE);
-      //  youTubePlayerSupportFragment.getView().setVisibility(View.INVISIBLE);
-
-        linkHref = getArguments().getString("linkHref");
-        Log.i(LOG_TAG, " onCreateView linkHref " + linkHref);
+        youTubeView.setVisibility(View.INVISIBLE);
+        date.setVisibility(View.INVISIBLE);
 
         initRetrofit();
         initLoaderImage();
         initTargetPicasso();
-
-
-
-
-
-        return rootView;
     }
 
     private void initLoaderImage(){
@@ -147,28 +119,25 @@ public class VideoFragment extends android.support.v4.app.Fragment{
         };
     }
 
-    public void initYouTube(){
+    public void initYouTube(final String linkHref){
         Log.i(LOG_TAG, "initYouTube ");
-/*
-        if(youTubePlayerSupportFragment != null){
-            youTubePlayerSupportFragment.initialize("AIzaSyAW4zFM9keH8D0uDd3YGbysra3Ci8Sn-tM",new YouTubePlayer.OnInitializedListener(){
+
+        if(youTubeView != null){
+            youTubeView.initialize("AIzaSyAW4zFM9keH8D0uDd3YGbysra3Ci8Sn-tM",new YouTubePlayer.OnInitializedListener(){
 
                 @Override
                 public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer player, boolean wasRestored) {
                     Log.i(LOG_TAG, "onInitializationSuccess");
 
-                    mWasRestored = wasRestored;
+                  //  mWasRestored = wasRestored;
                     mPlayer = player;
-
-                   // mPlayer.setFullscreenControlFlags(FULLSCREEN_FLAG_CUSTOM_LAYOUT);
-                  //  mPlayer.setOnFullscreenListener(this);
                     mPlayer.setFullscreen(false);
                     mPlayer.setShowFullscreenButton(true);
 
 
 
                     getVideoContent(linkHref);
-                  //  }
+
                 }
 
 
@@ -179,21 +148,21 @@ public class VideoFragment extends android.support.v4.app.Fragment{
 
                     if(error == YouTubeInitializationResult.SERVICE_MISSING){
 
-                        Toast.makeText(getActivity(), " Вам нужно установить приложение YouTube", Toast.LENGTH_LONG).show();
+                        Toast.makeText(activity, " Вам нужно установить приложение YouTube", Toast.LENGTH_LONG).show();
                     }
                     else{
 
-                        Toast.makeText(getActivity(), errorMessage, Toast.LENGTH_LONG).show();
+                        Toast.makeText(activity, errorMessage, Toast.LENGTH_LONG).show();
                     }
                 }
             });
 
         }
         else{
-          //  Toast.makeText(getActivity(), "NULL", Toast.LENGTH_LONG).show();
+            //  Toast.makeText(getActivity(), "NULL", Toast.LENGTH_LONG).show();
             Log.i(LOG_TAG, "NULL");
 
-        }*/
+        }
     }
 
     private String getNetworkType(Context context) {
@@ -222,17 +191,14 @@ public class VideoFragment extends android.support.v4.app.Fragment{
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-
-
         serverAPI = retrofit.create(ServerAPI.class);
     }
 
     private void getVideoContent (String linkHref){
 
-
-        String netType = getNetworkType(getContext());
+        String netType = getNetworkType(context);
         if(netType == null){
-            Toast.makeText(getContext(), "Подключение к сети отсутствует!", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "Подключение к сети отсутствует!", Toast.LENGTH_LONG).show();
         }
         else {
             try {
@@ -249,48 +215,38 @@ public class VideoFragment extends android.support.v4.app.Fragment{
 
                             annotation_video.setText(Html.fromHtml(videoContent.getData().getAnnotation()));
                             videoUrl = videoContent.getData().getVideo_url();
-
                             imageUrls = videoContent.getUrls();
+                            date.setText(videoContent.getData().getDate());
 
                             if (videoContent.getUrls().size() > 0) {
 
                                 Log.i(LOG_TAG, "videoContent size " + videoContent.getUrls().size());
-
                                 loadNextImage();
                             }
                             else{
                                 text_video.setVisibility(View.VISIBLE);
                                 annotation_video.setVisibility(View.VISIBLE);
                                 progressBar.setVisibility(View.INVISIBLE);
-                             //   youTubePlayerSupportFragment.getView().setVisibility(View.VISIBLE);
+                                youTubeView.setVisibility(View.VISIBLE);
+                                date.setVisibility(View.VISIBLE);
 
                                 text_video.setText(Html.fromHtml(videoContent.getData().getText()));
                             }
 
-                            videoFragmentListener.videoFragmentCreate();
-
+                            mPlayer.cueVideo(videoUrl);
                         }
                         catch(Exception e){
-
-                            Toast.makeText(getContext(), "Не удалось распознать видео статью!" + e.getMessage(), Toast.LENGTH_LONG).show();
-
+                            Toast.makeText(activity, "Не удалось распознать видео статью!" + e.getMessage(), Toast.LENGTH_LONG).show();
                         }
-
                         Log.i(LOG_TAG, "onResponse getVideoContent ");
-
                     }
-
                     @Override
                     public void onFailure(Call<VideoContent> call, Throwable t) {
-
-
-                        Toast.makeText(getContext(), "Ошибка запроса к серверу!" + t.getMessage(), Toast.LENGTH_LONG).show();
-
+                        Toast.makeText(context, "Ошибка запроса к серверу!" + t.getMessage(), Toast.LENGTH_LONG).show();
                         Log.i(LOG_TAG, "onFailure. Ошибка REST запроса getNewsContent " + t.toString());
                     }
                 });
             } catch (Exception e) {
-
                 Log.i(LOG_TAG, "Ошибка REST запроса к серверу  getNewsContent " + e.getMessage());
             }
         }
@@ -304,17 +260,17 @@ public class VideoFragment extends android.support.v4.app.Fragment{
         }
         else{
             try {
-                Picasso.with(getContext()).load(imageUrls.get(count_bitmap)).into(loadtarget);
+                Picasso.with(context).load(imageUrls.get(count_bitmap)).into(loadtarget);
             }
             catch (Exception e){
                 Log.d(LOG_TAG, "Error load image " + e.getMessage());
                 count_bitmap++;
-                Picasso.with(getContext()).load(imageUrls.get(count_bitmap)).into(loadtarget);            }
+                Picasso.with(context).load(imageUrls.get(count_bitmap)).into(loadtarget);
+            }
         }
-
     }
 
-    void initTargetPicasso(){
+    private void initTargetPicasso(){
 
         loadtarget = new Target() {
 
@@ -326,7 +282,7 @@ public class VideoFragment extends android.support.v4.app.Fragment{
                 try{
                     if (imageUrls.size() > 0) {
 
-                        Drawable drawable = new BitmapDrawable(getResources(),Bitmap.createBitmap(bitmap, 0, 0,bitmap.getWidth(), bitmap.getHeight()-18)); //обрежем сколько нужно нам пикселей) //создали драврэбл из битмап
+                        Drawable drawable = new BitmapDrawable(context.getResources(),Bitmap.createBitmap(bitmap, 0, 0,bitmap.getWidth(), bitmap.getHeight()-18)); //обрежем сколько нужно нам пикселей) //создали драврэбл из битмап
                         drawable.setBounds(0, 0, drawable.getIntrinsicWidth(),
                                 drawable.getIntrinsicHeight());
                         drawableHashMap.put(imageUrls.get(count_bitmap),drawable);  //ложим картинку с ключем адресом в хэшмап
@@ -337,53 +293,30 @@ public class VideoFragment extends android.support.v4.app.Fragment{
                         text_video.setVisibility(View.VISIBLE);
                         annotation_video.setVisibility(View.VISIBLE);
                         progressBar.setVisibility(View.INVISIBLE);
-                     //   youTubePlayerSupportFragment.getView().setVisibility(View.VISIBLE);
+                        youTubeView.setVisibility(View.VISIBLE);
+                        date.setVisibility(View.VISIBLE);
 
                         text_video.setText(Html.fromHtml(videoContent.getData().getText(), igLoader, null));
-
                     }
                 }
                 catch(Exception e){
-
                 }
-
-
-
             }
 
             @Override
             public void onBitmapFailed(Drawable errorDrawable) {
-
                 count_bitmap++;
-
             }
 
             @Override
             public void onPrepareLoad(Drawable placeHolderDrawable) {
-
             }
-
         };
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        initYouTube();
-        Log.d(LOG_TAG, "onResume ");
+    public void pauseVideo(){
+
+        mPlayer.pause();
 
     }
-
-    public void playVideo(){
-
-        if (!mWasRestored) {
-            // load your video
-            mPlayer.cueVideo(videoUrl);
-        }
-        else
-        {
-            mPlayer.play();
-        }
-    }
-
 }

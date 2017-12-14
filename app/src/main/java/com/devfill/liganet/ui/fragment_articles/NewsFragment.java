@@ -280,7 +280,10 @@ public class NewsFragment extends android.support.v4.app.Fragment implements Swi
     public void onRefresh() {
 
         swipeRefreshLayout.setRefreshing(true);
-        newsList.clear();
+
+          if(newsList != null){
+              newsList.clear();
+          }
 
         start = 0;
         end = 21;
@@ -291,28 +294,27 @@ public class NewsFragment extends android.support.v4.app.Fragment implements Swi
 
     private void loadNextImage(){
 
-        if(count_bitmap == newsList.size()) {
-            count_bitmap = 0;
-        }
-        else{
+            if(newsList != null) {
+                if (count_bitmap == newsList.size()) {
+                    count_bitmap = 0;
+                } else {
 
-            try {
-                picasso.load(newsList.get(count_bitmap).getImgUrl()).
-                        tag("load").
-                        resize(width, height).
-                        into(loadtarget);
+                    try {
+                        picasso.load(newsList.get(count_bitmap).getImgUrl()).
+                                tag("load").
+                                resize(width, height).
+                                into(loadtarget);
+                    } catch (Exception e) {
+                        Log.d(LOG_TAG, "Error load image " + e.getMessage());
+                        count_bitmap++;
+
+                      /*  picasso.load(newsList.get(count_bitmap).getImgUrl()).
+                                tag("load").
+                                resize(width, height).
+                                into(loadtarget);*/
+                    }
+                }
             }
-            catch (Exception e){
-                Log.d(LOG_TAG, "Error load image " + e.getMessage());
-                count_bitmap++;
-
-                picasso.load(newsList.get(count_bitmap).getImgUrl()).
-                        tag("load").
-                        resize(width, height).
-                        into(loadtarget);
-            }
-        }
-
     }
 
     void initTargetPicasso(){

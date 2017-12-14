@@ -7,6 +7,7 @@ import com.devfill.liganet.model.NewsContent;
 import com.devfill.liganet.model.PhotoContent;
 import com.devfill.liganet.model.VideoContent;
 
+import io.reactivex.Observable;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
@@ -18,6 +19,9 @@ public interface ServerAPI {
 
     @GET("/liga_net/get_news_content.php")
     Call<NewsContent> getNewsContent(@Query(value = "link_href") String link_href);
+
+    @GET("/liga_net/get_news_content.php")
+    Observable<NewsContent> getNewsContentRx(@Query(value = "link_href") String link_href);
 
     @GET("/liga_net/get_photo_content.php")
     Call<PhotoContent> getPhotoContent(@Query(value = "link_href") String link_href);

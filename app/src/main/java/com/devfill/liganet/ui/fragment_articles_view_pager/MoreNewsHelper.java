@@ -97,7 +97,7 @@ public class MoreNewsHelper {
                     @Override
                     public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
 
-                        // Log.d(LOG_TAG, "onBitmapLoaded  ");
+                         Log.d(LOG_TAG, "onBitmapLoaded  ");
 
                         if (articleList.size() > 0) {
                             articleList.get(count_bitmap).setBitmap(bitmap);

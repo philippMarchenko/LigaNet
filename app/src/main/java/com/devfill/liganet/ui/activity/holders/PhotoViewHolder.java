@@ -1,24 +1,23 @@
-package com.devfill.liganet.ui.fragment_photo;
+package com.devfill.liganet.ui.activity.holders;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Bundle;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.util.Log;
-import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
 
 import com.devfill.liganet.R;
 import com.devfill.liganet.adapter.ImageSliderAdapter;
@@ -40,8 +39,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 
-public class PhotoFragment extends android.support.v4.app.Fragment {
-
+public class PhotoViewHolder extends RecyclerView.ViewHolder{
 
     private static final String LOG_TAG = "PhotoFragmentTag";
 
@@ -57,28 +55,33 @@ public class PhotoFragment extends android.support.v4.app.Fragment {
     private List<String> imgUrls;
     private List<Bitmap> bitmapList = new ArrayList<>();
     private ProgressBar progressBar;
-    private FragmentTransaction ft;
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_photo, container, false);
 
-        title_photo_news  = (TextView) rootView.findViewById(R.id.title_photo_news);
-        text_article_photo  = (TextView) rootView.findViewById(R.id.text_article_photo);
-        progressBar = (ProgressBar) rootView.findViewById(R.id.progressPhoto);
+    Context context;
+    Activity activity;
 
-        Typeface typefaceR = Typeface.createFromAsset(getContext().getAssets(),
+    public PhotoViewHolder(View itemView,Context context, Activity activity) {
+        super(itemView);
+
+        this.activity = activity;
+        this.context = context;
+
+        title_photo_news  = (TextView) itemView.findViewById(R.id.title_photo_news);
+        text_article_photo  = (TextView) itemView.findViewById(R.id.text_article_photo);
+        progressBar = (ProgressBar) itemView.findViewById(R.id.progressPhoto);
+
+        Typeface typefaceR = Typeface.createFromAsset(context.getAssets(),
                 "fonts/UbuntuMono-R.ttf");
-        Typeface typefaceB = Typeface.createFromAsset(getContext().getAssets(),
+        Typeface typefaceB = Typeface.createFromAsset(context.getAssets(),
                 "fonts/UbuntuMono-B.ttf");
         title_photo_news.setTypeface(typefaceB);
         text_article_photo.setTypeface(typefaceR);
 
-        imageSliderAdapter = new ImageSliderAdapter(getContext(),bitmapList);
-        mPager = (ViewPager) rootView.findViewById(R.id.pagerArticles);
+        imageSliderAdapter = new ImageSliderAdapter(context,bitmapList);
+        mPager = (ViewPager) itemView.findViewById(R.id.pagerArticles);
         mPager.setAdapter(imageSliderAdapter);
 
-        TabLayout tabLayout = (TabLayout) rootView.findViewById(R.id.tab_layout_photo_slider);
+        TabLayout tabLayout = (TabLayout) itemView.findViewById(R.id.tab_layout_photo_slider);
         tabLayout.setupWithViewPager(mPager, true);
 
         title_photo_news.setVisibility(View.INVISIBLE);
@@ -90,11 +93,16 @@ public class PhotoFragment extends android.support.v4.app.Fragment {
 
         initTargetPicasso();
 
-        String linkHref = getArguments().getString("linkHref");
+        mPager.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
 
-        getPhotoContent(linkHref);
+                ViewParent parent = v.getParent();
+                parent.requestDisallowInterceptTouchEvent(true);
 
-        return rootView;
+                return false;
+            }
+        });
     }
 
     private String getNetworkType(Context context) {
@@ -128,11 +136,11 @@ public class PhotoFragment extends android.support.v4.app.Fragment {
         serverAPI = retrofit.create(ServerAPI.class);
     }
 
-    private void getPhotoContent (String linkHref){
+    public void getPhotoContent (String linkHref){
 
-        String netType = getNetworkType(getContext());
+        String netType = getNetworkType(context);
         if(netType == null){
-            Toast.makeText(getContext(), "Подключение к сети отсутствует!", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "Подключение к сети отсутствует!", Toast.LENGTH_LONG).show();
         }
         else {
             try {
@@ -165,7 +173,7 @@ public class PhotoFragment extends android.support.v4.app.Fragment {
                         }
                         catch(Exception e){
 
-                            Toast.makeText(getContext(), "Не удалось распознать фото!" + e.getMessage(), Toast.LENGTH_LONG).show();
+                            Toast.makeText(context, "Не удалось распознать фото!" + e.getMessage(), Toast.LENGTH_LONG).show();
 
                         }
 
@@ -179,7 +187,7 @@ public class PhotoFragment extends android.support.v4.app.Fragment {
                     public void onFailure(Call<PhotoContent> call, Throwable t) {
 
 
-                        Toast.makeText(getContext(), "Ошибка запроса к серверу!" + t.getMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, "Ошибка запроса к серверу!" + t.getMessage(), Toast.LENGTH_LONG).show();
 
                         Log.i(LOG_TAG, "onFailure. Ошибка REST запроса getNewsContent " + t.toString());
                     }
@@ -229,16 +237,15 @@ public class PhotoFragment extends android.support.v4.app.Fragment {
         } else {
 
             try {
-                Picasso.with(getContext()).load(imgUrls.get(count_bitmap)).into(loadtarget);
+                Picasso.with(context).load(imgUrls.get(count_bitmap)).into(loadtarget);
             } catch (Exception e) {
                 Log.d(LOG_TAG, "Error load image " + e.getMessage());
 
                 count_bitmap++;
-                Picasso.with(getContext()).load(imgUrls.get(count_bitmap)).into(loadtarget);
+                Picasso.with(context).load(imgUrls.get(count_bitmap)).into(loadtarget);
 
             }
 
         }
     }
-
 }

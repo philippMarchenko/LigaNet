@@ -7,8 +7,8 @@ apply plugin: 'com.android.application'
             applicationId "com.devfill.liganet"
             minSdkVersion 17
             targetSdkVersion 25
-            versionCode 11
-            versionName "2.1"
+            versionCode 12
+            versionName "2.2"
             testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         }
         buildTypes {
@@ -52,6 +52,8 @@ apply plugin: 'com.android.application'
 
         compile 'com.ogaclejapan.smarttablayout:library:1.6.1@aar'
 
+
+        compile 'com.github.lsjwzh.RecyclerViewPager:lib:v1.1.2@aar'
 
         // rxjava
         compile 'io.reactivex.rxjava2:rxjava:2.0.2'

@@ -6,18 +6,26 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewParent;
 
 import com.devfill.liganet.R;
+import com.devfill.liganet.adapter.NewsSliderAdapter;
 import com.devfill.liganet.ui.fragment_articles_view_pager.ArticlesFragmentViewPager;
 import com.devfill.liganet.ui.fragment_photo.PhotoFragment;
 import com.devfill.liganet.ui.fragment_video.VideoFragment;
 import com.eftimoff.viewpagertransformers.DepthPageTransformer;
+import com.google.android.youtube.player.YouTubeBaseActivity;
+import com.lsjwzh.widget.recyclerviewpager.RecyclerViewPager;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ArticleNewsActivity extends AppCompatActivity {
+public class ArticleNewsActivity extends YouTubeBaseActivity {
 
 
     private static final String LOG_TAG = "ArticleNewsActivityTag";
@@ -38,7 +46,22 @@ public class ArticleNewsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_article_news_pager);
 
-        mPager = (ViewPager) findViewById(R.id.pagerArticles);
+        myList = (ArrayList<String>) getIntent().getSerializableExtra("newsList");  //принимаем список ссылок
+        positionArticle = getIntent().getIntExtra("position",0);                    //принимаем позицию сттьи по которой кликнули
+
+        final RecyclerViewPager mRecyclerView = (RecyclerViewPager) findViewById(R.id.list);
+
+        LinearLayoutManager layout = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
+        mRecyclerView.setLayoutManager(layout);
+
+        NewsSliderAdapter newsSliderAdapter = new NewsSliderAdapter(myList,getBaseContext(),this);
+        mRecyclerView.setAdapter(newsSliderAdapter);
+        mRecyclerView.scrollToPosition(positionArticle);
+
+
+
+
+       /* mPager = (ViewPager) findViewById(R.id.pagerArticles);
 
         myList = (ArrayList<String>) getIntent().getSerializableExtra("newsList");
         positionArticle = getIntent().getIntExtra("position",0);
@@ -56,7 +79,7 @@ public class ArticleNewsActivity extends AppCompatActivity {
         mPager.setAdapter(adapter);
         mPager.setCurrentItem(positionArticle);
         mPager.setPageTransformer(true, new DepthPageTransformer());
-        initPagerListener();
+        initPagerListener();*/
     }
 
     private void checkPhotoVideo(int position){
@@ -88,7 +111,12 @@ public class ArticleNewsActivity extends AppCompatActivity {
 
             if(isVideo){
 
-                    VideoFragment videoFragment = new VideoFragment();
+                    VideoFragment videoFragment = new VideoFragment(new VideoFragment.VideoFragmentListener() {
+                        @Override
+                        public void videoFragmentCreate() {
+
+                        }
+                    });
                     Bundle bundle = new Bundle();
                     bundle.putString("linkHref",myList.get(position));
                     videoFragment.setArguments(bundle);
@@ -130,23 +158,13 @@ public class ArticleNewsActivity extends AppCompatActivity {
             public void onPageSelected(int position) {
 
                 Log.d(LOG_TAG, "onPageSelected " + position);
-                Log.d(LOG_TAG, "adapter.getCount() " + adapter.getCount());
 
-                if(positionPage > position){//User Move to left
-                    Log.d(LOG_TAG, "User Move to left ");
-                  //  addFragmentBack(positionArticle - 2);
-                  //  adapter.notifyDataSetChanged();
+                if(adapter.getItem(position) instanceof VideoFragment){
+
+                    VideoFragment videoFragment = (VideoFragment) adapter.getItem(position);
+                    videoFragment.playVideo();
+
                 }
-               /* else if (positionPage < position){ //User Move to right
-                    Log.d(LOG_TAG, "User Move to right");
-                    addFragment(position);
-                    adapter.notifyDataSetChanged();
-                }
-
-                positionPage = position;
-*/
-                Log.d(LOG_TAG, "adapter.getCount() " + adapter.getCount());
-
             }
 
             @Override

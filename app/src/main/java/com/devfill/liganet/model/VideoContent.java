@@ -23,7 +23,20 @@ public class VideoContent {
 
         String annotation;
         String text;
+        String date;
         String video_url;
+
+        public String getDate() {
+            return date;
+        }
+
+        public void setDate(String date) {
+            this.date = date;
+        }
+
+        public void setVideo_url(String video_url) {
+            this.video_url = video_url;
+        }
 
         public String getVideo_url() {
             return video_url;
